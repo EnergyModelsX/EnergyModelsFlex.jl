@@ -15,6 +15,8 @@ struct BatteryStorage{T<:Resource} <: EMB.Storage
     stor_cap::TimeProfile
     opex_var::TimeProfile
     opex_fixed::TimeProfile
+    charge_eff::Real
+    discharge_eff::Real
     stor_res::T
     input::Dict{<:Resource, <:Real}
     output::Dict{<:Resource, <:Real}
@@ -27,6 +29,8 @@ function BatteryStorage(
     stor_cap::TimeProfile,
     opex_var::TimeProfile,
     opex_fixed::TimeProfile,
+    charge_eff::Real,
+    discharge_eff::Real,
     stor_res::T,
     input::Dict{<:Resource, <:Real},
     output::Dict{<:Resource, <:Real},
@@ -38,6 +42,8 @@ function BatteryStorage(
         stor_cap,
         opex_var,
         opex_fixed,
+        charge_eff,
+        discharge_eff,
         stor_res,
         input,
         output,

@@ -42,7 +42,7 @@ function EMB.constraints_level_aux(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫
 
     # Constraint for the change in the level in a given operational period
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_level_Δ_op][n, t] == m[:flow_in][n, t, p_stor] - m[:flow_out][n, t, p_stor] # TODO - legg inn virkningsgrad
+        m[:stor_level_Δ_op][n, t] == n.charge_eff * m[:flow_in][n, t, p_stor] - (1/n.discharge_eff) * m[:flow_out][n, t, p_stor] # TODO - legg inn virkningsgrad
     )
 end
 

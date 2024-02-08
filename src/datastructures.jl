@@ -18,6 +18,8 @@ struct BatteryStorage{T<:Resource} <: EMB.Storage
     charge_eff::Real
     discharge_eff::Real
     stor_res::T
+    reserve_res_up::Vector{<:Resource}
+    reserve_res_down::Vector{<:Resource}
     input::Dict{<:Resource, <:Real}
     output::Dict{<:Resource, <:Real}
     data::Vector{<:Data}
@@ -32,6 +34,8 @@ function BatteryStorage(
     charge_eff::Real,
     discharge_eff::Real,
     stor_res::T,
+    reserve_res_up::Vector{<:Resource},
+    reserve_res_down::Vector{<:Resource},
     input::Dict{<:Resource, <:Real},
     output::Dict{<:Resource, <:Real},
 ) where {T<:Resource}
@@ -45,6 +49,8 @@ function BatteryStorage(
         charge_eff,
         discharge_eff,
         stor_res,
+        reserve_res_up,
+        reserve_res_down,
         input,
         output,
         Data[],

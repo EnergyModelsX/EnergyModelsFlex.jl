@@ -28,11 +28,11 @@ function constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯:
     )
 
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst][n, t] == n.discharge_cap[t] # + reserve_up[n, t]
+        m[:stor_rate_inst][n, t] + m[:stor_res_up][n, t] == n.discharge_cap[t]
     )
 
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst_charge][n, t] == n.charge_cap[t] # + reserve_down[n, t]
+        m[:stor_rate_inst_charge][n, t] + m[:stor_res_down][n, t] == n.charge_cap[t]
     )
 end
 
@@ -42,7 +42,7 @@ function EMB.constraints_level_aux(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫
 
     # Constraint for the change in the level in a given operational period
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_level_Δ_op][n, t] == n.charge_eff * m[:flow_in][n, t, p_stor] - (1/n.discharge_eff) * m[:flow_out][n, t, p_stor] # TODO - legg inn virkningsgrad
+        m[:stor_level_Δ_op][n, t] == n.charge_eff * m[:flow_in][n, t, p_stor] - (1/n.discharge_eff) * m[:flow_out][n, t, p_stor]
     )
 end
 
@@ -84,5 +84,15 @@ function EMB.constraints_flow_out(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
     # Constraint for storage rate use
     @constraint(m, [t ∈ 𝒯],
         m[:stor_rate_receive][n, t] == m[:flow_out][n, t, p_stor]
+    )
+
+    # Constraint for storage reserve up delivery
+    @constraint(m, [t ∈ 𝒯],
+        m[:stor_res_up][n, t] == sum(m[:flow_out][n, t, p] for p in n.reserve_res_up)
+    )
+
+    # Constraint for storage reserve down delivery
+    @constraint(m, [t ∈ 𝒯],
+        m[:stor_res_down][n, t] == sum(m[:flow_out][n, t, p] for p in n.reserve_res_down)
     )
 end

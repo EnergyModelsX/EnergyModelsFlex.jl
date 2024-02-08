@@ -23,6 +23,9 @@ function EMB.variables_capacity(m, 𝒩, 𝒯, modeltype::EnergyModel)
     @variable(m, stor_cap_inst[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_inst[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_inst_charge[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
+
+    @variable(m, stor_res_up[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
+    @variable(m, stor_res_down[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
 end
 
 function EMB.create_node(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)

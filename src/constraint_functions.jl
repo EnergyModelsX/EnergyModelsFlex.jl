@@ -11,11 +11,11 @@ function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
     )
 
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_use][n, t] <= m[:stor_rate_inst][n, t]
+        m[:stor_rate_ch][n, t] <= m[:stor_rate_inst_ch][n, t]
     )
 
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_dch][n, t] <= m[:stor_rate_inst_charge][n, t]
+        m[:stor_rate_dch][n, t] <= m[:stor_rate_inst_dch][n, t]
     )
 
     constraints_capacity_installed(m, n, 𝒯, modeltype)
@@ -27,12 +27,14 @@ function constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯:
         m[:stor_cap_inst][n, t] == cap.level[t]
     )
 
+    # Limits the actual discharge capacity to the technical max limit minus the reserve up capability
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst][n, t] + m[:stor_res_up][n, t] == n.discharge_cap[t]
+        m[:stor_rate_inst_dch][n, t] + m[:stor_res_up][n, t] == n.discharge_cap[t]
     )
 
+    # Limits the actual charge capacity to the technical max limit minus the reserve down capability
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst_charge][n, t] + m[:stor_res_down][n, t] == n.charge_cap[t]
+        m[:stor_rate_inst_ch][n, t] + m[:stor_res_down][n, t] == n.charge_cap[t]
     )
 end
 
@@ -72,6 +74,23 @@ function EMB.constraints_level_sp(
     end
 end
 
+function constraints_flow_in(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+    # Declaration of the required subsets
+    p_stor = storage_resource(n)
+    𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])
+
+    # Constraint for additional required input
+    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ᵃᵈᵈ],
+        m[:flow_in][n, t, p] == m[:flow_in][n, t, p_stor] * inputs(n, p)
+    )
+
+    # Constraint for storage rate use
+    @constraint(m, [t ∈ 𝒯],
+        m[:stor_rate_ch][n, t] == m[:flow_in][n, t, p_stor]
+    )
+
+end
+
 function EMB.constraints_flow_out(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
     p_stor = storage_resource(n)
     𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])
@@ -83,7 +102,7 @@ function EMB.constraints_flow_out(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
 
     # Constraint for storage rate use
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_receive][n, t] == m[:flow_out][n, t, p_stor]
+        m[:stor_rate_dch][n, t] == m[:flow_out][n, t, p_stor]
     )
 
     # Constraint for storage reserve up delivery

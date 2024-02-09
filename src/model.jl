@@ -1,26 +1,8 @@
-"""
-This file can be used for writing the constraints of new technology nodes or transmission
-modes.
-If you are only using the standard `types`, then this file can remain empty or be removed.
-"""
 
-function EMB.variables_capacity(m, 𝒩, 𝒯, modeltype::EnergyModel)
-
-    𝒩ⁿᵒᵗ = EMB.nodes_not_sub(𝒩, Union{Storage, Availability})
-    𝒩ˢᵗᵒʳ = filter(EMB.is_storage, 𝒩)
-
-    @variable(m, cap_use[𝒩ⁿᵒᵗ, 𝒯] >= 0)
-    @variable(m, cap_inst[𝒩ⁿᵒᵗ, 𝒯] >= 0)
-
-    @variable(m, stor_level[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
-    @variable(m, stor_level_Δ_op[𝒩ˢᵗᵒʳ, 𝒯])
-    if 𝒯 isa TwoLevel{S,T,U} where {S,T,U<:RepresentativePeriods}
-        𝒯ʳᵖ = repr_periods(𝒯)
-        @variable(m, stor_level_Δ_rp[𝒩ˢᵗᵒʳ, 𝒯ʳᵖ])
-    end
+function EMB.variables_node(m, 𝒩ˢᵗᵒʳ::Vector{<:BatteryStorage}, 𝒯, modeltype::EnergyModel)
     @variable(m, stor_rate_ch[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_dch[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
-    @variable(m, stor_cap_inst[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
+
     @variable(m, stor_rate_inst_dch[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_inst_ch[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
 

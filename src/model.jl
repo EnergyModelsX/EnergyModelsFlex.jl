@@ -19,7 +19,7 @@ function EMB.variables_capacity(m, 𝒩, 𝒯, modeltype::EnergyModel)
         @variable(m, stor_level_Δ_rp[𝒩ˢᵗᵒʳ, 𝒯ʳᵖ])
     end
     @variable(m, stor_rate_use[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
-    @variable(m, stor_rate_receive[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
+    @variable(m, stor_rate_dch[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_cap_inst[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_inst[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
     @variable(m, stor_rate_inst_charge[𝒩ˢᵗᵒʳ, 𝒯] >= 0)

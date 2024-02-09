@@ -15,7 +15,7 @@ function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
     )
 
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_receive][n, t] <= m[:stor_rate_inst_charge][n, t]
+        m[:stor_rate_dch][n, t] <= m[:stor_rate_inst_charge][n, t]
     )
 
     constraints_capacity_installed(m, n, 𝒯, modeltype)

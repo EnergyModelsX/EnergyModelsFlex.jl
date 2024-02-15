@@ -29,12 +29,20 @@ function constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯:
 
     # Limits the actual discharge capacity to the technical max limit minus the reserve up capability
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst_dch][n, t] + m[:stor_res_up][n, t] == n.discharge_cap[t]
+        m[:stor_rate_inst_dch][n, t] == n.discharge_cap[t]
     )
 
     # Limits the actual charge capacity to the technical max limit minus the reserve down capability
     @constraint(m, [t ∈ 𝒯],
-        m[:stor_rate_inst_ch][n, t] + m[:stor_res_down][n, t] == n.charge_cap[t]
+        m[:stor_rate_inst_ch][n, t] == n.charge_cap[t]
+    )
+
+    @constraint(m, [t ∈ 𝒯],
+        m[:stor_rate_dch][n, t] - m[:stor_rate_ch][n, t] - m[:stor_rate_inst_dch][n, t] + m[:stor_res_up][n, t] <= 0
+    )
+
+    @constraint(m, [t ∈ 𝒯],
+        - m[:stor_rate_dch][n, t] + m[:stor_rate_ch][n, t] -m[:stor_rate_inst_ch][n, t] + m[:stor_res_down][n, t] <= 0
     )
 end
 

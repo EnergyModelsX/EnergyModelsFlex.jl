@@ -46,6 +46,20 @@ function constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯:
     )
 end
 
+function constraints_equal_reserve(m, n, 𝒯::TimeStructure, modeltype::EnergyModel)
+end
+
+function constraints_equal_reserve(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+    for (t_prev, t) ∈ withprev(𝒯)
+        if !isnothing(t_prev)
+            @constraints(m, begin
+                m[:stor_res_up][n, t] - m[:stor_res_up][n, t_prev] == 0
+                m[:stor_res_down][n, t] - m[:stor_res_down][n, t_prev] == 0
+            end)
+        end
+    end
+end
+
 function EMB.constraints_level_aux(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)
     # Declaration of the required subsets
     p_stor = storage_resource(n)

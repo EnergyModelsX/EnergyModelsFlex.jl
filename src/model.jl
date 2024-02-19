@@ -24,6 +24,7 @@ function EMB.create_node(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫, modeltyp
 
     # Call of the function for limiting the capacity to the maximum installed capacity
     constraints_capacity(m, n, 𝒯, modeltype)
+    constraints_equal_reserve(m, n, 𝒯, modeltype)
 
     # Call of the functions for both fixed and variable OPEX constraints introduction
     constraints_opex_fixed(m, n, 𝒯ᴵⁿᵛ, modeltype)

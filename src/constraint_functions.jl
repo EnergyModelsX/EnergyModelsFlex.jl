@@ -18,9 +18,10 @@ function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
         m[:stor_rate_dch][n, t] <= m[:stor_rate_inst_dch][n, t]
     )
 
-    constraints_capacity_installed(m, n, 𝒯, modeltype)
+    EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
-function constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+function EMB.constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
 
     cap = RyeMicrogrid.capacity(n)
     @constraint(m, [t ∈ 𝒯],
@@ -96,7 +97,7 @@ function EMB.constraints_level_sp(
     end
 end
 
-function constraints_flow_in(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function EMB.constraints_flow_in(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
     # Declaration of the required subsets
     p_stor = storage_resource(n)
     𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])

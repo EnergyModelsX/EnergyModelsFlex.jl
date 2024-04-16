@@ -1,13 +1,13 @@
 using EnergyModelsSDDP
 
 
-function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::Union{SDDPOpModel, SDDPInvModel})
+function EMB.constraints_capacity(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::Union{SDDPOpModel, SDDPInvModel})
 
     basemodel = EnergyModelsSDDP.base_modeltype(modeltype)
     EMB.constraints_capacity(m, n, 𝒯, basemodel)
 end
 
-function EMB.constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::SDDPOpModel)
+function EMB.constraints_capacity_installed(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::SDDPOpModel)
     if EnergyModelsSDDP.pure_operational_model(modeltype)
         # If a pure operational model is running, the state variable cap_inst_st
         # is not needed.
@@ -15,11 +15,11 @@ function EMB.constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, �
         EMB.constraints_capacity_installed(m, n, 𝒯, basemodel)
         return
     end
-    throw("Investments is not implemented for SDDP+RyeMicrogrid.")
+    throw("Investments is not implemented for SDDP+")
 end
 
 
-function constraints_equal_reserve(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::Union{SDDPOpModel, SDDPInvModel} )
+function constraints_equal_reserve(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::Union{SDDPOpModel, SDDPInvModel} )
     # Set the constraints requireing stor_res_up and stor_res_down to be equal
     # throughout a stage.
     constraints_equal_reserve(m, n, 𝒯, EnergyModelsSDDP.base_modeltype(modeltype))
@@ -40,7 +40,7 @@ end
 
 function EMB.constraints_level_sp(
     m,
-    n::RyeMicrogrid.BatteryStorage{S},
+    n::BatteryStorage{S},
     t_inv::TS.StrategicPeriod{T, U},
     𝒫,
     modeltype::Union{SDDPOpModel, SDDPInvModel}

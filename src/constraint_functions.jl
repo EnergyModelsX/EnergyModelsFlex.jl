@@ -4,7 +4,7 @@
 Function for creating the constraint on the maximum level of a generic `Storage`.
 This function serves as fallback option if no other function is specified for a `Storage`.
 """
-function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function EMB.constraints_capacity(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
 
     @constraint(m, [t ∈ 𝒯],
         m[:stor_level][n, t] <= m[:stor_cap_inst][n, t]
@@ -21,9 +21,9 @@ function EMB.constraints_capacity(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeS
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
 
-function EMB.constraints_capacity_installed(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function EMB.constraints_capacity_installed(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-    cap = RyeMicrogrid.capacity(n)
+    cap = capacity(n)
     @constraint(m, [t ∈ 𝒯],
         m[:stor_cap_inst][n, t] == cap.level[t]
     )
@@ -50,7 +50,7 @@ end
 function constraints_equal_reserve(m, n, 𝒯::TimeStructure, modeltype::EnergyModel)
 end
 
-function constraints_equal_reserve(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function constraints_equal_reserve(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
     for (t_prev, t) ∈ withprev(𝒯)
         if !isnothing(t_prev)
             @constraints(m, begin
@@ -61,7 +61,7 @@ function constraints_equal_reserve(m, n::RyeMicrogrid.BatteryStorage, 𝒯::Time
     end
 end
 
-function EMB.constraints_level_aux(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)
+function EMB.constraints_level_aux(m, n::BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)
     # Declaration of the required subsets
     p_stor = storage_resource(n)
 
@@ -73,7 +73,7 @@ end
 
 function EMB.constraints_level_sp(
     m,
-    n::RyeMicrogrid.BatteryStorage{S},
+    n::BatteryStorage{S},
     t_inv::TS.StrategicPeriod{T, U},
     𝒫,
     modeltype::EnergyModel
@@ -97,7 +97,7 @@ function EMB.constraints_level_sp(
     end
 end
 
-function EMB.constraints_flow_in(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function EMB.constraints_flow_in(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
     # Declaration of the required subsets
     p_stor = storage_resource(n)
     𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])
@@ -114,7 +114,7 @@ function EMB.constraints_flow_in(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeSt
 
 end
 
-function EMB.constraints_flow_out(m, n::RyeMicrogrid.BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
+function EMB.constraints_flow_out(m, n::BatteryStorage, 𝒯::TimeStructure, modeltype::EnergyModel)
     p_stor = storage_resource(n)
     𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])
 

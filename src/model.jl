@@ -10,7 +10,7 @@ function EMB.variables_node(m, 𝒩ˢᵗᵒʳ::Vector{<:BatteryStorage}, 𝒯, m
     @variable(m, stor_res_down[𝒩ˢᵗᵒʳ, 𝒯] >= 0)
 end
 
-function EMB.create_node(m, n::RyeMicrogrid.BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)
+function EMB.create_node(m, n::BatteryStorage, 𝒯, 𝒫, modeltype::EnergyModel)
 
     # Declaration of the required subsets.
     𝒯ᴵⁿᵛ   = strategic_periods(𝒯)

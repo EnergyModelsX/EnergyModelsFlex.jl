@@ -10,12 +10,12 @@ const EMB = EnergyModelsBase
 
 
 # General functions
-include("datastructures.jl")
-include("model.jl")
-include("model_sddp.jl")
-include("constraint_functions.jl")
-include("constraint_functions_sddp.jl")
-include("checks.jl")
+include("battery_storage/datastructures.jl")
+include("battery_storage/model.jl")
+include("battery_storage/model_sddp.jl")
+include("battery_storage/constraint_functions.jl")
+include("battery_storage/constraint_functions_sddp.jl")
+include("battery_storage/checks.jl")
 
 
 export BatteryStorage

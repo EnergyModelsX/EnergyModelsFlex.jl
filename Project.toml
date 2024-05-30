@@ -10,9 +10,10 @@ TimeStruct = "f9ed5ce0-9f41-4eaa-96da-f38ab8df101c"
 
 [weakdeps]
 EnergyModelsSDDP = "2d9f47c3-4e61-4511-b027-cb6f3cfb5b65"
+SDDP = "f4570300-c277-11e8-125c-4912f86ce65d"
 
 [extensions]
-FlexSDDPExt = "EnergyModelsSDDP"
+FlexSDDPExt = ["SDDP", "EnergyModelsSDDP"]
 
 [compat]
 EnergyModelsBase = "^0.6.7"

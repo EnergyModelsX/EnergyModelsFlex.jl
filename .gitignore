@@ -6,3 +6,9 @@
 docs/build/
 *.lp
 *.mps
+
+# IDE
+.vscode/
+
+# EMX
+consistency_log.md

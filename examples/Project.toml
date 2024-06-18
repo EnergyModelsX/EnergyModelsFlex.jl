@@ -1,6 +1,7 @@
 [deps]
 EnergyModelsBase = "5d7e687e-f956-46f3-9045-6f5a5fd49f50"
 EnergyModelsFlex = "a81b9388-333d-4b63-81f2-910b060b544c"
+EnergyModelsInvestments = "fca3f8eb-b383-437d-8e7b-aac76bb2004f"
 EnergyModelsRenewableProducers = "b007c34f-ba52-4995-ba37-fffe79fbde35"
 EnergyModelsSDDP = "2d9f47c3-4e61-4511-b027-cb6f3cfb5b65"
 HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"

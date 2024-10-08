@@ -1,20 +1,3 @@
-using JuMP
-using HiGHS
-using YAML
-using TimeStruct
-using EnergyModelsBase
-using EnergyModelsRenewableProducers
-using Revise
-# using SEAC
-
-using Dates
-# using TimeZones
-using Plots
-# using MathOptInterface
-
-const TS = TimeStruct
-const EMB = EnergyModelsBase
-
 
 """
 Unit commitment nodes
@@ -47,19 +30,19 @@ end
 
 """
 Electric battery node
-- c_rate: 
-- coloumbic_eff: 
+- c_rate:
+- coloumbic_eff:
 """
 struct ElectricBattery{T} <: EMB.Storage{T}
     id
     charge::EMB.AbstractStorageParameters
     level::EMB.UnionCapacity
-    c_rate::Real # 
-    coloumbic_eff::Real  # efficency, typically 0.98 
+    c_rate::Real #
+    coloumbic_eff::Real  # efficency, typically 0.98
     stor_res::Resource
     input::Dict{<:Resource, <:Real}
     output::Dict{<:Resource, <:Real}
-    data::Vector{<:Data}  
+    data::Vector{<:Data}
 end
 
 struct LoadShiftingNode <: EMB.Sink
@@ -72,5 +55,5 @@ struct LoadShiftingNode <: EMB.Sink
     load_shift_duration::Real # in number
     load_shift_magnitude::Real
     n_loadshift::Real
-    data::Vector{Data} 
+    data::Vector{Data}
 end

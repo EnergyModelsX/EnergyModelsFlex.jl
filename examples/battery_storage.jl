@@ -12,6 +12,7 @@ import JuMP
 import PrettyTables: pretty_table
 import TimeStruct: FixedProfile, TwoLevel, SimpleTimes
 
+@warn "BatteryStorage from EnergyModelsFlex is not updated to EnergyModelsBase@v0.8.0 and was therefore removed from this package."
 
 function create_system()
 

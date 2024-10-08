@@ -1,7 +1,7 @@
 name = "EnergyModelsFlex"
 uuid = "a81b9388-333d-4b63-81f2-910b060b544c"
 authors = ["Per Aaslid <per.aaslid@sintef.no>"]
-version = "0.1.1"
+version = "0.2.0"
 
 [deps]
 EnergyModelsBase = "5d7e687e-f956-46f3-9045-6f5a5fd49f50"
@@ -18,8 +18,7 @@ FlexSDDPExt = ["SDDP", "EnergyModelsSDDP"]
 FlexInvestmentsExt = ["EnergyModelsInvestments"]
 
 [compat]
-EnergyModelsBase = "^0.6.7"
-EnergyModelsSDDP = "^0.1.8"
+EnergyModelsBase = "^0.8.0"
 julia = "1"
 
 [extras]

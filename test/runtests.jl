@@ -11,5 +11,5 @@ const TS = TimeStruct
 const TEST_ATOL = 1e-6
 
 @testset "EnergyModelsFlex" begin
-    @test true
+    include("test_minupdowntimenode.jl")
 end

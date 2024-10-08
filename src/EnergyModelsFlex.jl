@@ -24,4 +24,10 @@ include("SEAC/checks.jl")
 
 export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
 
+include("demand/datastructures.jl")
+include("demand/model.jl")
+include("demand/constraint_functions.jl")
+
+export PeriodDemandSink
+
 end

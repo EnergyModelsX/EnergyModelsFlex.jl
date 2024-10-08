@@ -8,13 +8,26 @@ const TS = TimeStruct
 const EMB = EnergyModelsBase
 
 
-# General functions
-include("battery_storage/datastructures.jl")
-include("battery_storage/model.jl")
-include("battery_storage/constraint_functions.jl")
-include("battery_storage/checks.jl")
+# BatteryStorage
+# TODO needs to be updated to EnergyModelsBase@v0.8.0.
+# include("battery_storage/datastructures.jl")
+# include("battery_storage/model.jl")
+# include("battery_storage/constraint_functions.jl")
+# include("battery_storage/checks.jl")
 
+# export BatteryStorage
 
-export BatteryStorage
+include("SEAC/datastructures.jl")
+include("SEAC/model.jl")
+include("SEAC/constraint_functions.jl")
+include("SEAC/checks.jl")
+
+export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
+
+include("demand/datastructures.jl")
+include("demand/model.jl")
+include("demand/constraint_functions.jl")
+
+export PeriodDemandSink
 
 end

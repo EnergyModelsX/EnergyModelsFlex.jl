@@ -70,7 +70,7 @@ function create_line(min_up, min_down)
         Dict(Product => 1),
         min_up, # minUpTime
         min_down, # minDownTime
-        1, # minCapacity
+        50, # minCapacity
         200, # maxCapacity
         []
     )
@@ -96,6 +96,10 @@ end
             cap_use = get_values(m, :cap_use, line, case[:T])
             check = check_cyclic_sequence(cap_use, min_up_time, min_down_time)
             @test check
+            msg = "check-min_up_time=$min_up_time, min_down_time=$min_down_time"
+            if !check
+                @warn "Failed for: $msg"
+            end
         end
     end
 end

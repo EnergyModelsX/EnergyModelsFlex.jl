@@ -1,4 +1,3 @@
-
 """
 EMB.constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
 
@@ -23,33 +22,37 @@ function EMB.constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, m
         period_total = sum(m[:cap_use][n, t] for t in period2op[i])
         # Define the demand_sink_deficit as the difference between the period demand and
         # the total capacity used.
-        @constraint(m, period_total + m[:demand_sink_deficit][n, i] == n.period_demand[i])
+        @constraint(m, period_total + m[:demand_sink_deficit][n, i] ==
+                    n.period_demand[i] + m[:demand_sink_surplus][n, i])
     end
 
     @constraint(m, [t ∈ 𝒯],
         m[:cap_use][n, t] <= m[:cap_inst][n, t]
     )
 
-    # Fixing the surplus variable to 0
-    # for t ∈ 𝒯
-    #     JuMP.fix(m[:sink_surplus][n, t], 0; force=true)
-    # end
-
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
+
 
 """
 constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, modeltype::EnergyModel)
 
 """
 function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, modeltype::EnergyModel)
-
-
+    # Only penalise the total surplus and deficit in each period, not in the
+    # operational periods.
     @constraint(m, [t_inv ∈ 𝒯ᴵⁿᵛ],
         m[:opex_var][n, t_inv] ==
-            sum((m[:sink_deficit][n, t] * deficit_penalty(n, t) +
+            sum((m[:demand_sink_surplus][n, period_index(n, t)] * surplus_penalty(n, t) +
                 m[:demand_sink_deficit][n, period_index(n, t)] * deficit_penalty(n, t)) *
                 multiple(t_inv, t)
             for t ∈ t_inv)
     )
+end
+
+function EMB.constraints_opex_fixed(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, modeltype::EnergyModel)
+    # Fix the fixed OPEX
+    for t_inv ∈ 𝒯ᴵⁿᵛ
+        fix(m[:opex_fixed][n, t_inv], 0, ; force = true)
+    end
 end

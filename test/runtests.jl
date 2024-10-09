@@ -12,4 +12,5 @@ const TEST_ATOL = 1e-6
 
 @testset "EnergyModelsFlex" begin
     include("test_minupdowntimenode.jl")
+    include("test_perioddemandsink.jl")
 end

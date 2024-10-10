@@ -25,7 +25,8 @@ function create_system(line)
         Dict(Power=> 1))
 
 
-    # The production can only run between 6-20 on weekdays. No production on weekends.
+    # The production can only run between 6-20 on weekdays, with capacity of 200.
+    # No production on weekends.
     weekday_prod = [fill(0, 6)..., fill(200, 14)..., fill(0, 4)...]
     @assert length(weekday_prod) == 24
     week_prod = [repeat(weekday_prod, 5)..., fill(0, 2 * 24)...]
@@ -33,7 +34,7 @@ function create_system(line)
     demand = PeriodDemandSink("demand_product",
         # 24 hours per day.
         24,
-        # Produce 1827 units per day, and nothing (0) in the weekend.
+        # Produce 1500 units per day, and nothing (0) in the weekend.
         [fill(1500, 5)..., 0, 0],
         OperationalProfile(week_prod), # kW - installed capacity
         Dict(:surplus => FixedProfile(0),
@@ -69,7 +70,7 @@ function create_line(min_up, min_down)
         Dict(Product => 1),
         min_up, # minUpTime
         min_down, # minDownTime
-        1, # minCapacity
+        50, # minCapacity
         200, # maxCapacity
         []
     )
@@ -85,11 +86,20 @@ end
 
             m = EnergyModelsBase.run_model(case, model, HiGHS.Optimizer)
 
+            # Test optimal solution
+            @test termination_status(m) == MOI.OPTIMAL
+
             line = case[:nodes][2]
 
+            # Test that the minimum up time and minimum down time are at least
+            # min_up_time and min_down_time.
             cap_use = get_values(m, :cap_use, line, case[:T])
             check = check_cyclic_sequence(cap_use, min_up_time, min_down_time)
             @test check
+            msg = "check-min_up_time=$min_up_time, min_down_time=$min_down_time"
+            if !check
+                @warn "Failed for: $msg"
+            end
         end
     end
 end

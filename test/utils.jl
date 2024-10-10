@@ -21,19 +21,22 @@ function check_cyclic_sequence(arr::Vector, min_up_value::Int, min_down_value::I
         return count, j
     end
 
+    izzero(x) = abs(x) <= 1e-10
+    iznonzero(x) = !izzero(x)
+
     i = 1  # Starting index
 
     while i <= n
-        if arr[i] == 0
+        if izzero(arr[i])
             # Count consecutive zeros starting from index i
-            count_zeros, next_idx = count_consecutive(i, x -> x == 0)
+            count_zeros, next_idx = count_consecutive(i, x -> izzero(x))
 
             if count_zeros < min_down_value
                 if i < min_down_value
                     # If were in the first segment, the rest of the leading zeros to this
                     # segment might be at the end of the array
                     needed_zeros = min_down_value - count_zeros
-                    last_zeros = all(v == 0 for v in arr[end-needed_zeros+1:end])
+                    last_zeros = all(izzero(v) for v in arr[end-needed_zeros+1:end])
                     if last_zeros
                         i = next_idx
                         continue
@@ -47,13 +50,13 @@ function check_cyclic_sequence(arr::Vector, min_up_value::Int, min_down_value::I
             i = next_idx  # Move to the next non-zero element
         else
             # Count consecutive non-zero values starting from index i
-            count_nonzeros, next_idx = count_consecutive(i, x -> x != 0)
+            count_nonzeros, next_idx = count_consecutive(i, x -> iznonzero(x))
             if count_nonzeros < min_up_value
                 if i < min_up_value
                     # If were in the first segment, the rest of the leading non-zeros to
                     # this segment might be at the end of the array.
                     needed_non_zeros = min_up_value - count_nonzeros
-                    last_non_zeros = all(v != 0 for v in arr[end-needed_non_zeros+1:end])
+                    last_non_zeros = all(iznonzero(v) for v in arr[end-needed_non_zeros+1:end])
                     if last_non_zeros
                         i = next_idx
                         continue

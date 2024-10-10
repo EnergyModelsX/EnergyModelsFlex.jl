@@ -24,8 +24,6 @@ function create_system(demand)
         FixedProfile(0),
         Dict(Power=> 1))
 
-
-
     nodes = [grid, demand]
     links = [
         Direct("grid-demand", grid, demand),
@@ -64,24 +62,35 @@ function create_demand_node()
     return demand
 end
 
-
-@testset "force-max-production" begin
+function test_max_grid_production(force_max_production::Bool)
     demand = create_demand_node()
     case, model, m = create_system(demand)
 
     # Force the grid node to produce at max capacity.
     source = case[:nodes][1]
-    @constraint(m, [t in case[:T]],
-        m[:cap_use][source, t] == m[:cap_inst][source, t]
-    )
+    @show source
 
-    # m = EnergyModelsBase.run_model(case, model, HiGHS.Optimizer)
+    if force_max_production
+        # Set a constraint on the grid (source node) to produce at max capacity.
+        # This will force the PeriodDemandSink to run a surplus.
+        @constraint(m, [t in case[:T]],
+            m[:cap_use][source, t] == m[:cap_inst][source, t]
+        )
+    end
+
     set_optimizer(m, HiGHS.Optimizer)
-    # set_optimizer_attribute(m, MOI.Silent(), true)
+    set_optimizer_attribute(m, MOI.Silent(), true)
     optimize!(m)
 
     # Test optimal solution
     @test termination_status(m) == MOI.OPTIMAL
+end
+
+@testset "force-max-production" begin
+    test_max_grid_production(true)
+end
+@testset "dont-force-max-production" begin
+    test_max_grid_production(false)
 end
 
 

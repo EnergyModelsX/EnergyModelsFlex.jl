@@ -26,10 +26,6 @@ function EMB.constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, m
                     n.period_demand[i] + m[:demand_sink_surplus][n, i])
     end
 
-    @constraint(m, [t ∈ 𝒯],
-        m[:cap_use][n, t] <= m[:cap_inst][n, t]
-    )
-
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
 

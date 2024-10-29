@@ -87,6 +87,48 @@ function EMB.constraints_flow_in(m, n::ActivationCostNode, 𝒯::TimeStructure, 
 end
 
 
+# function EMB.constraints_capacity(m, n::ElectricBattery, 𝒯::TimeStructure, modeltype::EnergyModel)
+#     @constraint(m, [t ∈ 𝒯], m[:stor_level][n, t] <= m[:stor_level_inst][n, t])
+
+#     @constraint(m, [t ∈ 𝒯],m[:stor_charge_use][n, t] <= m[:stor_charge_inst][n, t])
+
+#     @constraint(m, [t ∈ 𝒯],m[:stor_discharge_use][n, t] <= m[:stor_charge_inst][n, t])
+
+#     # Including c_rate as a constraint for the charging and discharging 
+#     @constraint( m, [t ∈  𝒯],m[:stor_charge_use][n, t] <= m[:stor_level_inst][n, t] * n.c_rate ) 
+#     @constraint( m, [t ∈  𝒯],m[:stor_discharge_use][n, t] <= m[:stor_level_inst][n, t] * n.c_rate ) 
+
+#     constraints_capacity_installed(m, n, 𝒯, modeltype)
+# end
+
+# function EMB.constraints_flow_in(m, n::ElectricBattery, 𝒯::TimeStructure, modeltype::EnergyModel)
+#     # Declaration of the required subsets
+#     p_stor = storage_resource(n)
+#     𝒫ᵃᵈᵈ   = setdiff(inputs(n), [p_stor])
+
+#     # Constraint for additional required input
+#     @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ᵃᵈᵈ],
+#         m[:flow_in][n, t, p] == m[:flow_in][n, t, p_stor] * inputs(n, p)
+#     )
+
+#     # Constraint for storage rate usage for charging and discharging with efficency
+#     @constraint(m, [t ∈ 𝒯],
+#         m[:stor_charge_use][n, t] == m[:flow_in][n, t, p_stor] * n.coloumbic_eff
+#     )
+# end
+
+function EMB.constraints_level_aux(m, n::ElectricBattery, 𝒯, 𝒫, modeltype::EnergyModel)
+    # Declaration of the required subsets
+    p_stor = storage_resource(n)
+
+    # Constraint for the change in the level in a given operational period
+    @constraint(m, [t ∈ 𝒯],
+        m[:stor_level_Δ_op][n, t] ==
+            m[:stor_charge_use][n, t] - m[:stor_discharge_use][n, t]
+    )
+end
+
+
 function EMB.constraints_capacity(m, n::ElectricBattery, 𝒯::TimeStructure, modeltype::EnergyModel)
     @constraint(m, [t ∈ 𝒯], m[:stor_level][n, t] <= m[:stor_level_inst][n, t])
 

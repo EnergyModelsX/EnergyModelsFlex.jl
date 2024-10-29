@@ -44,6 +44,18 @@ struct ElectricBattery{T} <: EMB.Storage{T}
     output::Dict{<:Resource, <:Real}
     data::Vector{<:Data}
 end
+function ElectricBattery{T}(
+    id,
+    charge::EMB.AbstractStorageParameters,
+    level::EMB.UnionCapacity,
+    c_rate::Real, # 
+    coloumbic_eff::Real , # efficency, typically 0.98 
+    stor_res::Resource,
+    input::Dict{<:Resource, <:Real},
+    output::Dict{<:Resource, <:Real},
+) where {T<:EMB.StorageBehavior}
+return ElectricBattery{T}(id,charge,level,c_rate,coloumbic_eff,stor_res,input,output,Data[])
+end
 
 struct LoadShiftingNode <: EMB.Sink
     id

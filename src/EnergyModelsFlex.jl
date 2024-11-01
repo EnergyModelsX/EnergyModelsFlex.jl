@@ -30,4 +30,10 @@ include("demand/constraint_functions.jl")
 
 export PeriodDemandSink
 
+include("ppa/datastructures.jl")
+include("ppa/constraint_functions.jl")
+include("ppa/checks.jl")
+
+export PayAsProducedPPA
+
 end

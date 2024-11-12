@@ -30,10 +30,10 @@ include("demand/constraint_functions.jl")
 
 export PeriodDemandSink
 
-include("ppa/datastructures.jl")
-include("ppa/constraint_functions.jl")
-include("ppa/checks.jl")
+include("sps/datastructures.jl")
+include("sps/constraint_functions.jl")
+include("sps/checks.jl")
 
-export PayAsProducedPPA
+export PayAsProducedPPA, StorageEfficiency, Combustion
 
 end

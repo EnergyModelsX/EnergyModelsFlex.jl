@@ -1,39 +1,29 @@
+"""
+The EnergyModelsFlex extension provides a series of technology node types for EMX enabling
+energy and process flexibility modeling.
+"""
 module EnergyModelsFlex
 
 using JuMP
 using TimeStruct
 using EnergyModelsBase
+using EnergyModelsRenewableProducers
 
 const TS = TimeStruct
 const EMB = EnergyModelsBase
+const EMR = EnergyModelsRenewableProducers
 
+for node_type ∈ ["source", "sink", "network", "storage"]
+    include("$node_type/datastructures.jl")
+    include("$node_type/model.jl")
+    include("$node_type/constraint_functions.jl")
+    include("$node_type/checks.jl")
+end
 
-# BatteryStorage
-# TODO needs to be updated to EnergyModelsBase@v0.8.0.
-# include("battery_storage/datastructures.jl")
-# include("battery_storage/model.jl")
-# include("battery_storage/constraint_functions.jl")
-# include("battery_storage/checks.jl")
-
-# export BatteryStorage
-
-include("SEAC/datastructures.jl")
-include("SEAC/model.jl")
-include("SEAC/constraint_functions.jl")
-include("SEAC/checks.jl")
-
+#export BatteryStorage
 export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
-
-include("demand/datastructures.jl")
-include("demand/model.jl")
-include("demand/constraint_functions.jl")
-
 export PeriodDemandSink
-
-include("sps/datastructures.jl")
-include("sps/constraint_functions.jl")
-include("sps/checks.jl")
-
-export PayAsProducedPPA, StorageEfficiency, Combustion
+export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, MultipleInputSink
+export ContinuousMultipleInputSinkStrat, BinaryMultipleInputSinkStrat
 
 end

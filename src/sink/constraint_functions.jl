@@ -1,0 +1,234 @@
+"""
+    constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Write docstring here...
+"""
+function EMB.constraints_capacity(
+    m,
+    n::PeriodDemandSink,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        m[:cap_use][n, t] + m[:sink_deficit][n, t] ==
+        m[:cap_inst][n, t] + m[:sink_surplus][n, t]
+    )
+
+    # Create a list mapping the demand period i to the operational periods it contains.
+    num_periods = number_of_periods(n, 𝒯)
+    period2op = [[] for i ∈ 1:num_periods]
+    for t ∈ 𝒯
+        period_id = period_index(n, t)
+        push!(period2op[period_id], t)
+    end
+
+    for i ∈ 1:num_periods
+        # Sum all values inside period i.
+        period_total = sum(m[:cap_use][n, t] for t ∈ period2op[i])
+        # Define the demand_sink_deficit as the difference between the period demand and
+        # the total capacity used.
+        @constraint(
+            m,
+            period_total + m[:demand_sink_deficit][n, i] ==
+            n.period_demand[i] + m[:demand_sink_surplus][n, i]
+        )
+    end
+
+    EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
+end
+
+"""
+    constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+
+Write docstring here...
+"""
+function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    # Only penalise the total surplus and deficit in each period, not in the
+    # operational periods.
+    @constraint(
+        m,
+        [t_inv ∈ 𝒯ᴵⁿᵛ],
+        m[:opex_var][n, t_inv] == sum(
+            (
+                m[:demand_sink_surplus][n, period_index(n, t)] * surplus_penalty(n, t) +
+                m[:demand_sink_deficit][n, period_index(n, t)] * deficit_penalty(n, t)
+            ) * scale_op_sp(t_inv, t) for t ∈ t_inv
+        )
+    )
+end
+
+"""
+    constraints_opex_fixed(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+
+Write docstring here...
+"""
+function EMB.constraints_opex_fixed(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    # Fix the fixed OPEX
+    for t_inv ∈ 𝒯ᴵⁿᵛ
+        fix(m[:opex_fixed][n, t_inv], 0, ; force = true)
+    end
+end
+
+"""
+    EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure)
+
+Function for creating the constraint on the inlet flow to a `MultipleInputSink`.
+The difference to the standard flow is that the MultipleInputSink allows for
+several different resources to be equivalent
+"""
+function EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, ::EnergyModel)
+    # Declaration of the required subsets
+    𝒫ⁱⁿ = inputs(n)
+
+    # Constraint for the individual input stream connections
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        sum(m[:flow_in][n, t, p] / inputs(n, p) for p ∈ 𝒫ⁱⁿ) == m[:cap_use][n, t]
+    )
+end
+
+"""
+    EMB.constraints_flow_in(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure)
+
+Function for creating the constraint on the inlet flow to a `AbstractMultipleInputSinkStrat`.
+The difference to the standard flow is that the AbstractMultipleInputSinkStrat uses the input resources
+in a ratio specified by the input_frac_strat variable for each strategic period.
+"""
+function EMB.constraints_flow_in(
+    m,
+    n::AbstractMultipleInputSinkStrat,
+    𝒯::TimeStructure,
+    ::EnergyModel,
+)
+
+    # Declaration of the required subsets.
+    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+    𝒫ⁱⁿ = inputs(n)
+
+    # Constraint for the individual input stream connections
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        sum(m[:flow_in][n, t, p] / inputs(n, p) for p ∈ 𝒫ⁱⁿ) == m[:cap_use][n, t]
+    )
+
+    # Constraint for the individual input stream connections
+    @constraint(
+        m,
+        [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ],
+        m[:flow_in][n, t, p] / inputs(n, p) + m[:sink_deficit_p][n, t, p] ==
+        EMB.capacity(n, t) * m[:input_frac_strat][n, 𝒯ᴵⁿᵛ[t.sp], p] +
+        m[:sink_surplus_p][n, t, p]
+    )
+
+    # The input fractions for each resources must sum to 1
+    @constraint(m, [t ∈ 𝒯ᴵⁿᵛ], sum(m[:input_frac_strat][n, t, p] for p ∈ 𝒫ⁱⁿ) == 1)
+
+    # Define sink_deficit and sink_surplus
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        sum(m[:sink_deficit_p][n, t, p] for p ∈ 𝒫ⁱⁿ) == m[:sink_deficit][n, t]
+    )
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        sum(m[:sink_surplus_p][n, t, p] for p ∈ 𝒫ⁱⁿ) == m[:sink_surplus][n, t]
+    )
+end
+
+"""
+    EMB.constraints_capacity(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Define the cap_inst variable to be the input capacity(n,t).
+
+!!! note "Implicity surplus and deficit constraints"
+    The following constraint for surplus and deficit are implicitly defined in the constraints_flow_in function.
+
+    `m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t] + m[:sink_surplus][n, t]`
+"""
+function EMB.constraints_capacity(
+    m,
+    n::AbstractMultipleInputSinkStrat,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
+end
+
+"""
+    EMB.constraints_capacity(m, n::LoadShiftingNode, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Write docstring here...
+"""
+function EMB.constraints_capacity(
+    m,
+    n::LoadShiftingNode,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    constraints_capacity_installed(m, n, 𝒯, modeltype)
+
+    # Extra constraints
+    load_shifts_per_periode = n.load_shifts_per_periode
+    times = collect(𝒯) # all operational times
+    ls_times = times[n.loadshifttimes]
+    n_loadshift = n.n_loadshift # number of timeslots we are allowed to shift a load, NB! timeslot does not mean timesteps, but number of slots allowed for load shifitng
+
+    # Constraint for the number of load shifts and a balance of `load_shift_from` and `load_shift_to`
+    for i ∈ 1:n_loadshift:(length(ls_times)-n_loadshift+1)
+        @constraint(
+            m,
+            sum(m[:load_shift_to][n, ls_times[i:(i+n_loadshift-1)]]) <=
+            load_shifts_per_periode
+        )
+        @constraint(
+            m,
+            sum(m[:load_shift_from][n, ls_times[i:(i+n_loadshift-1)]]) <=
+            load_shifts_per_periode
+        )
+        @constraint(
+            m,
+            sum(m[:load_shift_from][n, ls_times[i:(i+n_loadshift-1)]]) -
+            sum(m[:load_shift_to][n, ls_times[i:(i+n_loadshift-1)]]) == 0
+        )
+    end
+
+    # Ensure a given operational period is either used for `load_shift_from` or `load_shift_to` (or none)
+    for t ∈ ls_times
+        @constraint(m, m[:load_shift_from][n, t] + m[:load_shift_to][n, t] <= 1)
+    end
+
+    # Set the variable `load_shifted` to be the actual load that is shifted at the given
+    # operational period that is available for load shifting
+    all_in_shifting_times = []
+    for t ∈ n.loadshifttimes
+        for i ∈ 0:(n.load_shift_duration-1)
+            ti = times[t+i]
+            tls = times[t]
+            @constraint(
+                m,
+                m[:load_shifted][n, ti] ==
+                n.load_shift_magnitude *
+                (m[:load_shift_to][n, tls] - m[:load_shift_from][n, tls])
+            )
+            append!(all_in_shifting_times, t + i)
+        end
+    end
+
+    # ... and for all other times, set `load_shifted` to zero
+    for i ∈ 1:length(times)
+        if i ∉ all_in_shifting_times
+            fix(m[:load_shifted][n, times[i]], 0; force = true)
+        end
+    end
+    # Constrain the capacity to be the original demand pluss the shifted load
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        m[:cap_use][n, t] == m[:cap_inst][n, t] + m[:load_shifted][n, t]
+    )
+end

@@ -53,7 +53,7 @@ end
 
     # Test `Network` nodes
     @testset "Test Network nodes" begin
-        for node_type ∈ ["LimitedFlexibleInput", "MinUpDownTimeNode"]
+        for node_type ∈ ["LimitedFlexibleInput", "MinUpDownTimeNode", "Combustion"]
             run_node_test("network", node_type)
         end
     end

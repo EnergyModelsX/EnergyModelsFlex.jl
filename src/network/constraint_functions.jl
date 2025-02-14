@@ -161,3 +161,63 @@ function EMB.constraints_flow_in(
     tot_flow_in = @expression(m, [t ∈ 𝒯], sum(m[:flow_in][n, t, p] for p ∈ 𝒫ⁱⁿ))
     @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
 end
+
+"""
+    constraints_flow_in(m, n::Combustion, 𝒯::TimeStructure, ::EnergyModel)
+
+Function for creating the constraint on the inlet flow to a `Combustion` node. The input
+resources are limited by the `limit` field in the node `n` as for the `LimitedFlexibleInput` node,
+but additionally, it is balance requirement for the input and output flows controlled by the
+`heat_resource` field in the node `n`. If `outputs(n, p_heat)` == 1, then there is flow balance.
+"""
+function EMB.constraints_flow_in(
+    m,
+    n::Combustion,
+    𝒯::TimeStructure,
+    ::EnergyModel,
+)
+    # Declaration of the required subsets
+    𝒫ⁱⁿ = inputs(n)
+    p_heat = heat_resource(n)
+
+    # Constraint for the input stream connections
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        sum(m[:flow_in][n, t, p] / inputs(n, p) for p ∈ 𝒫ⁱⁿ) == m[:cap_use][n, t]
+    )
+
+    # Limit the fraction of an input resource relative to the total output
+    tot_flow_in = @expression(m, [t ∈ 𝒯], sum(m[:flow_in][n, t, p] for p ∈ 𝒫ⁱⁿ))
+    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
+
+    # Balance constraint for the combustion node
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        tot_flow_in[t] ==
+        m[:cap_use][n, t] + m[:flow_out][n, t, p_heat] / outputs(n, p_heat)
+    )
+end
+
+"""
+    constraints_flow_out(m, n::Combustion, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Function for creating the constraint on the outlet flow from a `Combustion` node.
+"""
+function EMB.constraints_flow_out(
+    m,
+    n::Combustion,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    # Declaration of the required subsets, excluding CO2, if specified
+    𝒫ᵒᵘᵗ = EMB.res_not(outputs(n), co2_instance(modeltype))
+    p_heat = heat_resource(n)
+    𝒫ᵐⁱˣ = setdiff(𝒫ᵒᵘᵗ, [p_heat])
+
+    # Constraint for the individual output stream connections
+    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ᵐⁱˣ],
+        m[:flow_out][n, t, p] == m[:cap_use][n, t] * outputs(n, p)
+    )
+end

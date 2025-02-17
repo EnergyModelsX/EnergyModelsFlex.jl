@@ -11,9 +11,9 @@ function EMB.check_node(n::MinUpDownTimeNode, 𝒯, ::EnergyModel, ::Bool)
 end
 
 """
-    check_node(n::LimitedFlexibleInput, 𝒯, ::EnergyModel)
+    check_node(n::Union{LimitedFlexibleInput, Combustion}, 𝒯, ::EnergyModel)
 
-This method checks that a `LimitedFlexibleInput` node is valid.
+This method checks that a `LimitedFlexibleInput` or a `Combustion` node is valid.
 
 ## Checks
  - The field `cap` is required to be non-negative.
@@ -24,7 +24,12 @@ This method checks that a `LimitedFlexibleInput` node is valid.
    accessible through a `StrategicPeriod` as outlined in the function
    `check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`.
 """
-function EMB.check_node(n::LimitedFlexibleInput, 𝒯, ::EnergyModel, check_timeprofiles::Bool)
+function EMB.check_node(
+    n::Union{LimitedFlexibleInput,Combustion},
+    𝒯,
+    ::EnergyModel,
+    check_timeprofiles::Bool,
+)
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
     @assert_or_log(

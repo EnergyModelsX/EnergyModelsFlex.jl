@@ -1,11 +1,6 @@
 # EnergyModelsFlex
 [![Build Status](https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl/badges/main/pipeline.svg)](https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl/-/jobs)
 [![Docs: stable](https://img.shields.io/badge/docs-stable-4495d1.svg)](https://clean_export.pages.sintef.no/EnergyModelsFlex.jl)
-
-
-[![Build Status](https://github.com/EnergyModelsX/EnergyModelsFlex.jl/workflows/CI/badge.svg)](https://github.com/EnergyModelsX/EnergyModelsFlex.jl/actions?query=workflow%3ACI)
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/)
-[![In Development](https://img.shields.io/badge/docs-dev-blue.svg)](https://energymodelsx.github.io/EnergyModelsFlex.jl/dev/)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/JuliaDiff/BlueStyle)
 

@@ -34,6 +34,7 @@ The following network node types are implemented in the `EnergyModelsFlex`.
 MinUpDownTimeNode
 ActivationCostNode
 LimitedFlexibleInput
+Combustion
 ```
 
 ## [Storage `Node` types](@id lib-pub-storage-node)

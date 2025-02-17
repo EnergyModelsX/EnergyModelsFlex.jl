@@ -22,8 +22,8 @@ end
 
 #export BatteryStorage
 export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
-export PeriodDemandSink
-export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, MultipleInputSink
+export PeriodDemandSink, MultipleInputSink
+export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, Combustion
 export ContinuousMultipleInputSinkStrat, BinaryMultipleInputSinkStrat
 
 end

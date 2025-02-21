@@ -197,11 +197,6 @@ function EMB.constraints_capacity(
         )
     end
 
-    # Ensure a given operational period is either used for `load_shift_from` or `load_shift_to` (or none)
-    for t ∈ ls_times
-        @constraint(m, m[:load_shift_from][n, t] + m[:load_shift_to][n, t] <= 1)
-    end
-
     # Set the variable `load_shifted` to be the actual load that is shifted at the given
     # operational period that is available for load shifting
     all_in_shifting_times = []

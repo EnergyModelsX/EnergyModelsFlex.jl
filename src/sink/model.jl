@@ -62,8 +62,8 @@ function EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::En
     times = collect(𝒯)
     𝒯ᴸˢ = times[𝒩ᴸˢ[1].load_shift_times]
     # Creating a variable for every time step where load shifting is allowed
-    @variable(m, load_shift_from[𝒩ᴸˢ, 𝒯ᴸˢ], Int)
-    @variable(m, load_shift_to[𝒩ᴸˢ, 𝒯ᴸˢ], Int)
+    @variable(m, load_shift_from[𝒩ᴸˢ, 𝒯ᴸˢ] >= 0, Int)
+    @variable(m, load_shift_to[𝒩ᴸˢ, 𝒯ᴸˢ] >= 0, Int)
     # Creating a variable for every timestep saying how much load is shifted
     @variable(m, load_shifted[𝒩ᴸˢ, 𝒯]) # can also be negative which will mean load shifted from
 end

@@ -173,27 +173,27 @@ function EMB.constraints_capacity(
     constraints_capacity_installed(m, n, 𝒯, modeltype)
 
     # Extra constraints
-    load_shifts_per_periode = n.load_shifts_per_periode
+    load_shifts_per_period = n.load_shifts_per_period
     times = collect(𝒯) # all operational times
-    ls_times = times[n.loadshifttimes]
-    n_loadshift = n.n_loadshift # number of timeslots we are allowed to shift a load, NB! timeslot does not mean timesteps, but number of slots allowed for load shifitng
+    ls_times = times[n.load_shift_times]
+    load_shift_times_per_period = n.load_shift_times_per_period # number of timeslots we are allowed to shift a load, NB! timeslot does not mean timesteps, but number of slots allowed for load shifitng
 
     # Constraint for the number of load shifts and a balance of `load_shift_from` and `load_shift_to`
-    for i ∈ 1:n_loadshift:(length(ls_times)-n_loadshift+1)
+    for i ∈ 1:load_shift_times_per_period:(length(ls_times)-load_shift_times_per_period+1)
         @constraint(
             m,
-            sum(m[:load_shift_to][n, ls_times[i:(i+n_loadshift-1)]]) <=
-            load_shifts_per_periode
+            sum(m[:load_shift_to][n, ls_times[i:(i+load_shift_times_per_period-1)]]) <=
+            load_shifts_per_period
         )
         @constraint(
             m,
-            sum(m[:load_shift_from][n, ls_times[i:(i+n_loadshift-1)]]) <=
-            load_shifts_per_periode
+            sum(m[:load_shift_from][n, ls_times[i:(i+load_shift_times_per_period-1)]]) <=
+            load_shifts_per_period
         )
         @constraint(
             m,
-            sum(m[:load_shift_from][n, ls_times[i:(i+n_loadshift-1)]]) -
-            sum(m[:load_shift_to][n, ls_times[i:(i+n_loadshift-1)]]) == 0
+            sum(m[:load_shift_from][n, ls_times[i:(i+load_shift_times_per_period-1)]]) -
+            sum(m[:load_shift_to][n, ls_times[i:(i+load_shift_times_per_period-1)]]) == 0
         )
     end
 
@@ -205,7 +205,7 @@ function EMB.constraints_capacity(
     # Set the variable `load_shifted` to be the actual load that is shifted at the given
     # operational period that is available for load shifting
     all_in_shifting_times = []
-    for t ∈ n.loadshifttimes
+    for t ∈ n.load_shift_times
         for i ∈ 0:(n.load_shift_duration-1)
             ti = times[t+i]
             tls = times[t]

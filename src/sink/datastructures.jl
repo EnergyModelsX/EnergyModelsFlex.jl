@@ -195,3 +195,27 @@ struct LoadShiftingNode <: EMB.Sink
     load_shift_times_per_period::Int
     data::Vector{Data}
 end
+function LoadShiftingNode(
+    id::Any,
+    cap::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+    load_shift_times::Vector{<:Int},
+    load_shifts_per_period::Int,
+    load_shift_duration::Int,
+    load_shift_magnitude::Real,
+    load_shift_times_per_period::Int,
+)
+    return LoadShiftingNode(
+        id,
+        cap,
+        penalty,
+        input,
+        load_shift_times,
+        load_shifts_per_period,
+        load_shift_duration,
+        load_shift_magnitude,
+        load_shift_times_per_period,
+        Data[],
+    )
+end

@@ -160,7 +160,11 @@ end
 """
     LoadShiftingNode <: EMB.Sink
 
-A `Sink` node where the demand can be altered by load shifting.
+A `Sink` node where the demand can be altered by load shifting. The load shifting is based on the assumption that the production happens in discrete batches. 
+A representive batch is defined with a magnitude and a duration. A load shift will in this case mean subtracting the consumption of a representive batch from the original consumption at one time slot
+and adding it on another timeslot. 
+
+NB! The node uses indicing of the time steps and is as of now not made to handle timesteps of different durations. 
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.

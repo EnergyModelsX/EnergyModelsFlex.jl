@@ -44,7 +44,7 @@ end
 """ 
     EMB.check_node(n::LoadShiftingNode, 𝒯, ::EnergyModel, check_timeprofiles::Bool)
 
-This method checks that the *[`LoadShiftingNode`](@ref)* node is valid.
+This method checks that the `LoadShiftingNode` node is valid.
 
 ## Checks
  - The field `cap` is required to be non-negative.

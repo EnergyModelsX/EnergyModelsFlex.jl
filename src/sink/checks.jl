@@ -40,7 +40,6 @@ function EMB.check_node(
     end
 end
 
-
 """ 
     EMB.check_node(n::LoadShiftingNode, 𝒯, ::EnergyModel, check_timeprofiles::Bool)
 
@@ -83,4 +82,3 @@ function EMB.check_node(n::LoadShiftingNode, 𝒯, ::EnergyModel, check_timeprof
         "The values of load_shifts_per_period must be non-negative."
     )
 end
-

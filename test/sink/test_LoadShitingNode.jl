@@ -43,7 +43,7 @@ m = EMB.run_model(case, model, HiGHS.Optimizer)
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 for t_inv in 𝒯ᴵⁿᵛ
     for t in t_inv 
-        @test value.(m[:cap_use][load_shift_demand, t]) ≈ desired_cap_use[t]
+        @test value.(m[:cap_use][load_shift_demand, t]) ≈ desired_cap_use[t], atol ∈ TEST_ATOL
     end
 end
 

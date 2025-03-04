@@ -112,11 +112,11 @@ power_source = RefSource(
 
 load_shift_demand = LoadShiftingNode(
     2,
-    OperationalProfile(demand), # cap 
-    Dict(:surplus => FixedProfile(4), :deficit => FixedProfile(10)), # penalty 
-    Dict(Power => 1), # input 
+    OperationalProfile(demand), # cap
+    Dict(:surplus => FixedProfile(4), :deficit => FixedProfile(10)), # penalty
+    Dict(Power => 1), # input
     load_shift_times,
-    2, # load_shifts_per_period 
+    2, # load_shifts_per_period
     3, # load_shift_duration
     10, # load_shift_magnitude
     3, # load_shift_times_per_period
@@ -135,8 +135,8 @@ m = EMB.run_model(case, model, HiGHS.Optimizer)
 
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 for t_inv ∈ 𝒯ᴵⁿᵛ
-    for t ∈ t_inv
-        @test value.(m[:cap_use][load_shift_demand, t]) ≈ desired_cap_use[t],
-        atol ∈ TEST_ATOL
-    end
+    @test all(
+        value.(m[:cap_use][load_shift_demand, t]) ≈ desired_cap_use[t]
+        for t ∈ t_inv, atol ∈ TEST_ATOL
+    )
 end

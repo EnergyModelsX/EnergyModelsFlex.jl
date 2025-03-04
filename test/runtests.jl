@@ -39,7 +39,7 @@ end
             "BinaryMultipleInputSinkStrat",
             "ContinuousMultipleInputSinkStrat",
             "PeriodDemandSink",
-            # "LoadShiftingNode"
+            "LoadShiftingNode",
         ]
             run_node_test("sink", node_type)
         end

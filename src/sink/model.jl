@@ -49,12 +49,21 @@ function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯,
     @variable(m, sink_deficit_p[𝒩, 𝒯, 𝒫] >= 0)
 end
 
+"""
+    EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
+
+Create the optimization variables for every time slots indicated by `load_shift_times`
+    - :load_shift_from, integer variable for how many batches shifted away from the this time slot
+    - :load_shift_to, integer variable for how many batches shifted to this time slot
+for every timestep in: 
+    - :load_shifted, continous variable for the total capacity load shifted from the time step 
+"""
 function EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
     times = collect(𝒯)
-    𝒯ᴸˢ = times[𝒩ᴸˢ[1].loadshifttimes]
+    𝒯ᴸˢ = times[𝒩ᴸˢ[1].load_shift_times]
     # Creating a variable for every time step where load shifting is allowed
-    @variable(m, load_shift_from[𝒩ᴸˢ, 𝒯ᴸˢ], Bin)
-    @variable(m, load_shift_to[𝒩ᴸˢ, 𝒯ᴸˢ], Bin)
+    @variable(m, load_shift_from[𝒩ᴸˢ, 𝒯ᴸˢ] >= 0, Int)
+    @variable(m, load_shift_to[𝒩ᴸˢ, 𝒯ᴸˢ] >= 0, Int)
     # Creating a variable for every timestep saying how much load is shifted
     @variable(m, load_shifted[𝒩ᴸˢ, 𝒯]) # can also be negative which will mean load shifted from
 end

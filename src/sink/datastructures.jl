@@ -160,7 +160,13 @@ end
 """
     LoadShiftingNode <: EMB.Sink
 
-A `Sink` node where the demand can be altered by load shifting.
+A `Sink` node where the demand can be altered by load shifting. The load shifting is based on the assumption that the production happens in discrete batches. 
+A representive batch is defined with a magnitude and a duration. A load shift will in this case mean subtracting the consumption of a representive batch from the original consumption at one time slot
+and adding it on another timeslot. The node is furthermore build for a case where the wokring shifts dictates when the batches may be initiatedl. 
+Thus the timesteps where shuch an batch is allowed to be adde/subtracted is defined by the `loadshifttimes` field. The `loadshifttimes` is further gouped together
+in goups of `load_shift_tines_per_period`, for wich the representive batches can only be shifted within this group. 
+
+NB! The node uses indicing of the time steps and is as of now not made to handle timesteps of different durations. 
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
@@ -169,12 +175,12 @@ A `Sink` node where the demand can be altered by load shifting.
   Requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
 - **`loadshifttimes::Vector{<:Int}`** is the indices of the time structure that bulks of loads
-  may be shifted from.
-- **`load_shifts_per_periode::Int`** the upper limit of the number of load shifts
+  may be shifted from/to.
+- **`load_shifts_per_period::Int`** the upper limit of the number of load shifts within the period defined by `load_shift_times_per_period`
   that can be performed for a given period (defined by the number of timeslots that can be shifted - `n_loadshift`).
 - **`load_shift_duration::Int`** the number of operational periods in each load shift.
 - **`load_shift_magnitude::Real`** the magnitude for each operational period that is load shifted.
-- **`n_loadshift::Int`** the number of timeslots (from the loadshifttimes) that can be shifted.
+- **`load_shift_times_per_period::Int`** the number of timeslots (from the loadshifttimes) that can be shifted.
 - **`data::Vector{<:Data}`** is the additional data (e.g. for investments).
 """
 struct LoadShiftingNode <: EMB.Sink
@@ -182,10 +188,34 @@ struct LoadShiftingNode <: EMB.Sink
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
-    loadshifttimes::Vector{<:Int}
-    load_shifts_per_periode::Int
+    load_shift_times::Vector{<:Int}
+    load_shifts_per_period::Int
     load_shift_duration::Int
     load_shift_magnitude::Real
-    n_loadshift::Int
+    load_shift_times_per_period::Int
     data::Vector{Data}
+end
+function LoadShiftingNode(
+    id::Any,
+    cap::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+    load_shift_times::Vector{<:Int},
+    load_shifts_per_period::Int,
+    load_shift_duration::Int,
+    load_shift_magnitude::Real,
+    load_shift_times_per_period::Int,
+)
+    return LoadShiftingNode(
+        id,
+        cap,
+        penalty,
+        input,
+        load_shift_times,
+        load_shifts_per_period,
+        load_shift_duration,
+        load_shift_magnitude,
+        load_shift_times_per_period,
+        Data[],
+    )
 end

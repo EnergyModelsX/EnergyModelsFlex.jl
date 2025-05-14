@@ -1,10 +1,20 @@
 """ `AbstractPeriodDemandSink` as supertypes for period demand sinks."""
 abstract type AbstractPeriodDemandSink <: EMB.Sink end
 
-""" `AbstractMultipleInputSink` as supertypes for MultipleInputSink nodes."""
-abstract type AbstractMultipleInputSink <: EMB.Sink end
+"""
+    abstract type AbstractMultipleInputSink <: Sink
 
-""" `AbstractMultipleInputSinkStrat` as supertypes for MultipleInputSinkStrat nodes."""
+Abstract supertype for `Sink` nodes in which the demand can be satisfied by multiple
+resources.
+"""
+abstract type AbstractMultipleInputSink <: Sink end
+
+"""
+    abstract type AbstractMultipleInputSinkStrat <: AbstractMultipleInputSink
+
+Abstract supertype for [`AbstractMultipleInputSink`](@ref) nodes in which the ratio between
+the different resources must be constant within a strategic period.
+"""
 abstract type AbstractMultipleInputSinkStrat <: AbstractMultipleInputSink end
 
 """
@@ -87,15 +97,12 @@ function MultipleInputSink(
 end
 
 """
-    BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
+    struct BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
 
-A `Sink` node with multiple inputs for satsifying the demand.
+A `Sink` node with multiple inputs for satisfying the demand.
 
 This type of node corresponds to an energy service demand where several different energy
 carriers can satisfy the demand, but only one resource at the time (for each strategic period).
-Process emissions can be included, but if the field is not added, then no
-process emissions are assumed through the usage of a constructor.
-Energy use related CO2 emissions are however included.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
@@ -103,7 +110,7 @@ Energy use related CO2 emissions are however included.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (e.g. for investments).
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
 """
 struct BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     id::Any
@@ -122,16 +129,13 @@ function BinaryMultipleInputSinkStrat(
 end
 
 """
-    ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
+    struct ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
 
-A `Sink` node with multiple inputs for satsifying the demand.
+A `Sink` node with multiple inputs for satisfying the demand.
 
 This type of node corresponds to an energy service demand where several different energy
 carriers can satisfy the demand after the supplied energy. The fraction of the input resources
 are given as a variable to be optimized (for each strategic period).
-Process emissions can be included, but if the field is not added, then no
-process emissions are assumed through the usage of a constructor.
-Energy use related CO2 emissions are however included.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
@@ -139,7 +143,7 @@ Energy use related CO2 emissions are however included.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (e.g. for investments).
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
 """
 struct ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     id::Any

@@ -120,9 +120,18 @@ end
 """
     EMB.constraints_flow_in(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure)
 
-Function for creating the constraint on the inlet flow to a `AbstractMultipleInputSinkStrat`.
-The difference to the standard flow is that the AbstractMultipleInputSinkStrat uses the input resources
-in a ratio specified by the input_frac_strat variable for each strategic period.
+Function for creating the constraint on the inlet flow to a [`AbstractMultipleInputSinkStrat`](@ref).
+
+The difference to the standard method is that the [`AbstractMultipleInputSinkStrat`](@ref)
+allows for satisfying the demand with multiple resources as specified through the variable
+`input_frac_strat`.
+
+As a consequence, the method includes the constraints for:
+
+1. the capacity utilization (replacing `constraints_capacity`),
+2. the bounds on the individual flows into the node based on the variable `input_frac_strat`,
+3. the summation limit of `input_frac_strat`, and
+4. the calculation of the total deficit in the `Sink` node.
 """
 function EMB.constraints_flow_in(
     m,
@@ -145,9 +154,9 @@ function EMB.constraints_flow_in(
     # Constraint for the individual input stream connections
     @constraint(
         m,
-        [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ],
+        [t_inv ∈ 𝒯ᴵⁿᵛ, t ∈ t_inv, p ∈ 𝒫ⁱⁿ],
         m[:flow_in][n, t, p] / inputs(n, p) + m[:sink_deficit_p][n, t, p] ==
-        EMB.capacity(n, t) * m[:input_frac_strat][n, 𝒯ᴵⁿᵛ[t.sp], p] +
+        capacity(n, t) * m[:input_frac_strat][n, t_inv, p] +
         m[:sink_surplus_p][n, t, p]
     )
 
@@ -170,12 +179,11 @@ end
 """
     EMB.constraints_capacity(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Define the cap_inst variable to be the input capacity(n,t).
+Function for creating the constraint on the capacity of a [`AbstractMultipleInputSinkStrat`](@ref).
 
-!!! note "Implicity surplus and deficit constraints"
-    The following constraint for surplus and deficit are implicitly defined in the constraints_flow_in function.
-
-    `m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t] + m[:sink_surplus][n, t]`
+It differs from the standard method as it does not include the capacity constraint as this
+is included in `constraints_flow_in`. Instead, it only calls the subfunction
+`constraints_capacity_installed`.
 """
 function EMB.constraints_capacity(
     m,

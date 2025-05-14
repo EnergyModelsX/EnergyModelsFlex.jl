@@ -47,8 +47,7 @@ makedocs(
                 "PeriodDemandSink"=>"nodes/sink/perioddemand.md",
                 "LoadShiftingNode"=>"nodes/sink/loadshiftingnode.md",
                 "MultipleInputSink"=>"nodes/sink/multipleinputsink.md",
-                "BinaryMultipleInputSinkStrat"=>"nodes/sink/binarymultipleinputstratsink.md",
-                "ContinuousMultipleInputSinkStrat"=>"nodes/sink/continuousmultipleinputsinkstrat.md",
+                "AbstractMultipleInputSinkStrat"=>"nodes/sink/multipleinputsinkstrat.md",
             ],
             "Network nodes"=>Any[
                 "MinUpDownTimeNode"=>"nodes/network/minupdowntimenode.md",

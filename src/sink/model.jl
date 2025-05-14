@@ -18,14 +18,18 @@ function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:PeriodDemandSink}, 𝒯
 end
 
 """
-    EMB.variables_node(m, 𝒩::Vector{ContinuousMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
+    EMB.variables_node(m, 𝒩::Vector{<:AbstractMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
-Create the optimization variable `:input_frac_strat` for every [`ContinuousMultipleInputSinkStrat`](@ref) node.
-This method is called from `EnergyModelsBase.jl`.
+Creates the following additional variables for **ALL** [`AbstractMultipleInputSinkStrat`](@ref)
+subtypes:
+- `input_frac_strat[n, t_inv, p]` is the fraction of the demand satisfied by resource `p` in
+  investment period `t_inv`.
+- `sink_surplus_p[n, t, p]` is the surplus of resource `p` in operational period `t`.
+- `sink_deficit_p[n, t, p]` is the deficit of resource `p` in operational period `t`.
 """
 function EMB.variables_node(
     m,
-    𝒩::Vector{ContinuousMultipleInputSinkStrat},
+    𝒩::Vector{<:AbstractMultipleInputSinkStrat},
     𝒯,
     ::EnergyModel,
 )
@@ -40,10 +44,10 @@ function EMB.variables_node(
 end
 
 """
-    EMB.variables_node(m, 𝒩::Vector{ContinuousMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
+    EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
-Create the optimization variable `:input_frac_strat` for every [`BinaryMultipleInputSinkStrat`](@ref) node.
-This method is called from `EnergyModelsBase.jl`.
+Modifies the variable `input_frac_strat[n, t_inv, p]` of [`BinaryMultipleInputSinkStrat`](@ref)
+to be binary to not allow fuel switching within a strategic period.
 """
 function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
@@ -51,9 +55,9 @@ function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯,
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
     𝒫 = unique([p for n ∈ 𝒩 for p ∈ inputs(n)])
 
-    @variable(m, input_frac_strat[𝒩, 𝒯ᴵⁿᵛ, 𝒫], Bin)
-    @variable(m, sink_surplus_p[𝒩, 𝒯, 𝒫] >= 0)
-    @variable(m, sink_deficit_p[𝒩, 𝒯, 𝒫] >= 0)
+    for n ∈ 𝒩, t_inv ∈ 𝒯ᴵⁿᵛ, p ∈ 𝒫
+        set_binary(m[:input_frac_strat][n, t_inv, p])
+    end
 end
 
 """

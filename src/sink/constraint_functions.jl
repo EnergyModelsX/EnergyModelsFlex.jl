@@ -79,9 +79,10 @@ end
 """
     EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure)
 
-Function for creating the constraint on the inlet flow to a `MultipleInputSink`.
-The difference to the standard flow is that the MultipleInputSink allows for
-several different resources to be equivalent
+Function for creating the constraint on the inlet flow of a `MultipleInputSink`.
+
+The difference to the standard constraint is that the `MultipleInputSink` allows for
+several different resources can be used interchangably and the ratio is not enforced.
 """
 function EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, ::EnergyModel)
     # Declaration of the required subsets

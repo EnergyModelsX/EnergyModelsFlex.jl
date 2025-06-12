@@ -99,15 +99,10 @@ Returns the index of the period (*e.g.*, day) that a operational period `t` belo
 period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / period_length(n)))
 
 """
-    MultipleInputSink <: Sink
+    struct MultipleInputSink <: AbstractMultipleInputSink
 
-A `Sink` node with multiple inputs for satsifying the demand.
-
-This type of node corresponds to an energy service demand where several different energy
-carriers can satisfy the demand after the supplied energy.
-Process emissions can be included, but if the field is not added, then no
-process emissions are assumed through the usage of a constructor.
-Energy use related CO2 emissions are however included.
+A `Sink` node with multiple inputs for satsifying the demand. Contrary to a standard sink,
+it is possible to utilize the individual input resources independent of each other.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
@@ -115,7 +110,7 @@ Energy use related CO2 emissions are however included.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (e.g. for investments).
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
 """
 struct MultipleInputSink <: AbstractMultipleInputSink
     id::Any

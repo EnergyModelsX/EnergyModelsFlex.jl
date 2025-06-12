@@ -32,7 +32,7 @@ This package provides several node types that extend the EnergyModelsX interface
 
 - [`PeriodDemandSink`](@ref nodes-perioddemandsink): Allows demand to be met flexibly within a defined time period (e.g. daily energy use).
 - [`LoadShiftingNode`](@ref nodes-loadshiftingnode): Supports discrete batch shifting across time within allowed work shifts.
-- [`MultipleInputSink`](@ref nodes-multipleinputsink): Enables flexible use of multiple input resources to meet demand.
+- [`MultipleInputSink`](@ref nodes-mul_in_sink): Enables flexible use of multiple input resources to meet demand.
 - [`BinaryMultipleInputSinkStrat`](@ref nodes-mul_in_sink_strat): Input choice from multiple fuels using binary (exclusive) decisions per period.
 - [`ContinuousMultipleInputSinkStrat`](@ref nodes-mul_in_sink_strat): Allows input blending over strategic periods using continuous fractions.
 

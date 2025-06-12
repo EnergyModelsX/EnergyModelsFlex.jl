@@ -1,7 +1,22 @@
 """
     constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Write docstring here...
+Add capacity constraints to the optimization model `m` for a node `n`
+representing a period demand sink over the time structure `𝒯`. The constraints
+ensure that the node's capacity usage respects its operational limits and
+accounts for surplus and deficit over periods.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node representing a period demand sink.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
+
+# Constraints
+- Ensures capacity usage matches installed capacity plus any surplus or deficit.
+- Limits capacity usage to installed capacity per operational period.
+- Accounts the total deficit and surplus over each period.
+
 """
 function EMB.constraints_capacity(
     m,
@@ -14,6 +29,16 @@ function EMB.constraints_capacity(
         [t ∈ 𝒯],
         m[:cap_use][n, t] + m[:sink_deficit][n, t] ==
         m[:cap_inst][n, t] + m[:sink_surplus][n, t]
+    )
+
+    # Need to constraint the used capacity to the installed capacity per
+    # operational period. Instead, the node may get input in operational periods
+    # when the cap field is 0. This is ok for regular sink nodes, but this node
+    # only penalizes surplus or deficit over a period.
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        m[:cap_use][n, t] <= m[:cap_inst][n, t]
     )
 
     # Create a list mapping the demand period i to the operational periods it contains.
@@ -42,7 +67,21 @@ end
 """
     constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
 
-Write docstring here...
+Add operational expenditure (opex) variable constraints to the optimization
+model `m` for a node `n` representing a period demand sink over the time
+structure `𝒯ᴵⁿᵛ`. The constraints ensure that the node's surplus and deficit
+penalties are properly accounted for in each period.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node representing a period demand sink.
+- `𝒯ᴵⁿᵛ`: The time structure for strategic periods.
+- `modeltype`: The type of energy model.
+
+# Constraints
+- Penalizes total surplus and deficit in each period.
+- Accounts for surplus and deficit penalties scaled by operational periods.
+
 """
 function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the
@@ -57,18 +96,6 @@ function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::Energ
             ) * scale_op_sp(t_inv, t) for t ∈ t_inv
         )
     )
-end
-
-"""
-    constraints_opex_fixed(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
-
-Write docstring here...
-"""
-function EMB.constraints_opex_fixed(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
-    # Fix the fixed OPEX
-    for t_inv ∈ 𝒯ᴵⁿᵛ
-        fix(m[:opex_fixed][n, t_inv], 0, ; force = true)
-    end
 end
 
 """
@@ -162,7 +189,23 @@ end
 """
     EMB.constraints_capacity(m, n::LoadShiftingNode, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Write docstring here...
+Add capacity constraints to the optimization model `m` for a node `n`
+representing a load-shifting node over the time structure `𝒯`. The constraints
+ensure that the node's capacity usage respects its operational limits and
+accounts for load shifting.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node representing a load-shifting node.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
+
+# Constraints
+- Ensures capacity usage matches installed capacity plus any shifted load.
+- Limits the number of load shifts per period.
+- Balances load shifts from and to operational periods.
+- Sets the `load_shifted` variable to the actual load shifted during load-shifting periods.
+- Fixes `load_shifted` to zero for non-load-shifting periods.
 """
 function EMB.constraints_capacity(
     m,

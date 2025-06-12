@@ -36,7 +36,7 @@ function check_cyclic_sequence(arr::Vector, min_up_value::Int, min_down_value::I
                     # If were in the first segment, the rest of the leading zeros to this
                     # segment might be at the end of the array
                     needed_zeros = min_down_value - count_zeros
-                    last_zeros = all(izzero(v) for v ∈ arr[end-needed_zeros+1:end])
+                    last_zeros = all(izzero(v) for v ∈ arr[(end-needed_zeros+1):end])
                     if last_zeros
                         i = next_idx
                         continue
@@ -57,7 +57,7 @@ function check_cyclic_sequence(arr::Vector, min_up_value::Int, min_down_value::I
                     # this segment might be at the end of the array.
                     needed_non_zeros = min_up_value - count_nonzeros
                     last_non_zeros =
-                        all(iznonzero(v) for v ∈ arr[end-needed_non_zeros+1:end])
+                        all(iznonzero(v) for v ∈ arr[(end-needed_non_zeros+1):end])
                     if last_non_zeros
                         i = next_idx
                         continue

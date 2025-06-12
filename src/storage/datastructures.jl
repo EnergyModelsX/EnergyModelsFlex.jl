@@ -1,11 +1,11 @@
 """
-    ElectricBattery{T} <: EMB.Storage{T}
+    ElectricBattery <: EMB.Storage
 
 Electric battery node
 - c_rate:
 - coloumbic_eff:
 """
-struct ElectricBattery{T} <: EMB.Storage{T}
+struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
     id::Any
     charge::EMB.AbstractStorageParameters
     level::EMB.UnionCapacity
@@ -15,6 +15,21 @@ struct ElectricBattery{T} <: EMB.Storage{T}
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
     data::Vector{<:Data}
+
+    function ElectricBattery{T}(
+        id,
+        charge::EMB.AbstractStorageParameters,
+        level::EMB.UnionCapacity,
+        c_rate::Real, #
+        coloumbic_eff::Real, # efficency, typically 0.98
+        stor_res::Resource,
+        input::Dict{<:Resource,<:Real},
+        output::Dict{<:Resource,<:Real},
+        data::Vector{<:Data}) where {T<:EMB.StorageBehavior}
+        @warn "Depcrecation note: the development of ElectricBattery node is " *
+              "discontinued, and the node will be removed in the next release v0.3.0."
+        new{T}(id, charge, level, c_rate, coloumbic_eff, stor_res, input, output, data)
+    end
 end
 function ElectricBattery{T}(
     id,
@@ -40,68 +55,6 @@ function ElectricBattery{T}(
 end
 
 """
-    BatteryStorage{T} <: EMB.Storage{T}
-
-A battery storage including reserve capabilities.
-
-Includes addional types for reserves up and down.
-"""
-
-struct BatteryStorage{T} <: EMB.Storage{T}
-    id::Any
-    charge_cap::TimeProfile
-    discharge_cap::TimeProfile
-    stor_cap::TimeProfile
-    opex_var::TimeProfile
-    opex_fixed::TimeProfile
-    charge_eff::Real
-    discharge_eff::Real
-    stor_res::T
-    reserve_res_up::Vector{<:Resource}
-    reserve_res_down::Vector{<:Resource}
-    input::Dict{<:Resource,<:Real}
-    output::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
-end
-function BatteryStorage(
-    id,
-    charge_cap::TimeProfile,
-    discharge_cap::TimeProfile,
-    stor_cap::TimeProfile,
-    opex_var::TimeProfile,
-    opex_fixed::TimeProfile,
-    charge_eff::Real,
-    discharge_eff::Real,
-    stor_res::T,
-    reserve_res_up::Vector{<:Resource},
-    reserve_res_down::Vector{<:Resource},
-    input::Dict{<:Resource,<:Real},
-    output::Dict{<:Resource,<:Real},
-) where {T<:Resource}
-    return BatteryStorage(
-        id,
-        charge_cap,
-        discharge_cap,
-        stor_cap,
-        opex_var,
-        opex_fixed,
-        charge_eff,
-        discharge_eff,
-        stor_res,
-        reserve_res_up,
-        reserve_res_down,
-        input,
-        output,
-        Data[],
-    )
-end
-
-has_emissions(n::RefStorage{<:ResourceEmit}) = false
-
-capacity(n::BatteryStorage) =
-    (level = n.stor_cap, charge = n.charge_cap, discharge = n.discharge_cap)
-
-"""
     StorageEfficiency{T} <: EMB.Storage{T}
 
 A StorageEfficiency node which enables storage efficiency control compared to RefStorage{T}.
@@ -109,10 +62,11 @@ A StorageEfficiency node which enables storage efficiency control compared to Re
 It is designed as a parametric type through the type parameter `T` to differentiate between
 different cyclic behaviours. Note that the parameter `T` is only used for dispatching, but
 does not carry any other information. Hence, it is simple to fast switch between different
-[`StorageBehavior`](@ref)s.
+[`StorageBehavior`](@extref EnergyModelsBase.StorageBehavior)s.
 
-The current implemented cyclic behaviours are [`CyclicRepresentative`](@ref),
-[`CyclicStrategic`](@ref), and [`AccumulatingEmissions`](@ref).
+The current implemented cyclic behaviours are [`CyclicRepresentative`](@extref
+EnergyModelsBase.CyclicRepresentative) and [`CyclicStrategic`](@extref
+EnergyModelsBase.CyclicStrategic).
 
 # Fields
 - **`id`** is the name/identifier of the node.

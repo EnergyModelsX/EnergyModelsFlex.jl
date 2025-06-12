@@ -1,7 +1,22 @@
 """
     constraints_capacity(m, n::MinUpDownTimeNode, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Write docstring here...
+
+Add capacity constraints to the optimization model `m` for a node `n` with
+minimum up/down time requirements over the time structure `𝒯`. The constraints
+ensure that the node's capacity usage respects its operational limits and
+switching constraints.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node with minimum up/down time requirements.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
+
+# Constraints
+- Ensures minimum up/down time requirements are met.
+- Enforces capacity usage within specified limits.
+- Adds switching constraints to prevent simultaneous on/off switching.
 """
 function EMB.constraints_capacity(
     m,
@@ -55,18 +70,18 @@ function EMB.constraints_capacity(
 
             @constraint(m, m[:onswitch][n, t] + m[:offswitch][n, t] <= 1)
 
-            @constraint(m, sum(m[:onswitch][n, circshift(ops, -i + M)[1:M-1]]) <= 1)
+            @constraint(m, sum(m[:onswitch][n, circshift(ops, -i + M)[1:(M-1)]]) <= 1)
             @constraint(
                 m,
                 m[:offswitch][n, t] <=
-                1 - sum(m[:onswitch][n, circshift(ops, -i + M)[1:M-1]])
+                1 - sum(m[:onswitch][n, circshift(ops, -i + M)[1:(M-1)]])
             )
 
-            @constraint(m, sum(m[:offswitch][n, circshift(ops, -i + N)[1:N-1]]) <= 1)
+            @constraint(m, sum(m[:offswitch][n, circshift(ops, -i + N)[1:(N-1)]]) <= 1)
             @constraint(
                 m,
                 m[:onswitch][n, t] <=
-                1 - sum(m[:offswitch][n, circshift(ops, -i + N)[1:N-1]])
+                1 - sum(m[:offswitch][n, circshift(ops, -i + N)[1:(N-1)]])
             )
 
             @constraint(m, m[:cap_use][n, t] <= m[:on_off][n, t] * max_cap)
@@ -81,7 +96,21 @@ end
 """
     constraints_capacity(m, n::ActivationCostNode, 𝒯::TimeStructure, ::EnergyModel)
 
-Write docstring here...
+Add capacity constraints to the optimization model `m` for a node `n` with
+activation cost considerations over the time structure `𝒯`. The constraints
+ensure that the node's capacity usage respects its operational limits and
+switching constraints.
+
+# Constraints
+- Ensures proper on/off switching behavior.
+- Enforces capacity usage within specified limits.
+- Adds constraints to prevent simultaneous on/off switching.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node with activation cost considerations.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
 """
 function EMB.constraints_capacity(
     m,
@@ -114,7 +143,20 @@ end
 """
     constraints_flow_in(m, n::ActivationCostNode, 𝒯::TimeStructure, ::EnergyModel)
 
-Write docstring here...
+Add flow input constraints to the optimization model `m` for a node `n` with
+activation cost considerations over the time structure `𝒯`. The constraints
+ensure that the node's input flows respect its capacity usage and activation
+consumption.
+
+# Arguments
+- `m`: The optimization model.
+- `n`: The node with activation cost considerations.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
+
+# Constraints
+- Ensures input flow respects capacity usage.
+- Accounts for activation consumption in input flows.
 """
 function EMB.constraints_flow_in(
     m,

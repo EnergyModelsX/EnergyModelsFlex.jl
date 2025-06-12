@@ -4,7 +4,26 @@ abstract type UnitCommitmentNode{} <: EMB.NetworkNode end
 """
     MinUpDownTimeNode{} <: UnitCommitmentNode
 
-Write docstring here...
+`MinUpDownTimeNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
+nodes-network_node) type that introduces unit commitment logic including minimum
+up and down time constraints.  It is useful for modeling dispatchable power
+plants or technologies where operation must adhere to minimum runtime
+constraints.
+
+# Fields
+- **`id`**: Identifier or name for the node.
+- **`cap::TimeProfile`**: The upper bound on installed capacity over time.
+  This field constrains the operational capacity and is required.
+- **`opex_var::TimeProfile`**: Variable operating expenses per unit of utilized capacity, enforced through the `cap_use` variable.
+- **`opex_fixed::TimeProfile`**: Fixed operating expenses applied per installed capacity unit and investment period.
+- **`input::Dict{<:Resource,<:Real}`**: Resource definitions with conversion factors for input flows.
+- **`output::Dict{<:Resource,<:Real}`**: Resource definitions with conversion factors for output flows.
+- **`minUpTime::Real`**: Minimum number of operational periods the unit must remain on after being started.
+- **`minDownTime::Real`**: Minimum number of operational periods the unit must remain off after being stopped.
+- **`minCapacity::Real`**: Minimum power output when the unit is on.
+- **`maxCapacity::Real`**: Maximum power output when the unit is on (usually aligned with `cap`).
+- **`data::Vector{<:Data}`**: Optional metadata (e.g., emissions or investment data). This is initialized to an empty array by default.
+
 """
 struct MinUpDownTimeNode{} <: UnitCommitmentNode
     id::Any
@@ -23,7 +42,21 @@ end
 """
     ActivationCostNode{} <: UnitCommitmentNode
 
-Write docstring here...
+`ActivationCostNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
+nodes-network_node) that introduces unit commitment logic with additional fuel
+or resource costs incurred upon startup.  It models technologies that consume
+extra input when switching on, such as combustion turbines or thermal boilers.
+
+# Fields
+- **`id`**: Identifier or name of the node.
+- **`cap::TimeProfile`**: The available operational capacity over time.
+- **`opex_var::TimeProfile`**: Variable operating expenses applied per unit of used capacity.
+- **`opex_fixed::TimeProfile`**: Fixed operating expenses applied per unit of installed capacity during each investment period.
+- **`input::Dict{<:Resource,<:Real}`**: Energy or material inputs with conversion ratios.
+- **`output::Dict{<:Resource,<:Real}`**: Energy or material outputs with conversion ratios.
+- **`activation_time::Real`**: Duration of activation effect (currently used to inform activation logic in customized formulations).
+- **`activation_consumption::Dict{<:Resource,<:Real}`** Additional input resources required when the unit switches on.
+- **`data::Vector{<:Data}`**: Optional metadata (e.g., for emissions or investment logic). Defaults to an empty array if not specified.
 """
 struct ActivationCostNode{} <: UnitCommitmentNode
     id::Any

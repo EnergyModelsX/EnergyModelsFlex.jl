@@ -11,6 +11,20 @@ function EMB.check_node(n::MinUpDownTimeNode, 𝒯, ::EnergyModel, ::Bool)
 end
 
 """
+    EMB.check_node(n::ActivationCostNode, 𝒯, ::EnergyModel, ::Bool)
+
+This method checks that a `ActivationCostNode` node is valid.
+
+## Checks
+ - Investments are not supported for this node.
+"""
+function EMB.check_node(n::ActivationCostNode, 𝒯, ::EnergyModel, ::Bool)
+    @assert_or_log(
+        !EnergyModelsInvestments.has_investment(n),
+        "The node ActivationsCostNode does not support investments.")
+end
+
+"""
     check_node(n::Union{LimitedFlexibleInput, Combustion}, 𝒯, ::EnergyModel)
 
 This method checks that a `LimitedFlexibleInput` or a `Combustion` node is valid.

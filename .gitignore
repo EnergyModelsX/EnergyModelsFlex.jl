@@ -17,7 +17,6 @@
 *startup.jl
 docs/build/
 docs/src/manual/NEWS.md
-docs/src/examples/*.md
 *.lp
 *.mps
 dev/
@@ -27,3 +26,5 @@ dev/
 
 # EMX
 consistency_log.md
+
+Makefile

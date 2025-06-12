@@ -1,4 +1,8 @@
-""" `AbstractPeriodDemandSink` as supertypes for period demand sinks."""
+"""
+    abstract type AbstractPeriodDemandSink <: EMB.Sink
+
+Supertypes for period demand sinks in which the demand must be satisifed within a given period.
+"""
 abstract type AbstractPeriodDemandSink <: EMB.Sink end
 
 """
@@ -18,23 +22,32 @@ the different resources must be constant within a strategic period.
 abstract type AbstractMultipleInputSinkStrat <: AbstractMultipleInputSink end
 
 """
-    PeriodDemandSink <: AbstractPeriodDemandSink
+    struct PeriodDemandSink <: AbstractPeriodDemandSink
 
-A `PeriodDemandSink` is a sink that has a demand that can be fulfulled any time dyring a
-period of defined length. If the timestructure has operational periods of 1 hour, then
-the demand should be fulfilled daily, `period_length` should be 24. The field the demand
-for each day is then set as an array as the `period_demand` field. The `cap` field is the
-maximum capacity that can be fulfilled in each operational period.
+A `PeriodDemandSink` is a [`Sink`](@extref EnergyModelsBase.Sink) that has a demand that can
+be satisfied any time during a period of defined length. If the chosen time structure has
+operational periods of  a duration of 1 hour and the  demand should be fulfilled daily,
+`period_length` should be 24. The demand for each day is then set as an array as the
+`period_demand` field. The `cap` field is the maximum capacity that can be fulfilled in
+each operational period.
+
+# Fields
+- **`id`** is the name/identifier of the node.
+- **`period_length::Int`** is the number of periods in which the period demand can be
+  satisfied.
+- **`period_demand::Array{<:Real}`**
+- **`cap::TimeProfile`** is the demand within each of the periods.
+- **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
+  dictionary requires the  fields `:surplus` and `:deficit`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@ref)s with conversion
+  value `Real`.
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments). The field `data`
+  is conditional through usage of a constructor.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
     id::Any
-    # Number of operational periods in each demand period. E.g. 24 for daily, 168 for
-    # weekly, given that the operational period is 1 hour.
     period_length::Int
-    # The demand in each period, given as a vector with the same length as the number of
-    # periods (e.g. days) in the time structure.
     period_demand::Array{<:Real}
-    # Max capacity of the demand in each operational period
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
@@ -51,15 +64,39 @@ function PeriodDemandSink(
     PeriodDemandSink(id, period_length, period_demand, cap, penalty, input, Data[])
 end
 
-""" Returns the number of periods for a `PeriodDemandSink`. """
-number_of_periods(n::AbstractPeriodDemandSink) = length(n.period_demand)
-""" Returns the number of periods for a `PeriodDemandSink` given a `TimeStructure`
 """
-number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure) =
-    Int(length(𝒯) / n.period_length)
+    period_demand(n::AbstractPeriodDemandSink)
+    period_demand(n::AbstractPeriodDemandSink, i::Int)
 
-""" Returns the index of the period (e.g. day) that a operational period `t` belongs to. """
-period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / n.period_length))
+Returns the period demand of `AbstractPeriodDemandSink` `n` as Array or in demand period `i`.
+"""
+period_demand(n::AbstractPeriodDemandSink) = n.period_demand
+period_demand(n::AbstractPeriodDemandSink, i) = n.period_demand[i]
+
+"""
+    period_length(n::AbstractPeriodDemandSink)
+
+Returns the length of the demand period of `AbstractPeriodDemandSink` `n`.
+"""
+period_length(n::AbstractPeriodDemandSink) = n.period_length
+
+"""
+    number_of_periods(n::AbstractPeriodDemandSink)
+    number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure)
+
+Returns the number of periods for a `PeriodDemandSink` `n`. If a `TimeStructure` is provided
+it calculates it based on the chosen time structure.
+"""
+number_of_periods(n::AbstractPeriodDemandSink) = length(period_demand(n))
+number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure) =
+    Int(length(𝒯) / period_length(n))
+
+"""
+    period_index(n::AbstractPeriodDemandSink, t)
+
+Returns the index of the period (*e.g.*, day) that a operational period `t` belongs to.
+"""
+period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / period_length(n)))
 
 """
     MultipleInputSink <: Sink

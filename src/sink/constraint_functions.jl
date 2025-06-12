@@ -1,26 +1,15 @@
 """
-    constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
+    EMB.constraints_capacity(m, n::AbstractPeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Add capacity constraints to the optimization model `m` for a node `n`
-representing a period demand sink over the time structure `𝒯`. The constraints
-ensure that the node's capacity usage respects its operational limits and
-accounts for surplus and deficit over periods.
+Function for creating the constraint on the maximum capacity utilization of an
+[`AbstractPeriodDemandSink`](@ref).
 
-# Arguments
-- `m`: The optimization model.
-- `n`: The node representing a period demand sink.
-- `𝒯`: The time structure.
-- `modeltype`: The type of energy model.
-
-# Constraints
-- Ensures capacity usage matches installed capacity plus any surplus or deficit.
-- Limits capacity usage to installed capacity per operational period.
-- Accounts the total deficit and surplus over each period.
-
+The method is changed from the standard approach through calculating the demand period
+surplus or deficit in addition to the operational period surplus or deficit.
 """
 function EMB.constraints_capacity(
     m,
-    n::PeriodDemandSink,
+    n::AbstractPeriodDemandSink,
     𝒯::TimeStructure,
     modeltype::EnergyModel,
 )
@@ -57,7 +46,7 @@ function EMB.constraints_capacity(
         @constraint(
             m,
             period_total + m[:demand_sink_deficit][n, i] ==
-            n.period_demand[i] + m[:demand_sink_surplus][n, i]
+            period_demand(n, i) + m[:demand_sink_surplus][n, i]
         )
     end
 
@@ -65,25 +54,14 @@ function EMB.constraints_capacity(
 end
 
 """
-    constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
 
-Add operational expenditure (opex) variable constraints to the optimization
-model `m` for a node `n` representing a period demand sink over the time
-structure `𝒯ᴵⁿᵛ`. The constraints ensure that the node's surplus and deficit
-penalties are properly accounted for in each period.
+Function for creating the constraint on the variable OPEX of an [`AbstractPeriodDemandSink`](@ref).
 
-# Arguments
-- `m`: The optimization model.
-- `n`: The node representing a period demand sink.
-- `𝒯ᴵⁿᵛ`: The time structure for strategic periods.
-- `modeltype`: The type of energy model.
-
-# Constraints
-- Penalizes total surplus and deficit in each period.
-- Accounts for surplus and deficit penalties scaled by operational periods.
-
+The method is adjusted from the default method through utilizing the period demand surplus
+and deficit instead of the operational period deficit or surplus.
 """
-function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the
     # operational periods.
     @constraint(

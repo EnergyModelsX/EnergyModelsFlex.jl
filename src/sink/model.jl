@@ -1,5 +1,5 @@
 """
-    EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:PeriodDemandSink}, 𝒯, ::EnergyModel)
+    EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
 
 Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref) nodes:
 - `demand_sink_surplus[n, i]` is a non-negative variable indicating a surplus in demand in
@@ -12,7 +12,7 @@ Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref
     from `TimeStruct`. Instead, it is a period in which the demand must be satisfied. A period
     can consist of multiple operational periods.
 """
-function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:PeriodDemandSink}, 𝒯, ::EnergyModel)
+function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
     @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] >= 0)
     @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] >= 0)
 end

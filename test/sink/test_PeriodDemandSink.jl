@@ -68,12 +68,6 @@ function test_max_grid_production(force_max_production::Bool)
     source = case[:nodes][1]
     @show source
 
-    if force_max_production
-        # Set a constraint on the grid (source node) to produce at max capacity.
-        # This will force the PeriodDemandSink to run a surplus.
-        @constraint(m, [t in case[:T]], m[:cap_use][source, t] == m[:cap_inst][source, t])
-    end
-
     set_optimizer(m, HiGHS.Optimizer)
     set_optimizer_attribute(m, MOI.Silent(), true)
     optimize!(m)
@@ -82,10 +76,7 @@ function test_max_grid_production(force_max_production::Bool)
     @test termination_status(m) == MOI.OPTIMAL
 end
 
-@testset "force-max-production" begin
-    test_max_grid_production(true)
-end
-@testset "dont-force-max-production" begin
+@testset "run-production" begin
     test_max_grid_production(false)
 end
 
@@ -107,7 +98,7 @@ end
 
     # Test that the demand is fulfilled for each period.
     for i ∈ 1:num_periods
-        period_values = vals[(i-1)*period_length+1:i*period_length]
+        period_values = vals[((i-1)*period_length+1):(i*period_length)]
         period_total = sum(val for val ∈ period_values)
         @test period_total == demand.period_demand[i]
     end

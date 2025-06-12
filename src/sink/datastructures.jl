@@ -160,13 +160,21 @@ end
 """
     LoadShiftingNode <: EMB.Sink
 
-A `Sink` node where the demand can be altered by load shifting. The load shifting is based on the assumption that the production happens in discrete batches. 
-A representive batch is defined with a magnitude and a duration. A load shift will in this case mean subtracting the consumption of a representive batch from the original consumption at one time slot
-and adding it on another timeslot. The node is furthermore build for a case where the wokring shifts dictates when the batches may be initiatedl. 
-Thus the timesteps where shuch an batch is allowed to be adde/subtracted is defined by the `loadshifttimes` field. The `loadshifttimes` is further gouped together
-in goups of `load_shift_tines_per_period`, for wich the representive batches can only be shifted within this group. 
+A `Sink` node where the demand can be altered by load shifting. The load
+shifting is based on the assumption that the production happens in discrete
+batches. A representative batch is defined with a magnitude and a duration. A
+load shift will in this case mean subtracting the consumption of a representative
+batch from the original consumption at one time slot and adding it on another
+timeslot. The node is furthermore build for a case where the working shifts
+dictates when the batches may be initiated. Thus the timesteps where such a
+batch is allowed to be added/subtracted is defined by the `load_shift_times` field.
+The `load_shift_times` is further grouped together in groups of
+`load_shift_times_per_period`, for which the representative batches can only be
+shifted within this group.
 
-NB! The node uses indicing of the time steps and is as of now not made to handle timesteps of different durations. 
+!!! warning
+    The node uses indexing of the time steps and is as of now not made to handle
+    timesteps of different durations.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
@@ -174,7 +182,7 @@ NB! The node uses indicing of the time steps and is as of now not made to handle
 - **`penalty::Dict{Symbol, <:TimeProfile}`** (not used) are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
-- **`loadshifttimes::Vector{<:Int}`** is the indices of the time structure that bulks of loads
+- **`load_shift_times::Vector{<:Int}`** are the indices of the time structure that bulks of loads
   may be shifted from/to.
 - **`load_shifts_per_period::Int`** the upper limit of the number of load shifts within the period defined by `load_shift_times_per_period`
   that can be performed for a given period (defined by the number of timeslots that can be shifted - `n_loadshift`).

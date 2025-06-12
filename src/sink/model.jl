@@ -1,13 +1,26 @@
 """
     EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:PeriodDemandSink}, 𝒯, ::EnergyModel)
 
-Write docstring here...
+Declare variables for the optimization model `m` related to period demand sink
+nodes `𝒩ˢⁱⁿᵏ` over the time structure `𝒯`. These variables represent the
+surplus and deficit in demand for each period.
+
+# Arguments
+- `m`: The optimization model.
+- `𝒩ˢⁱⁿᵏ`: A vector of period demand sink nodes.
+- `𝒯`: The time structure.
+- `modeltype`: The type of energy model.
+
+# Variables
+- `demand_sink_surplus[n, i]`: Non-negative variable indicating surplus in demand for each period `i`.
+- `demand_sink_deficit[n, i]`: Non-negative variable indicating deficit in demand for each period `i`.
+
 """
 function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:PeriodDemandSink}, 𝒯, ::EnergyModel)
     n = first(𝒩ˢⁱⁿᵏ)
     num_periods = number_of_periods(n, 𝒯)
-    @variable(m, demand_sink_surplus[𝒩ˢⁱⁿᵏ, i = 1:num_periods] >= 0)
-    @variable(m, demand_sink_deficit[𝒩ˢⁱⁿᵏ, i = 1:num_periods] >= 0)
+    @variable(m, demand_sink_surplus[𝒩ˢⁱⁿᵏ, i=1:num_periods] >= 0)
+    @variable(m, demand_sink_deficit[𝒩ˢⁱⁿᵏ, i=1:num_periods] >= 0)
 end
 
 """
@@ -53,10 +66,10 @@ end
     EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
 
 Create the optimization variables for every time slots indicated by `load_shift_times`
-    - :load_shift_from, integer variable for how many batches shifted away from the this time slot
-    - :load_shift_to, integer variable for how many batches shifted to this time slot
-for every timestep in: 
-    - :load_shifted, continous variable for the total capacity load shifted from the time step 
+ - `:load_shift_from[n, t]`, integer variable for how many batches shifted away from the this time slot
+ - `:load_shift_to[n, t]`, integer variable for how many batches shifted to this time slot
+for every timestep in:
+ - `:load_shifted[n ,t]`, continous variable for the total capacity load shifted from the time step
 """
 function EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
     times = collect(𝒯)

@@ -4,7 +4,13 @@
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/JuliaDiff/BlueStyle)
 
-The EnergyModelsFlex extension provides a series of technology node types for [EnergyModelsX](https://github.com/EnergyModelsX) (EMX) enabling energy and process flexibility modeling.
+EnergyModelsFlex is a Julia package that extends the
+[`EnergyModelsX`](https://github.com/EnergyModelsX)` energy system modeling
+framework with additional node types that capture different aspects of
+flexibility in energy systems.
+
+This package provides a series of technology node types for `EnergyModelsX`
+enabling energy and process flexibility modeling.
 
 ## Usage
 

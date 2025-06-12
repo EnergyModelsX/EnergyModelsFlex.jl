@@ -40,7 +40,7 @@ function EMB.check_node(
     end
 end
 
-""" 
+"""
     EMB.check_node(n::LoadShiftingNode, 𝒯, ::EnergyModel, check_timeprofiles::Bool)
 
 This method checks that the `LoadShiftingNode` node is valid.
@@ -48,7 +48,7 @@ This method checks that the `LoadShiftingNode` node is valid.
 ## Checks
  - The field `cap` is required to be non-negative.
  - The values of the dictionary `input` are required to be positive.
- - The values of load_shift_times are required to be larger than 0. 
+ - The values of load_shift_times are required to be larger than 0.
  - The values of load_shift_times are required to be less than the length of 𝒯.
  - The values of load_shift_magnitude are required to be non-negative.
  - The values of load_shift_duration are required to be positive.

@@ -77,6 +77,7 @@ Pages = [
     "library/public.md",
     "library/internals/types.md",
     "library/internals/methods-fields.md",
+    "library/internals/methods-EMF.md",
     "library/internals/methods-EMB.md",
 ]
 Depth = 1

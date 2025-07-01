@@ -39,8 +39,8 @@ each operational period.
 - **`cap::TimeProfile`** is the demand within each of the periods.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
   dictionary requires the  fields `:surplus` and `:deficit`.
-- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@ref)s with conversion
-  value `Real`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
 - **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
@@ -109,7 +109,8 @@ it is possible to utilize the individual input resources independent of each oth
 - **`cap::TimeProfile`** is the Demand.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
-- **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
 - **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
 """
 struct MultipleInputSink <: AbstractMultipleInputSink
@@ -141,8 +142,13 @@ carriers can satisfy the demand, but only one resource at the time (for each str
 - **`cap::TimeProfile`** is the Demand.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
-- **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
 - **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
+
+!!! warning "Investment options"
+    It is not possible to utilize investments for a `BinaryMultipleInputSinkStrat` as this
+    would introduce bilinear constraints.
 """
 struct BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     id::Any
@@ -174,8 +180,13 @@ are given as a variable to be optimized (for each strategic period).
 - **`cap::TimeProfile`** is the Demand.
 - **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
-- **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
 - **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
+
+!!! warning "Investment options"
+    It is not possible to utilize investments for a `BinaryMultipleInputSinkStrat` as this
+    would introduce bilinear constraints.
 """
 struct ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     id::Any
@@ -217,7 +228,8 @@ shifted within this group.
 - **`cap::TimeProfile`** is the original Demand (before load shifting).
 - **`penalty::Dict{Symbol, <:TimeProfile}`** (not used) are penalties for surplus or deficits.
   Requires the fields `:surplus` and `:deficit`.
-- **`input::Dict{<:Resource, <:Real}`** are the input `Resource`s with conversion value `Real`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
 - **`load_shift_times::Vector{<:Int}`** are the indices of the time structure that bulks of loads
   may be shifted from/to.
 - **`load_shifts_per_period::Int`** the upper limit of the number of load shifts within the period defined by `load_shift_times_per_period`

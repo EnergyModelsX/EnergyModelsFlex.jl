@@ -1,11 +1,11 @@
 # [MultipleInputSink node](@id nodes-mul_in_sink)
 
-[`MultipleInputSink`](@ref) nodes are [`Sink`](@ref) nodes that allow the use of multiple energy carriers (resources) to satisfy a single demand.
+[`MultipleInputSink`](@ref) nodes are [`Sink`](@extref EnergyModelsBase.Sink) nodes that allow the use of multiple energy carriers (resources) to satisfy a single demand.
 Each input resource has a conversion factor, and their combined contribution must meet the demand.
 
 ## [Introduced type and its fields](@id nodes-mul_in_sink-fields)
 
-The [`MultipleInputSink`](@ref) node extends the [`Sink`](@ref) functionality to support multiple simultaneous energy inputs with equivalent service delivery. This is useful for modeling technologies such as hybrid heating systems or multi-fuel industrial boilers.
+The [`MultipleInputSink`](@ref) node extends the [`Sink`](@extref EnergyModelsBase.Sink) functionality to support multiple simultaneous energy inputs with equivalent service delivery. This is useful for modeling technologies such as hybrid heating systems or multi-fuel industrial boilers.
 
 The fields of a [`MultipleInputSink`](@ref) node are given as:
 
@@ -28,7 +28,7 @@ The fields of a [`MultipleInputSink`](@ref) node are given as:
   !!! note
       The field `data` is not required as we include a constructor when the value is excluded.
   !!! danger "Using `CaptureData`"
-      As a `Sink` node does not have any output, it is not possible to utilize `CaptureData`.
+      As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
       If you still plan to specify it, you will receive an error in the model building.
 
 ## [Mathematical description](@id nodes-mul_in_sink-math)
@@ -55,7 +55,7 @@ It does not add any additional variables.
 
 ### [Constraints](@id nodes-mul_in_sink-math-con)
 
-The following sections omit the direction inclusion of the vector of [`MultipleInputSink`](@ref) nodes.
+The following sections omit the direct inclusion of the vector of [`MultipleInputSink`](@ref) nodes.
 Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`MultipleInputSink`](@ref) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all investment periods).
 
@@ -99,7 +99,7 @@ These standard constraints are:
   ```
 
   !!! tip "The function `scale_op_sp`"
-      The function [``scale\_op\_sp(t_{inv}, t)``](@ref scale_op_sp) calculates the scaling factor between operational and investment periods.
+      The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
 - `constraints_data`:\
@@ -114,4 +114,4 @@ The function `constraints_flow_in` receives a new method to account for that the
 The total effective input from all resources (accounting for their conversion factors) must equal the capacity used to meet demand.
 
 !!! tip "Conversion factors"
-    The input resource values in ``\texttt{flow_in}`` are divided by their conversion factors to normalize their contribution toward demand fulfillment.
+    The input resource values in ``\texttt{flow\_in}`` are divided by their conversion factors to normalize their contribution toward demand fulfillment.

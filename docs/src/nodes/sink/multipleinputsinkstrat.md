@@ -1,14 +1,14 @@
 # [AbstractMultipleInputSinkStrat node](@id nodes-mul_in_sink_strat)
 
-[`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) are [`Sink`](@ref) nodes that models flexible energy service demands that can be met by a combination of multiple input resources.
-Unlike [`MultipleInputSink`](@ref ) nodes, we enforce that the ratio between the different input resources is the same in all operational periods of an investment period
+[`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) are [`Sink`](@extref EnergyModelsBase.Sink) nodes that models flexible energy service demands that can be met by a combination of multiple input resources.
+Unlike [`MultipleInputSink`](@ref ) nodes, we enforce that the ratio between the different input resources is the same in all operational periods of an investment period.
 
 !!! warning "InvestmentData"
-    The current implementation does not allow for the incorporation of investment data.
+    The current implementation does not allow for the incorporation of investment data as this would lead to bilinear constraints.
 
 ## [Introduced types and their fields](@id nodes-mul_in_sink_strat-fields)
 
-We implement to types of [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) nodes:
+We implement two types of [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) nodes:
 
 1. [`ContinuousMultipleInputSinkStrat`](@ref) and
 2. [`BinaryMultipleInputSinkStrat`](@ref).
@@ -48,7 +48,7 @@ These fields are:
   !!! note
       The field `data` is not required as we include a constructor when the value is excluded.
   !!! danger "Using `CaptureData`"
-      As a `Sink` node does not have any output, it is not possible to utilize `CaptureData`.
+      As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
       If you still plan to specify it, you will receive an error in the model building.
 
 !!! note
@@ -77,7 +77,7 @@ The variables include:
 #### [Additional variables](@id nodes-mul_in_sink_strat-math-add)
 
 [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_node()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource.
-These variables are for a [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) node ``n`` in operational period ``t``:
+These variables are for an [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) node ``n`` in operational period ``t``:
 
 - ``\texttt{input\_frac\_strat}[n, t_{inv}, p]``:\
   Fraction of the demand satisfied by input resource ``p`` in strategic period ``t_{inv}``.
@@ -89,7 +89,7 @@ These variables are for a [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFl
 
 ### [Constraints](@id nodes-mul_in_sink_strat-math-con)
 
-The following sections omit the direction inclusion of the vector of [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) nodes.
+The following sections omit the direct inclusion of the vector of [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) nodes.
 Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all investment periods).
 

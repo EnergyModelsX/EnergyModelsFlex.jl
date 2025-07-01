@@ -1,7 +1,7 @@
 # [PeriodDemandSink node](@id nodes-perioddemandsink)
 
 [`PeriodDemandSink`](@ref) nodes represent flexible demand sinks where demand must be fulfilled within defined periods (*e.g.* daily or weekly), rather than in each individual operational time step.
-**A *period* is thus a consecutive range of operational periods, that together will model ,*e.g.*, a day or a week etc.**
+**A *period* is thus a consecutive range of operational periods, that together will model, *e.g.*, a day or a week etc.**
 
 This node can, *e.g.*, be combined with [`MinUpDownTimeNode`](@ref), to allow production to be moved to the time of the day when it is cheapest because of, *e.g.*, energy or production costs.
 
@@ -14,7 +14,8 @@ This node can, *e.g.*, be combined with [`MinUpDownTimeNode`](@ref), to allow pr
 
 ## [Introduced type and its fields](@id nodes-perioddemandsink-fields)
 
-The [`PeriodDemandSink`](@ref) node extends the [`Sink`](@ref) functionality by introducing aggregated demand over fixed-length periods. This is useful for representing flexible loads like electric vehicle charging or industrial batch processes, where exact timing of delivery is flexible.
+The [`PeriodDemandSink`](@ref) node extends the [`Sink`](@extref EnergyModelsBase.Sink) functionality by introducing aggregated demand over fixed-length periods.
+This is useful for representing flexible loads like electric vehicle charging or industrial batch processes, where exact timing of delivery is flexible.
 
 !!! note "Abstract supertype"
     `PeriodDemandSink` is defined as a subtype of [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink), and constraints are put on this supertype.
@@ -46,7 +47,7 @@ The fields of a [`PeriodDemandSink`](@ref) node are given as:
   !!! warning "Chosen values"
       The current implementation does not represent the proper cost due to the summation.
       Instead, you must consider the duration of an operational period and the field `period_length` when providing a value.
-      In this case, the value should be multiplied by ``1/(period_length(n) \times duration(t)``.
+      In this case, the value should be multiplied by ``1/period\_length(n) \times duration(t)``.
 
 - **`input::Dict{<:Resource,<:Real}`**:\
   The field `input` includes [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.\
@@ -54,6 +55,11 @@ The fields of a [`PeriodDemandSink`](@ref) node are given as:
 - **`data::Vector{Data}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
+  !!! note
+      The field `data` is not required as we include a constructor when the value is excluded.
+  !!! danger "Using `CaptureData`"
+      As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
+      If you still plan to specify it, you will receive an error in the model building.
 
 !!! note
     Unlike [`RefSink`](@extref EnergyModelsBase.RefSink), the delivery of demand here is flexible within each demand period.
@@ -91,7 +97,7 @@ These variables are for a [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.Abs
 
 ### [Constraints](@id nodes-perioddemandsink-math-con)
 
-The following sections omit the direction inclusion of the vector of [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes.
+The following sections omit the direct inclusion of the vector of [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes.
 Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all investment periods).
 

@@ -1,26 +1,15 @@
 """
-    constraints_capacity(m, n::PeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
+    EMB.constraints_capacity(m, n::AbstractPeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Add capacity constraints to the optimization model `m` for a node `n`
-representing a period demand sink over the time structure `𝒯`. The constraints
-ensure that the node's capacity usage respects its operational limits and
-accounts for surplus and deficit over periods.
+Function for creating the constraint on the maximum capacity utilization of an
+[`AbstractPeriodDemandSink`](@ref).
 
-# Arguments
-- `m`: The optimization model.
-- `n`: The node representing a period demand sink.
-- `𝒯`: The time structure.
-- `modeltype`: The type of energy model.
-
-# Constraints
-- Ensures capacity usage matches installed capacity plus any surplus or deficit.
-- Limits capacity usage to installed capacity per operational period.
-- Accounts the total deficit and surplus over each period.
-
+The method is changed from the standard approach through calculating the demand period
+surplus or deficit in addition to the operational period surplus or deficit.
 """
 function EMB.constraints_capacity(
     m,
-    n::PeriodDemandSink,
+    n::AbstractPeriodDemandSink,
     𝒯::TimeStructure,
     modeltype::EnergyModel,
 )
@@ -57,7 +46,7 @@ function EMB.constraints_capacity(
         @constraint(
             m,
             period_total + m[:demand_sink_deficit][n, i] ==
-            n.period_demand[i] + m[:demand_sink_surplus][n, i]
+            period_demand(n, i) + m[:demand_sink_surplus][n, i]
         )
     end
 
@@ -65,25 +54,14 @@ function EMB.constraints_capacity(
 end
 
 """
-    constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
 
-Add operational expenditure (opex) variable constraints to the optimization
-model `m` for a node `n` representing a period demand sink over the time
-structure `𝒯ᴵⁿᵛ`. The constraints ensure that the node's surplus and deficit
-penalties are properly accounted for in each period.
+Function for creating the constraint on the variable OPEX of an [`AbstractPeriodDemandSink`](@ref).
 
-# Arguments
-- `m`: The optimization model.
-- `n`: The node representing a period demand sink.
-- `𝒯ᴵⁿᵛ`: The time structure for strategic periods.
-- `modeltype`: The type of energy model.
-
-# Constraints
-- Penalizes total surplus and deficit in each period.
-- Accounts for surplus and deficit penalties scaled by operational periods.
-
+The method is adjusted from the default method through utilizing the period demand surplus
+and deficit instead of the operational period deficit or surplus.
 """
-function EMB.constraints_opex_var(m, n::PeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the
     # operational periods.
     @constraint(
@@ -101,9 +79,10 @@ end
 """
     EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure)
 
-Function for creating the constraint on the inlet flow to a `MultipleInputSink`.
-The difference to the standard flow is that the MultipleInputSink allows for
-several different resources to be equivalent
+Function for creating the constraint on the inlet flow of a `MultipleInputSink`.
+
+The difference to the standard constraint is that the `MultipleInputSink` allows for
+several different resources can be used interchangably and the ratio is not enforced.
 """
 function EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, ::EnergyModel)
     # Declaration of the required subsets
@@ -120,9 +99,18 @@ end
 """
     EMB.constraints_flow_in(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure)
 
-Function for creating the constraint on the inlet flow to a `AbstractMultipleInputSinkStrat`.
-The difference to the standard flow is that the AbstractMultipleInputSinkStrat uses the input resources
-in a ratio specified by the input_frac_strat variable for each strategic period.
+Function for creating the constraint on the inlet flow to a [`AbstractMultipleInputSinkStrat`](@ref).
+
+The difference to the standard method is that the [`AbstractMultipleInputSinkStrat`](@ref)
+allows for satisfying the demand with multiple resources as specified through the variable
+`input_frac_strat`.
+
+As a consequence, the method includes the constraints for:
+
+1. the capacity utilization (replacing `constraints_capacity`),
+2. the bounds on the individual flows into the node based on the variable `input_frac_strat`,
+3. the summation limit of `input_frac_strat`, and
+4. the calculation of the total deficit in the `Sink` node.
 """
 function EMB.constraints_flow_in(
     m,
@@ -145,9 +133,9 @@ function EMB.constraints_flow_in(
     # Constraint for the individual input stream connections
     @constraint(
         m,
-        [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ],
+        [t_inv ∈ 𝒯ᴵⁿᵛ, t ∈ t_inv, p ∈ 𝒫ⁱⁿ],
         m[:flow_in][n, t, p] / inputs(n, p) + m[:sink_deficit_p][n, t, p] ==
-        EMB.capacity(n, t) * m[:input_frac_strat][n, 𝒯ᴵⁿᵛ[t.sp], p] +
+        capacity(n, t) * m[:input_frac_strat][n, t_inv, p] +
         m[:sink_surplus_p][n, t, p]
     )
 
@@ -170,12 +158,11 @@ end
 """
     EMB.constraints_capacity(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Define the cap_inst variable to be the input capacity(n,t).
+Function for creating the constraint on the capacity of a [`AbstractMultipleInputSinkStrat`](@ref).
 
-!!! note "Implicity surplus and deficit constraints"
-    The following constraint for surplus and deficit are implicitly defined in the constraints_flow_in function.
-
-    `m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t] + m[:sink_surplus][n, t]`
+It differs from the standard method as it does not include the capacity constraint as this
+is included in `constraints_flow_in`. Instead, it only calls the subfunction
+`constraints_capacity_installed`.
 """
 function EMB.constraints_capacity(
     m,

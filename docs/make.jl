@@ -47,8 +47,7 @@ makedocs(
                 "PeriodDemandSink"=>"nodes/sink/perioddemand.md",
                 "LoadShiftingNode"=>"nodes/sink/loadshiftingnode.md",
                 "MultipleInputSink"=>"nodes/sink/multipleinputsink.md",
-                "BinaryMultipleInputSinkStrat"=>"nodes/sink/binarymultipleinputstratsink.md",
-                "ContinuousMultipleInputSinkStrat"=>"nodes/sink/continuousmultipleinputsinkstrat.md",
+                "AbstractMultipleInputSinkStrat"=>"nodes/sink/multipleinputsinkstrat.md",
             ],
             "Network nodes"=>Any[
                 "MinUpDownTimeNode"=>"nodes/network/minupdowntimenode.md",
@@ -66,6 +65,7 @@ makedocs(
             "Internals"=>String[
                 "library/internals/types.md",
                 "library/internals/methods-fields.md",
+                "library/internals/methods-EMF.md",
                 "library/internals/methods-EMB.md",
             ],
         ],

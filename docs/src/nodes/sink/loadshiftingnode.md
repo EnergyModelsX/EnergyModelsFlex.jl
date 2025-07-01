@@ -1,6 +1,6 @@
 # [LoadShiftingNode](@id nodes-loadshiftingnode)
 
-[`LoadShiftingNode`](@ref) is a specialized [`Sink`](@ref) node that allows for **batch-wise load shifting**. It is designed for demand profiles where discrete production batches can be rescheduled within defined working shifts. This flexibility allows modeling of industrial processes that can shift load within operational constraints.
+[`LoadShiftingNode`](@ref) is a specialized [`Sink`](@extref EnergyModelsBase.Sink) node that allows for **batch-wise load shifting**. It is designed for demand profiles where discrete production batches can be rescheduled within defined working shifts. This flexibility allows modeling of industrial processes that can shift load within operational constraints.
 
 !!! warning
     This node is designed for **uniform timestep durations**. Irregular durations may cause misalignment of shifted loads.
@@ -16,7 +16,7 @@
 
 ## [Introduced type and its fields](@id nodes-loadshiftingnode-fields)
 
-The [`LoadShiftingNode`](@ref) extends the basic [`Sink`](@ref) with load shifting logic based on indexed operational periods and discrete batch shifts.
+The [`LoadShiftingNode`](@ref) extends the basic [`Sink`](@extref EnergyModelsBase.Sink) with load shifting logic based on indexed operational periods and discrete batch shifts.
 
 The fields of a [`LoadShiftingNode`](@ref) are:
 
@@ -54,7 +54,7 @@ The fields of a [`LoadShiftingNode`](@ref) are:
 
 ### [Variables](@id nodes-loadshiftingnode-math-var)
 
-In addition to standard [`Sink`](@ref) variables:
+In addition to standard [`Sink`](@extref EnergyModelsBase.Sink) variables:
 
 - [``\texttt{opex\_var}``](@extref EnergyModelsBase man-opt_var-opex)
 - [``\texttt{opex\_fixed}``](@extref EnergyModelsBase man-opt_var-opex)
@@ -111,7 +111,7 @@ the node introduces:
   ```
 
   !!! tip "The function `scale_op_sp`"
-      The function [``scale\_op\_sp(t_{inv}, t)``](@ref scale_op_sp) calculates the scaling factor between operational and investment periods.
+      The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
 - `constraints_data`:\

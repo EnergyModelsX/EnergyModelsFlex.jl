@@ -21,21 +21,12 @@ This is useful for representing flexible loads like electric vehicle charging or
     `PeriodDemandSink` is defined as a subtype of [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink), and constraints are put on this supertype.
     By subtyping `AbstractPeriodDemandSink`, you can easily extend the functionality of this node.
 
-The fields of a [`PeriodDemandSink`](@ref) node are given as:
+### [Standard fields](@id nodes-perioddemandsink-fields-stand)
+
+The standard fields are given as:
 
 - **`id`**:\
   The field `id` is only used for providing a name to the node.
-- **`period_length::Int`**:\
-  Defines how many operational periods are included in a single demand period.\
-  For instance, if the duration of the operational periods is 1 hour and `period_length = 24`, then each demand period spans one day.
-  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled.
-
-- **`period_demand::Vector{<:Real}`**:\
-  The total demand to be met during each demand period. The length of this vector should match the number of periods (*e.g.*, days) in the time structure. If the time structure represents on year with hourly resolution, this vector must then have 365 elements.
-
-  !!! warning "Time consistency"
-      Ensure that the `period_demand` vector length aligns with the total time horizon divided by `period_length`. Mismatches can lead to indexing errors or inconsistent demand enforcement.
-
 - **`cap::TimeProfile`**:\
   The maximum amount of demand that can be met in each operational period.
   This acts as a capacity on instantaneous delivery, while `period_demand` enforces total energy delivered within the chosen period.
@@ -55,7 +46,7 @@ The fields of a [`PeriodDemandSink`](@ref) node are given as:
 - **`data::Vector{Data}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
-  !!! note
+  !!! note "Included constructor"
       The field `data` is not required as we include a constructor when the value is excluded.
   !!! danger "Using `CaptureData`"
       As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
@@ -65,9 +56,35 @@ The fields of a [`PeriodDemandSink`](@ref) node are given as:
     Unlike [`RefSink`](@extref EnergyModelsBase.RefSink), the delivery of demand here is flexible within each demand period.
     This is helpful for modeling demand that can shift within a day or week.
 
+### [Additional fields](@id nodes-perioddemandsink-fields-new)
+
+[`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)s require additional fields to specify both the periods and their respective demands:
+
+- **`period_length::Int`**:\
+  Defines how many operational periods are included in a single demand period.\
+  For instance, if the duration of the operational periods is 1 hour and `period_length = 24`, then each demand period spans one day.
+  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled.
+
+- **`period_demand::Vector{<:Real}`**:\
+  The total demand to be met during each demand period. The length of this vector should match the number of periods (*e.g.*, days) in the time structure. If the time structure represents on year with hourly resolution, this vector must then have 365 elements.
+
+  !!! warning "Time consistency"
+      Ensure that the `period_demand` vector length aligns with the total time horizon divided by `period_length`. Mismatches can lead to indexing errors or inconsistent demand enforcement.
+
+These fields are at the 2ⁿᵈ and 3ʳᵈ position below the field `id` as shown in [`PeriodDemandSink`](@ref).
+
 ## [Mathematical description](@id nodes-perioddemandsink-math)
 
-The [`PeriodDemandSink`](@ref) node introduces variables and constraints associated with period-based demand fulfillment.
+In the following mathematical equations, we use the name for variables and functions used in the model.
+Variables are in general represented as
+
+``\texttt{var\_example}[index_1, index_2]``
+
+with square brackets, while functions are represented as
+
+``func\_example(index_1, index_2)``
+
+with paranthesis.
 
 ### [Variables](@id nodes-perioddemandsink-math-var)
 
@@ -103,7 +120,7 @@ In addition, all constraints are valid ``\forall t \in T`` (that is in all opera
 
 #### [Standard constraints](@id nodes-perioddemandsink-math-con-stand)
 
-[`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase.Sink) node as described in the *[documentaiton of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
+[`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase nodes-sink) node as described in the *[documentaiton of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
 These standard constraints are:
 
 - `constraints_capacity_installed`:

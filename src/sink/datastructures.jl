@@ -32,16 +32,16 @@ operational periods of  a duration of 1 hour and the  demand should be fulfilled
 each operational period.
 
 # Fields
-- **`id`** is the name/identifier of the node.
+- **`id::Any`** is the name/identifier of the node.
 - **`period_length::Int`** is the number of periods in which the period demand can be
   satisfied.
-- **`period_demand::Array{<:Real}`**
-- **`cap::TimeProfile`** is the demand within each of the periods.
+- **`period_demand::Array{<:Real}`** is the demand within each of the periods.
+- **`cap::TimeProfile`** is the installed capacity.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
   dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments). The field `data`
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
@@ -101,17 +101,20 @@ period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / period_len
 """
     struct MultipleInputSink <: AbstractMultipleInputSink
 
-A `Sink` node with multiple inputs for satsifying the demand. Contrary to a standard sink,
-it is possible to utilize the individual input resources independent of each other.
+A [`Sink`](@extref EnergyModelsBase.Sink) node with multiple inputs for satisfying the demand.
+
+Contrary to a standard sink, it is possible to utilize the individual input resources
+independent of each other.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`cap::TimeProfile`** is the Demand.
-- **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
-  Requires the fields `:surplus` and `:deficit`.
+- **`cap::TimeProfile`** is the demand.
+- **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
+  dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
 - **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct MultipleInputSink <: AbstractMultipleInputSink
     id::Any
@@ -132,19 +135,20 @@ end
 """
     struct BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
 
-A `Sink` node with multiple inputs for satisfying the demand.
+A [`Sink`](@extref EnergyModelsBase.Sink) node with multiple inputs for satisfying the demand.
 
 This type of node corresponds to an energy service demand where several different energy
 carriers can satisfy the demand, but only one resource at the time (for each strategic period).
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`cap::TimeProfile`** is the Demand.
-- **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
-  Requires the fields `:surplus` and `:deficit`.
+- **`cap::TimeProfile`** is the demand.
+- **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
+  dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 
 !!! warning "Investment options"
     It is not possible to utilize investments for a `BinaryMultipleInputSinkStrat` as this
@@ -169,7 +173,7 @@ end
 """
     struct ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
 
-A `Sink` node with multiple inputs for satisfying the demand.
+A [`Sink`](@extref EnergyModelsBase.Sink) node with multiple inputs for satisfying the demand.
 
 This type of node corresponds to an energy service demand where several different energy
 carriers can satisfy the demand after the supplied energy. The fraction of the input resources
@@ -177,12 +181,13 @@ are given as a variable to be optimized (for each strategic period).
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`cap::TimeProfile`** is the Demand.
-- **`penalty::Dict{Symbol, <:TimeProfile}`** are penalties for surplus or deficits.
-  Requires the fields `:surplus` and `:deficit`.
+- **`cap::TimeProfile`** is the demand.
+- **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
+  dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*,for investments).
+- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 
 !!! warning "Investment options"
     It is not possible to utilize investments for a `BinaryMultipleInputSinkStrat` as this
@@ -237,7 +242,8 @@ shifted within this group.
 - **`load_shift_duration::Int`** the number of operational periods in each load shift.
 - **`load_shift_magnitude::Real`** the magnitude for each operational period that is load shifted.
 - **`load_shift_times_per_period::Int`** the number of timeslots (from the loadshifttimes) that can be shifted.
-- **`data::Vector{<:Data}`** is the additional data (e.g. for investments).
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments). The field `data`
+  is conditional through usage of a constructor.
 """
 struct LoadShiftingNode <: EMB.Sink
     id::Any

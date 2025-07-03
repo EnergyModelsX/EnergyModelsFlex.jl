@@ -1,49 +1,73 @@
 # [LimitedFlexibleInput node](@id nodes-limitedflexibleinput)
 
-[`LimitedFlexibleInput`](@ref) nodes are a specialized form of [`NetworkNode`](@ref)s that support multiple input resources with a fixed output structure, but **limit** how much each individual input can contribute to the total inflow. This is particularly useful for modeling constraints such as fuel blend caps, quality requirements, or policy-imposed input fractions.
+[`LimitedFlexibleInput`](@ref) nodes are a specialized form of [`NetworkNode`](@extref EnergyModelsBase nodes-network_node)s that support multiple input resources with a fixed output structure, but **limit** how much each individual input can contribute to the total inflow.
+This is particularly useful for modeling constraints such as fuel blend caps, quality requirements, or policy-imposed input fractions.
 
 ## [Introduced type and its fields](@id nodes-limitedflexibleinput-fields)
 
-The [`LimitedFlexibleInput`](@ref) node builds on the [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) implementation by adding an additional `limit` field, which restricts the **fractional contribution** of each input [`Resource`](@ref) to the total input flow.
+The [`LimitedFlexibleInput`](@ref) node builds on the [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) implementation by adding an additional `limit` field, which restricts the **fractional contribution** of each input [`Resource`](@extref EnergyModelsBase.Resource) to the total input flow.
 
-The fields of a [`LimitedFlexibleInput`](@ref) node are:
+### [Standard fields](@id nodes-limitedflexibleinput-fields-stand)
+
+The standard fields are given as:
 
 - **`id`**:\
-  The name or identifier of the node.
+  The field `id` is only used for providing a name to the node.
 - **`cap::TimeProfile`**:\
-  The installed capacity profile over time.\
-  This sets the upper bound on `cap_use`, which is used in capacity-related constraints.
+  The installed capacity corresponds to the nominal capacity of the node.\
+  If the node should contain investments through the application of [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/), it is important to note that you can only use `FixedProfile` or `StrategicProfile` for the capacity, but not `RepresentativeProfile` or `OperationalProfile`.
+  In addition, all values have to be non-negative.
 - **`opex_var::TimeProfile`**:\
-  Variable operating expenses applied per unit of output.
+  The variable operational expenses are based on the capacity utilization through the variable [`:cap_use`](@extref EnergyModelsBase man-opt_var-cap).
+  Hence, it is directly related to the specified `input` and `output` ratios.
+  The variable operating expenses can be provided as `OperationalProfile` as well.
 - **`opex_fixed::TimeProfile`**:\
   Fixed operating expenses applied per unit of installed capacity and investment period duration.
+- **`input::Dict{<:Resource,<:Real}`** and **`output::Dict{<:Resource,<:Real}`**:\
+  Both fields describe the `input` and `output` [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.\
+  CO₂ cannot be directly specified, *i.e.*, you cannot specify a ratio.
+  If you use [`CaptureData`](@extref EnergyModelsBase.CaptureData), it is however necessary to specify CO₂ as output, although the ratio is not important.\
+  All values have to be non-negative.
+- **`data::Vector{<:Data}`**:\
+  An entry for providing additional data to the model.
+  In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
+
+  !!! note "Constructor for `LimitedFlexibleInput`"
+      The field `data` is not required as we include a constructor when the value is excluded.
+
+  !!! warning "Using `CaptureData`"
+      If you plan to use [`CaptureData`](@extref EnergyModelsBase.CaptureData) for a [`LimitedFlexibleInput`](@ref) node, it is crucial that you specify your CO₂ resource in the `output` dictionary.
+      The chosen value is however **not** important as the CO₂ flow is automatically calculated based on the process utilization and the provided process emission value.
+      The reason for this necessity is that flow variables are declared through the keys of the `output` dictionary.
+      Hence, not specifying CO₂ as `output` resource results in not creating the corresponding flow variable and subsequent problems in the design.
+
+      We plan to remove this necessity in the future.
+      As it would most likely correspond to breaking changes, we have to be careful to avoid requiring major changes in other packages.
+
+### [Additional fields](@id nodes-limitedflexibleinput-fields-new)
+
+[`LimitedFlexibleInput`](@ref) nodes add a single additional field compared to a [`NetworkNode`](@extref EnergyModelsBase nodes-network_node):
+
 - **`limit::Dict{<:Resource,<:Real}`**:\
   A dictionary that sets the maximum share each input resource can contribute to the **total inflow**.
+  `Resource`s which are specified in the `input` dictionary, but not in the `limit` dictionary will be treated as unconstrained.
+  This corresponds to a value of ``1`` in the `limit` dictionary.
+  All values should be in the range ``[0, 1]``.
+
+  !!! tip
+      The `limit` field can be used to enforce regulatory blending requirements (*e.g.*, max 30 % coal in a hybrid boiler), or to simulate physical limitations such as combustion chamber design.
 
   !!! note "Total inflow dependency"
-      The limit applies **relative to the total inflow**, not to the output or installed capacity. This makes it suitable for mix-based constraints, such as resource quota obligations.
-
-  !!! warning "Input limits must be non-zero"
-      If a resource is listed in `input` but not in `limit`, it is treated as **unconstrained**. Ensure that all input resources you wish to constrain are included in the `limit` dictionary.
-
-- **`input::Dict{<:Resource,<:Real}`**:\
-  Input resources and their conversion factors.
-- **`output::Dict{<:Resource,<:Real}`**:\
-  Output resources and their conversion factors.
-- **`data::Vector{<:Data}`**:\
-  Optional metadata for investment and emissions modeling.
-
-!!! tip
-    The `limit` field can be used to enforce regulatory blending requirements (e.g., max 30% coal in a hybrid boiler), or to simulate physical limitations such as combustion chamber design.
-
+      The limit applies **relative to the total inflow**, not to the output or installed capacity.
+      This makes it suitable for mix-based constraints, such as resource quota obligations.
 
 ## [Mathematical description](@id nodes-limitedflexibleinput-math)
 
-[`LimitedFlexibleInput`](@ref) nodes extend the standard [`NetworkNode`](@ref) constraint set by introducing resource-specific limits on the input mix.
+[`LimitedFlexibleInput`](@ref) nodes extend the standard [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) constraint set by introducing resource-specific limits on the input mix.
 
 ### [Variables](@id nodes-limitedflexibleinput-math-var)
 
-Like all [`NetworkNode`](@ref)s, the following optimization variables are used:
+Like all [`NetworkNode`](@extref EnergyModelsBase nodes-network_node)s, the following optimization variables are used:
 
 - [``\texttt{opex\_var}``](@extref EnergyModelsBase man-opt_var-opex) \
   Variable operating expenses.
@@ -61,15 +85,14 @@ Like all [`NetworkNode`](@ref)s, the following optimization variables are used:
 
 ### [Constraints](@id nodes-limitedflexibleinput-math-con)
 
-#### Standard constraints
+The following sections omit the direct inclusion of the vector of [`LimitedFlexibleInput`](@ref) nodes.
+Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`LimitedFlexibleInput`](@ref) types if not stated differently.
+In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all investment periods).
 
-The following standard constraints are implemented for a [`NetworkNode`](@extref
-EnergyModelsBase nodes-network_node) node.  [`NetworkNode`](@ref) nodes utilize
-the declared method for all nodes 𝒩.  The constraint functions are called
-within the function [`create_node`](@extref EnergyModelsBase.create_node).
-Hence, if you do not have to call additional functions, but only plan to include
-a method for one of the existing functions, you do not have to specify a new
-[`create_node`](@extref EnergyModelsBase.create_node) method.
+#### [Standard constraints](@id nodes-limitedflexibleinput-math-con-stand)
+
+[`LimitedFlexibleInput`](@ref) utilize in general the standard constraints that are implemented for a [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) node as described in the *[documentation of `EnergyModelsBase`](@extref EnergyModelsBase nodes-network_node-math-con)*.
+These standard constraints are:
 
 - `constraints_capacity`:
 
@@ -87,7 +110,6 @@ a method for one of the existing functions, you do not have to specify a new
       The function `constraints_capacity_installed` is also used in [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) to incorporate the potential for investment.
       Nodes with investments are then no longer constrained by the parameter capacity.
 
-
 - `constraints_flow_out`:
 
   ```math
@@ -103,7 +125,7 @@ a method for one of the existing functions, you do not have to specify a new
   ```
 
   !!! tip "Why do we use `first()`"
-      The variable ``\texttt{cap\_inst}`` is declared over all operational periods (see the section on *[Capacity variables](@ref man-opt_var-cap)* for further explanations).
+      The variable ``\texttt{cap\_inst}`` is declared over all operational periods (see the section on *[Capacity variables](@extref EnergyModelsBase man-opt_var-cap)* for further explanations).
       Hence, we use the function ``first(t_{inv})`` to retrieve the installed capacity in the first operational period of a given investment period ``t_{inv}`` in the function `constraints_opex_fixed`.
 
 - `constraints_opex_var`:
@@ -113,31 +135,28 @@ a method for one of the existing functions, you do not have to specify a new
   ```
 
   !!! tip "The function `scale_op_sp`"
-      The function [``scale\_op\_sp(t_{inv}, t)``](@ref scale_op_sp) calculates the scaling factor between operational and investment periods.
+      The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
 - `constraints_data`:\
   This function is only called for specified data of the nodes, see above.
 
+The function `constraints_flow_in` receives a new method to handle the input flow constraints:
 
-#### Additional constraints
+- **Input/output balance (normalized):**
 
-- `constraints_flow_in`
+  ```math
+  \sum_{p \in P^{in}} \frac{\texttt{flow\_in}[n, t, p]}{inputs(n, p)} =
+  \texttt{cap\_use}[n, t]
+  ```
 
-  - **Input/output balance (normalized):**
+  This constraint enforces a normalized energy balance between input resource flows and total utilized capacity.
 
-    ```math
-    \sum_{p \in P^{in}} \frac{\texttt{flow\_in}[n, t, p]}{inputs(n, p)} =
-    \texttt{cap\_use}[n, t]
-    ```
+- **Input share constraint per resource:**
 
-    This constraint enforces a normalized energy balance between input resource flows and total utilized capacity.
+  ```math
+  \texttt{flow\_in}[n, t, p] \leq
+  \left(\sum_{q \in P^{in}} \texttt{flow\_in}[n, t, q]\right) \cdot limit(n, p)
+  ```
 
-  - **Input share constraint per resource:**
-
-    ```math
-    \texttt{flow\_in}[n, t, p] \leq
-    \left(\sum_{q \in P^{in}} \texttt{flow\_in}[n, t, q]\right) \cdot limit(n, p)
-    ```
-
-    This constraint ensures that the contribution of resource $p$ is limited to a maximum fraction defined in the `limit` field.
+  This constraint ensures that the contribution of resource ``p`` is limited to a maximum fraction defined in the `limit` field.

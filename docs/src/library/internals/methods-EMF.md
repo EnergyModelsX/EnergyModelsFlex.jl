@@ -10,4 +10,5 @@ Pages = ["methods-EMF.md"]
 
 ```@docs
 EnergyModelsFlex.check_period_ts
+EnergyModelsFlex.check_limits_default
 ```

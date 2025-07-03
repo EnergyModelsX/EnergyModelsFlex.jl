@@ -1,4 +1,8 @@
-""" `UnitCommitmentNode` is an abstract type for unit commitment nodes."""
+"""
+    UnitCommitmentNode{} <: EMB.NetworkNode
+
+Abstract type for unit commitment nodes.
+"""
 abstract type UnitCommitmentNode{} <: EMB.NetworkNode end
 
 """
@@ -12,18 +16,24 @@ constraints.
 
 # Fields
 - **`id`**: Identifier or name for the node.
-- **`cap::TimeProfile`**: The upper bound on installed capacity over time.
-  This field constrains the operational capacity and is required.
-- **`opex_var::TimeProfile`**: Variable operating expenses per unit of utilized capacity, enforced through the `cap_use` variable.
-- **`opex_fixed::TimeProfile`**: Fixed operating expenses applied per installed capacity unit and investment period.
-- **`input::Dict{<:Resource,<:Real}`**: Resource definitions with conversion factors for input flows.
-- **`output::Dict{<:Resource,<:Real}`**: Resource definitions with conversion factors for output flows.
-- **`minUpTime::Real`**: Minimum number of operational periods the unit must remain on after being started.
-- **`minDownTime::Real`**: Minimum number of operational periods the unit must remain off after being stopped.
-- **`minCapacity::Real`**: Minimum power output when the unit is on.
-- **`maxCapacity::Real`**: Maximum power output when the unit is on (usually aligned with `cap`).
-- **`data::Vector{<:Data}`**: Optional metadata (e.g., emissions or investment data). This is initialized to an empty array by default.
-
+- **`cap::TimeProfile`** is the installed capacity.
+- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+  through the variable `:cap_use`.
+- **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
+  through the variable `:cap_inst`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`minUpTime::Real`** is the minimum number of operational periods the unit must remain on
+  after being started.
+- **`minDownTime::Real`** is the minimum number of operational periods the unit must remain
+  off after being stopped.
+- **`minCapacity::Real`** is the minimum power output when the unit is on.
+- **`maxCapacity::Real`** is the maximum power output when the unit is on
+  (usually aligned with `cap`).
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct MinUpDownTimeNode{} <: UnitCommitmentNode
     id::Any
@@ -38,6 +48,32 @@ struct MinUpDownTimeNode{} <: UnitCommitmentNode
     maxCapacity::Real
     data::Array{Data}
 end
+function MinUpDownTimeNode(
+    id,
+    cap::TimeProfile,
+    opex_var::TimeProfile,
+    opex_fixed::TimeProfile,
+    input::Dict{<:Resource,<:Real},
+    output::Dict{<:Resource,<:Real},
+    minUpTime::Real,
+    minDownTime::Real,
+    minCapacity::Real,
+    maxCapacity::Real,
+)
+    return MinUpDownTimeNode(
+        id,
+        cap,
+        opex_var,
+        opex_fixed,
+        input,
+        output,
+        minUpTime,
+        minDownTime,
+        minCapacity,
+        maxCapacity,
+        Data[],
+    )
+end
 
 """
     ActivationCostNode{} <: UnitCommitmentNode
@@ -48,15 +84,22 @@ or resource costs incurred upon startup.  It models technologies that consume
 extra input when switching on, such as combustion turbines or thermal boilers.
 
 # Fields
-- **`id`**: Identifier or name of the node.
-- **`cap::TimeProfile`**: The available operational capacity over time.
-- **`opex_var::TimeProfile`**: Variable operating expenses applied per unit of used capacity.
-- **`opex_fixed::TimeProfile`**: Fixed operating expenses applied per unit of installed capacity during each investment period.
-- **`input::Dict{<:Resource,<:Real}`**: Energy or material inputs with conversion ratios.
-- **`output::Dict{<:Resource,<:Real}`**: Energy or material outputs with conversion ratios.
-- **`activation_time::Real`**: Duration of activation effect (currently used to inform activation logic in customized formulations).
-- **`activation_consumption::Dict{<:Resource,<:Real}`** Additional input resources required when the unit switches on.
-- **`data::Vector{<:Data}`**: Optional metadata (e.g., for emissions or investment logic). Defaults to an empty array if not specified.
+- **`id`** is the name/identifier of the node.
+- **`cap::TimeProfile`** is the installed capacity.
+- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+  through the variable `:cap_use`.
+- **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
+  through the variable `:cap_inst`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`activation_time::Real`**: Duration of activation effect (currently used to inform
+  activation logic in customized formulations).
+- **`activation_consumption::Dict{<:Resource,<:Real}`** Additional input resources required
+  when the unit switches on.
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct ActivationCostNode{} <: UnitCommitmentNode
     id::Any
@@ -69,30 +112,56 @@ struct ActivationCostNode{} <: UnitCommitmentNode
     activation_consumption::Dict{Resource,Real}
     data::Array{Data}
 end
+function ActivationCostNode(
+    id,
+    cap::TimeProfile,
+    opex_var::TimeProfile,
+    opex_fixed::TimeProfile,
+    input::Dict{<:Resource,<:Real},
+    output::Dict{<:Resource,<:Real},
+    activation_time::Real,
+    activation_consumption::Dict{<:Resource,<:Real},
+)
+    return ActivationCostNode(
+        id,
+        cap,
+        opex_var,
+        opex_fixed,
+        input,
+        output,
+        activation_time,
+        activation_consumption,
+        Data[],
+    )
+end
 
 """
     LimitedFlexibleInput <: NetworkNode
 
 A `LimitedFlexibleInput` node.
 The `LimitedFlexibleInput` utilizes a linear, time independent conversion rate of the `input`
-[`Resource`](@ref)s to the output [`Resource`](@ref)s, subject to the available capacity and
-limitation of the [`Resource`](@ref)s given by the limit field.
+[`Resource`](@extref EnergyModelsBase.Resource)s to the output
+[`Resource`](@extref EnergyModelsBase.Resource)s, subject to the available capacity and
+limitation of the [`Resource`](@extref EnergyModelsBase.Resource)s given by the limit field.
 
-As opposed to the `RefNetworkNode` in `EnergyModelsBase`, the `LimitedFlexibleInput` node introduces
-a `limit` on the fraction a given resource can contribute to the total inflow.
+As opposed to the `RefNetworkNode` in `EnergyModelsBase`, the `LimitedFlexibleInput` node
+introduces a `limit` on the fraction a given resource can contribute to the total inflow.
 
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per energy unit produced.
-- **`opex_fixed::TimeProfile`** is the fixed operating expense.
-- **`limit::Dict{<:Resource, <:Real}`** are the limits for each [`Resource`](@ref)s of the total input.
-- **`input::Dict{<:Resource, <:Real}`** are the input [`Resource`](@ref)s with conversion
-  value `Real`.
-- **`output::Dict{<:Resource, <:Real}`** are the generated [`Resource`](@ref)s with
-  conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (e.g. for investments). The field `data`
-  is conditional through usage of a constructor.
+- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+  through the variable `:cap_use`.
+- **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
+  through the variable `:cap_inst`.
+- **`limit::Dict{<:Resource, <:Real}`** are the limits for each
+  [`Resource`](@extref EnergyModelsBase.Resource)s of the total input.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct LimitedFlexibleInput <: NetworkNode
     id::Any
@@ -128,16 +197,19 @@ in the sense that the output `heat_res` captures the lost energy.
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per energy unit produced.
-- **`opex_fixed::TimeProfile`** is the fixed operating expense.
-- **`limit::Dict{<:Resource, <:Real}`** are the limits for each [`Resource`](@ref)s of the total input.
+- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+  through the variable `:cap_use`.
+- **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
+  through the variable `:cap_inst`.
+- **`limit::Dict{<:Resource, <:Real}`** are the limits for each
+  [`Resource`](@extref EnergyModelsBase.Resource)s of the total input.
 - **`heat_res::Resource`** the residual heat resource.
-- **`input::Dict{<:Resource, <:Real}`** are the input [`Resource`](@ref)s with conversion
-  value `Real`.
-- **`output::Dict{<:Resource, <:Real}`** are the generated [`Resource`](@ref)s with
-  conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (e.g. for investments). The field `data`
-  is conditional through usage of a constructor.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct Combustion <: NetworkNode
     id::Any

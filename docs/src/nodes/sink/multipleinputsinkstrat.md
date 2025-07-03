@@ -2,6 +2,8 @@
 
 [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) are [`Sink`](@extref EnergyModelsBase.Sink) nodes that models flexible energy service demands that can be met by a combination of multiple input resources.
 Unlike [`MultipleInputSink`](@ref ) nodes, we enforce that the ratio between the different input resources is the same in all operational periods of an investment period.
+The [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) introduces **strategic-period-based input fractions**, used to proportionally allocate resource inflows across each operational period.
+This allows for continuous blending of energy carriers in a flexible and cost-optimal way.
 
 !!! warning "InvestmentData"
     The current implementation does not allow for the incorporation of investment data as this would lead to bilinear constraints.
@@ -45,7 +47,7 @@ These fields are:
 - **`data::Vector{Data}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
-  !!! note
+  !!! note "Included constructor"
       The field `data` is not required as we include a constructor when the value is excluded.
   !!! danger "Using `CaptureData`"
       As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
@@ -56,7 +58,16 @@ These fields are:
 
 ## [Mathematical description](@id nodes-mul_in_sink_strat-math)
 
-The [`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) introduces **strategic-period-based input fractions**, used to proportionally allocate resource inflows across each operational period. This allows for continuous blending of energy carriers in a flexible and cost-optimal way.
+In the following mathematical equations, we use the name for variables and functions used in the model.
+Variables are in general represented as
+
+``\texttt{var\_example}[index_1, index_2]``
+
+with square brackets, while functions are represented as
+
+``func\_example(index_1, index_2)``
+
+with paranthesis.
 
 ### [Variables](@id nodes-mul_in_sink_strat-math-var)
 
@@ -73,6 +84,8 @@ The variables include:
 - [``\texttt{sink\_surplus}``](@extref EnergyModelsBase man-opt_var-sink)
 - [``\texttt{sink\_deficit}``](@extref EnergyModelsBase man-opt_var-sink)
 - [``\texttt{emissions\_node}``](@extref EnergyModelsBase man-opt_var-emissions) if `EmissionsData` is added to the field `data`
+
+It does not add any additional variables.
 
 #### [Additional variables](@id nodes-mul_in_sink_strat-math-add)
 
@@ -95,7 +108,7 @@ In addition, all constraints are valid ``\forall t \in T`` (that is in all opera
 
 #### [Standard constraints](@id nodes-mul_in_sink_strat-math-con-stand)
 
-[`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase.Sink) node as described in the *[documentaiton of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
+[`AbstractMultipleInputSinkStrat`](@ref EnergyModelsFlex.AbstractMultipleInputSinkStrat) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase nodes-sink) node as described in the *[documentation of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
 These standard constraints are:
 
 - `constraints_capacity_installed`:
@@ -129,6 +142,9 @@ These standard constraints are:
 - `constraints_data`:\
   This function is only called for specified additional data, see above.
 
+The function `constraints_capacity` is extended with a new method as we moved the capacity constraint to the function `constraints_flow_in` as outlined below.
+As a consequence, it only calls the function `constraints_capacity_installed`.
+
 The function `constraints_flow_in` is extended with a new method to account for the potential of supplying the demand with multiple resources.
 The inlet overall flow balance is given by
 
@@ -160,6 +176,3 @@ The sum of the individual surplus and deficits of each resource represent then s
 \sum_{p \in P^{in}} \texttt{sink\_deficit\_p}[n, t, p] = & \texttt{sink\_deficit}[n, t] \\
 \end{aligned}
 ```
-
-The function `constraints_capacity` is extended with a new method as we moved the capacity constraint to the function `constraints_flow_in` as outlined above.
-As a consequence, it only calls the function `constraints_capacity_installed`.

@@ -8,13 +8,13 @@ EnergyModelsFlex
 
 Flexibility in energy systems refers to the ability to adapt generation, consumption, or conversion in response to variability in supply and demand—especially with growing shares of intermittent renewable sources like wind and solar. Flexibility can be implemented in several forms:
 
- - **Temporal flexibility:** shifting electricity consumption or production across time (e.g. demand response, storage).
+- **Temporal flexibility:** shifting electricity consumption or production across time (e.g. demand response, storage).
 
- - **Input flexibility:** using different fuels or resources to meet the same service (e.g. fuel-switching boilers).
+- **Input flexibility:** using different fuels or resources to meet the same service (e.g. fuel-switching boilers).
 
- - **Operational flexibility:** including start-up/shutdown constraints, minimum running times, or part-load efficiency.
+- **Operational flexibility:** including start-up/shutdown constraints, minimum running times, or part-load efficiency.
 
- - **Network and conversion flexibility:** controlling flows across interconnected energy carriers (e.g. heat and electricity).
+- **Network and conversion flexibility:** controlling flows across interconnected energy carriers (e.g. heat and electricity).
 
 **`EnergyModelsFlex`** introduces custom nodes that allow modelers to represent these dimensions of flexibility in a structured, modular way.
 
@@ -45,7 +45,7 @@ This package provides several node types that extend the EnergyModelsX interface
 
 ### Storage
 
-- [`StorageEfficiency`](@ref): Allows modeling of time- and state-dependent storage efficiency losses.
+- [`StorageEfficiency`](@ref nodes-stor_eff): Allows modeling of time- and state-dependent storage efficiency losses.
 
 ---
 

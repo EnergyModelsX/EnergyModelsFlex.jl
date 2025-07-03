@@ -70,19 +70,19 @@ EnergyModelsBase.CyclicStrategic).
 
 # Fields
 - **`id`** is the name/identifier of the node.
-- **`charge::AbstractStorageParameters`** are the charging parameters of the `Storage` node.
-  Depending on the chosen type, the charge parameters can include variable OPEX, fixed OPEX,
-  and/or a capacity.
-- **`level::AbstractStorageParameters`** are the level parameters of the `Storage` node.
-  Depending on the chosen type, the charge parameters can include variable OPEX and/or fixed OPEX.
-- **`stor_res::Resource`** is the stored [`Resource`](@ref).
-- **`input::Dict{<:Resource, <:Real}`** are the input [`Resource`](@ref)s with conversion
-  value `Real`.
-- **`output::Dict{<:Resource, <:Real}`** are the generated [`Resource`](@ref)s with conversion
-  value `Real`. Only relevant for linking and the stored [`Resource`](@ref) as the output
-  value is not utilized in the calculations.
-- **`data::Vector{<:Data}`** is the additional data (e.g. for investments). The field `data`
-  is conditional through usage of a constructor.
+- **`charge::UnionCapacity`** are the charging parameters of the
+  [`Storage`](@extref EnergyModelsBase.Storage) node. Depending on the chosen type, the
+  charge parameters can include variable OPEX and/or fixed OPEX. They must include a capacity.
+- **`level::UnionCapacity`** are the level parameters of the
+  [`Storage`](@extref EnergyModelsBase.Storage) node. Depending on the chosen type, the
+  level parameters can include variable OPEX and/or fixed OPEX. They must include a capacity.
+- **`stor_res::Resource`** is the stored [`Resource`](@extref EnergyModelsBase.Resource).
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
 """
 struct StorageEfficiency{T} <: EMB.Storage{T}
     id::Any

@@ -25,7 +25,7 @@ function EMB.check_node(
 )
     EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
 
-    # Check that the period length and demad is working with the time structure
+    # Check that the period length and demand is working with the time structure
     # The check will only be activated in 0.3
     # for (idx_sp, ts_oper) ∈ enumerate(𝒯.operational)
     #     sub_msg = "the operational time structure in strategic period $(idx_sp)"

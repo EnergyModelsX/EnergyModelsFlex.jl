@@ -1,6 +1,7 @@
 # [LoadShiftingNode](@id nodes-loadshiftingnode)
 
 [`LoadShiftingNode`](@ref) is a specialized [`Sink`](@extref EnergyModelsBase.Sink) node that allows for **batch-wise load shifting**. It is designed for demand profiles where discrete production batches can be rescheduled within defined working shifts. This flexibility allows modeling of industrial processes that can shift load within operational constraints.
+[`LoadShiftingNode`](@ref)s introduce integer and continuous variables to allow demand shifting across time, subject to batching, balance, and capacity constraints.
 
 !!! warning
     This node is designed for **uniform timestep durations**. Irregular durations may cause misalignment of shifted loads.
@@ -12,7 +13,6 @@
     - The node utilizes the indices of the operational period.
       It cannot be used with `OperationalScenarios` and `RepresentativePeriods`.
     Its application should be carefully evaluated.
-
 
 ## [Introduced type and its fields](@id nodes-loadshiftingnode-fields)
 
@@ -47,10 +47,18 @@ The fields of a [`LoadShiftingNode`](@ref) are:
 !!! warning "No investments"
     Investments are not implemented for this node.
 
-
 ## [Mathematical description](@id nodes-loadshiftingnode-math)
 
-[`LoadShiftingNode`](@ref) introduces integer and continuous variables to allow demand shifting across time, subject to batching, balance, and capacity constraints.
+In the following mathematical equations, we use the name for variables and functions used in the model.
+Variables are in general represented as
+
+``\texttt{var\_example}[index_1, index_2]``
+
+with square brackets, while functions are represented as
+
+``func\_example(index_1, index_2)``
+
+with paranthesis.
 
 ### [Variables](@id nodes-loadshiftingnode-math-var)
 
@@ -78,7 +86,15 @@ the node introduces:
 
 ### [Constraints](@id nodes-loadshiftingnode-math-con)
 
-#### Standard constraints
+The following sections omit the direct inclusion of the vector of [`LoadShiftingNode`](@ref) nodes.
+Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`LoadShiftingNode`](@ref) types if not stated differently.
+In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all investment periods).
+
+#### [Standard constraints](@id nodes-loadshiftingnode-math-con-stand)
+
+Load shifting nodes nodes utilize in general the standard constraints described on *[Constraint functions](@extref EnergyModelsBase man-con)*.
+In fact, they use the same `create_node` function as a [`RefSource`](@extref EnergyModelsBase.RefSource) node.
+These standard constraints are:
 
 - `constraints_flow_in`:
 
@@ -90,7 +106,7 @@ the node introduces:
 
   !!! tip "Multiple inputs"
       The constrained above allows for the utilization of multiple inputs with varying ratios.
-      it is however necessary to deliver the fixed ratio of all inputs.
+      It is however necessary to deliver the fixed ratio of all inputs.
 
 - `constraints_opex_fixed`:\
   The current implementation fixes the fixed operating expenses of a sink to 0.
@@ -117,10 +133,7 @@ the node introduces:
 - `constraints_data`:\
   This function is only called for specified additional data, see above.
 
-
-#### Additional constraints
-
-The following constraints are implemented:
+The function `constraints_capacity` receives a new method to handle the load shifting constraints:
 
 - `constraints_capacity`
 

@@ -191,6 +191,7 @@ function EMB.constraints_flow_in(
 )
     # Declaration of the required subsets
     𝒫ⁱⁿ = inputs(n)
+    𝒫ˡⁱᵐ = limits(n)
 
     # Constraint for the input stream connections
     @constraint(
@@ -201,7 +202,7 @@ function EMB.constraints_flow_in(
 
     # Limit the fraction of an input resource relative to the total output
     tot_flow_in = @expression(m, [t ∈ 𝒯], sum(m[:flow_in][n, t, p] for p ∈ 𝒫ⁱⁿ))
-    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
+    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ˡⁱᵐ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
 end
 
 """
@@ -220,6 +221,7 @@ function EMB.constraints_flow_in(
 )
     # Declaration of the required subsets
     𝒫ⁱⁿ = inputs(n)
+    𝒫ˡⁱᵐ = limits(n)
     p_heat = heat_resource(n)
 
     # Constraint for the input stream connections
@@ -231,7 +233,7 @@ function EMB.constraints_flow_in(
 
     # Limit the fraction of an input resource relative to the total output
     tot_flow_in = @expression(m, [t ∈ 𝒯], sum(m[:flow_in][n, t, p] for p ∈ 𝒫ⁱⁿ))
-    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ⁱⁿ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
+    @constraint(m, [t ∈ 𝒯, p ∈ 𝒫ˡⁱᵐ], m[:flow_in][n, t, p] ≤ tot_flow_in[t] * limits(n, p))
 
     # Balance constraint for the combustion node
     @constraint(

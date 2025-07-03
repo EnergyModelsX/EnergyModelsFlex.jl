@@ -25,7 +25,7 @@ The fields of a [`MultipleInputSink`](@ref) node are given as:
 - **`data::Vector{Data}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
-  !!! note
+  !!! note "Included constructor"
       The field `data` is not required as we include a constructor when the value is excluded.
   !!! danger "Using `CaptureData`"
       As a `Sink` node does not have any output, it is not possible to utilize [`CaptureData`](@extref EnergyModelsBase.CaptureData).
@@ -33,7 +33,16 @@ The fields of a [`MultipleInputSink`](@ref) node are given as:
 
 ## [Mathematical description](@id nodes-mul_in_sink-math)
 
-[`MultipleInputSink`](@ref) nodes introduce a modified flow-in constraint to aggregate contributions from multiple energy carriers, each adjusted by their specific conversion factor.
+In the following mathematical equations, we use the name for variables and functions used in the model.
+Variables are in general represented as
+
+``\texttt{var\_example}[index_1, index_2]``
+
+with square brackets, while functions are represented as
+
+``func\_example(index_1, index_2)``
+
+with paranthesis.
 
 ### [Variables](@id nodes-mul_in_sink-math-var)
 
@@ -61,7 +70,7 @@ In addition, all constraints are valid ``\forall t \in T`` (that is in all opera
 
 #### [Standard constraints](@id nodes-mul_in_sink-math-con-stand)
 
-[`MultipleInputSink`](@ref) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase.Sink) node as described in the *[documentaiton of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
+[`MultipleInputSink`](@ref) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase nodes-sink) node as described in the *[documentation of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
 These standard constraints are:
 
 - `constraints_capacity`:
@@ -105,7 +114,7 @@ These standard constraints are:
 - `constraints_data`:\
   This function is only called for specified additional data, see above.
 
-The function `constraints_flow_in` receives a new method to account for that the individual resources can be used interchangeably:
+The function `constraints_flow_in` receives a new method to account for that the individual resources can be used interchangeably adjusted by their specific conversion factor:
 
 ```math
 \sum_{p \in P} \frac{\texttt{inflow}[n,t,p]}{inputs(n,p)}=\texttt{cap\_use}[n,t]

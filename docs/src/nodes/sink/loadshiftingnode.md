@@ -162,7 +162,7 @@ The function `constraints_capacity` receives a new method to handle the load shi
 
     ```math
     \texttt{load\_shifted}[n, t+i] =
-    n.load\_shift\_magnitude \cdot
+    n.load\_shift\_magnitude \times
     (\texttt{load\_shift\_to}[n, t] - \texttt{load\_shift\_from}[n, t])
     ```
 

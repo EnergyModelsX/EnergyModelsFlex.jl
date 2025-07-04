@@ -15,3 +15,9 @@ EnergyModelsFlex.period_length
 EnergyModelsFlex.period_index
 EnergyModelsFlex.number_of_periods
 ```
+
+## [`ActivationCostNode` types](@id lib-int-met_field-ActivationCostNode)
+
+```@docs
+EnergyModelsFlex.activation_consumption
+```

@@ -40,7 +40,7 @@ model = OperationalModel(
     CO2,
 )
 case = Dict(:T => 𝒯, :nodes => nodes, :links => links, :products => resources)
-m = EMB.run_model(case, model, HiGHS.Optimizer)
+m = EMB.run_model(case, model, OPTIMIZER)
 
 # We only have curtailment in the first strategic period
 @test sum(value.(m[:curtailment][source_1, t]) > 0 for t ∈ 𝒯) == 3

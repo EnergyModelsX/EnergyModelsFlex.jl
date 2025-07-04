@@ -28,27 +28,6 @@ function EMB.check_node(
 end
 
 """
-    EMB.check_node(n::ActivationCostNode, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
-
-This method checks that a `ActivationCostNode` node is valid.
-
-## Checks
- - Investments are not supported for this node.
-"""
-function EMB.check_node(
-    n::ActivationCostNode,
-    𝒯,
-    modeltype::EnergyModel,
-    check_timeprofiles::Bool,
-)
-    # EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
-
-    @assert_or_log(
-        !EnergyModelsInvestments.has_investment(n),
-        "The node ActivationsCostNode does not support investments.")
-end
-
-"""
     EMB.check_node(
         n::LimitedFlexibleInput,
         𝒯,

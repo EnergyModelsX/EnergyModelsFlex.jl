@@ -38,7 +38,7 @@ model = OperationalModel(
 )
 
 case = Dict(:T => 𝒯, :nodes => 𝒩, :links => ℒ, :products => 𝒫)
-m = EMB.run_model(case, model, HiGHS.Optimizer)
+m = EMB.run_model(case, model, OPTIMIZER)
 
 # Testing the correct source usage
 𝒫ⁱⁿ = inputs(sink)

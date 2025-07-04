@@ -1,6 +1,6 @@
 name = "EnergyModelsFlex"
 uuid = "a81b9388-333d-4b63-81f2-910b060b544c"
-authors = ["Per Aaslid <per.aaslid@sintef.no>"]
+authors = ["Sigrid Aunsmo, Sigmund Eggen Holm, Jon Vegard Venås, and  Per Åslid"]
 version = "0.2.8"
 
 [deps]
@@ -10,8 +10,8 @@ JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 TimeStruct = "f9ed5ce0-9f41-4eaa-96da-f38ab8df101c"
 
 [compat]
-EnergyModelsBase = "^0.8.3"
-EnergyModelsRenewableProducers = "^0.6.4"
-JuMP = "^1.23"
-TimeStruct = "^0.9"
-julia = "^1.10"
+EnergyModelsBase = "0.8.3"
+EnergyModelsRenewableProducers = "0.6.4"
+JuMP = "1.23"
+TimeStruct = "0.9"
+julia = "1.10"

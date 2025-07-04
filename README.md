@@ -13,6 +13,10 @@
 > The different node types are partly experimental.
 > They have furthermore some limitations with respect to the chosen `TimeStructure` or whether they are able to handle investments.
 > As a consequence, it is advised to read the documentation for each node to identify their usefulness.
+>
+> The initial version is based on [`EnergyModelsBase` v0.8](https://energymodelsx.github.io/EnergyModelsBase.jl/v0.8/).
+> It is planned to update the model in the near future to support the latest version of `EnergyModelsBase`.
+> This update may include the removal of some nodes and a rewrite of the behaviour of the different nodes.
 
 ## Usage
 

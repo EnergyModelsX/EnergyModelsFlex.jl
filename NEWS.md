@@ -1,5 +1,13 @@
 # Release notes
 
+## Version 0.2.8 (2025-07-04)
+
+### Public release on GitHub
+
+* Released the exisiting version so that case studies in the project [FLEX4FACT](https://flex4fact.eu/) are running without any problems.
+* Release dependes on old versions of `EnergyModelsBase`.
+* It is planned to update the model to the latest version within a short period of time
+
 ## Version 0.2.7 (2025-01-14)
 
 ### Enhancement

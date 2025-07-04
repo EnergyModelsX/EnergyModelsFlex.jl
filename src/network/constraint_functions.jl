@@ -136,8 +136,10 @@ function EMB.constraints_capacity(
             end
         end
     end
+    @constraint(m, [t ∈ 𝒯], m[:onswitch][n, t] + m[:offswitch][n, t] ≤ 1)
     @constraint(m, [t ∈ 𝒯], m[:cap_use][n, t] == m[:on_off][n, t] * capacity(n, t))
-    @constraint(m, [t ∈ 𝒯], m[:cap_use][n, t] <= m[:cap_inst][n, t])
+    @constraint(m, [t ∈ 𝒯], m[:cap_use][n, t] ≤ m[:cap_inst][n, t])
+    @constraint(m, [t ∈ 𝒯], m[:cap_inst][n, t] == capacity(n, t))
 end
 
 """

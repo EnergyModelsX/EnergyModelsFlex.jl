@@ -131,7 +131,7 @@ model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     CO2,
 )
-m = EMB.run_model(case, model, HiGHS.Optimizer)
+m = EMB.run_model(case, model, OPTIMIZER)
 
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 for t_inv ∈ 𝒯ᴵⁿᵛ

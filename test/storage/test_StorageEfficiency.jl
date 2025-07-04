@@ -55,7 +55,7 @@ model = OperationalModel(
     CO2,
 )
 case = Dict(:T => 𝒯, :nodes => nodes, :links => links, :products => resources)
-m = EMB.run_model(case, model, HiGHS.Optimizer)
+m = EMB.run_model(case, model, OPTIMIZER)
 
 # Testing the deficit
 for t_inv ∈ 𝒯ᴵⁿᵛ

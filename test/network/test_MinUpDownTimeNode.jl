@@ -81,7 +81,7 @@ end
             line = create_line(min_up_time, min_down_time)
             case, model = create_system(line)
 
-            m = EnergyModelsBase.run_model(case, model, HiGHS.Optimizer)
+            m = EnergyModelsBase.run_model(case, model, OPTIMIZER)
 
             # Test optimal solution
             @test termination_status(m) == MOI.OPTIMAL

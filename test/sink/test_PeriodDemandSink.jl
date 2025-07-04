@@ -65,7 +65,7 @@ function test_max_grid_production(force_max_production::Bool)
     source = case[:nodes][1]
     @show source
 
-    set_optimizer(m, HiGHS.Optimizer)
+    set_optimizer(m, OPTIMIZER)
     set_optimizer_attribute(m, MOI.Silent(), true)
     optimize!(m)
 
@@ -127,7 +127,7 @@ end
     demand = create_demand_node()
     case, model, m = create_system(demand)
 
-    set_optimizer(m, HiGHS.Optimizer)
+    set_optimizer(m, OPTIMIZER)
     optimize!(m)
 
     # Test optimal solution

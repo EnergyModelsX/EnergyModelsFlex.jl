@@ -1,6 +1,11 @@
 # [ActivationCostNode](@id nodes-activationcostnode)
 
-[`ActivationCostNode`](@ref) is a specialized [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) that introduces unit commitment logic with additional fuel or resource costs incurred upon startup. It models technologies that consume extra input when switching on, such as combustion turbines or thermal boilers.
+[`ActivationCostNode`](@ref) is a specialized [`NetworkNode`](@extref EnergyModelsBase nodes-network_node) that introduces unit commitment logic with additional fuel or resource costs incurred upon startup.
+It models technologies that consume extra input when switching on, such as combustion turbines or thermal boilers.
+
+!!! warning "Limitations in its current version"
+    - The node does not allow for part-load operation.
+    - The node does not allow for investments.
 
 !!! tip "Use cases"
     This node is useful when modeling generation or conversion units that consume startup fuel, such as gas turbines, diesel generators, or heating systems with preheat requirements.
@@ -36,9 +41,6 @@ The standard fields are given as:
   An entry for providing additional data to the model.
   In the current version, it is used for providing `EmissionsData`.
 
-  !!! warning "No investments"
-      Note that investments are currently not implemented for this node.
-
   !!! note "Constructor for `ActivationCostNode`"
       The field `data` is not required as we include a constructor when the value is excluded.
 
@@ -60,8 +62,10 @@ The standard fields are given as:
 
 - **`activation_time::Real`**:\
   Duration of activation effect (currently used to inform activation logic in customized formulations).
+  This field is currently not utilized.
 - **`activation_consumption::Dict{<:Resource,<:Real}`**:\
-  Additional input resources required when the unit switches on.
+  Required consumption of the input resources when the node switches on.
+  Note that the value is the absolute required value and the resource **must** be included in the `input` dictionary.
 
 ## [Mathematical description](@id nodes-activationcostnode-math)
 
@@ -130,45 +134,53 @@ These standard constraints are:
 - `constraints_data`:\
   This function is only called for specified data of the nodes, see above.
 
-The functions `constraints_capacity` and `constraints_flow_in` receive new methods to handle, respectively, the capacity and output flow constraints:
+The functions `constraints_capacity` is extended with  a new method to calculate the on-off switching.
+The consistency across time is provided by the following constraint
 
-- `constraints_capacity`
+```math
+\texttt{on\_off}[n, t] =
+\texttt{on\_off}[n, t_{prev}] - \texttt{offswitch}[n, t] + \texttt{onswitch}[n, t]
+```
 
-  - **Unit commitment state transition** (ensures consistency across time):
+  For the first time step in each investment period, the last value of the previous period is used instead of $t_{prev}$.
 
-    ```math
-    \texttt{on\_off}[n, t] =
-    \texttt{on\_off}[n, t_{prev}] - \texttt{offswitch}[n, t] + \texttt{onswitch}[n, t]
-    ```
-    For the first time step in each investment period, the last value of the previous period is used instead of $t_{prev}$.
+```math
+\texttt{offswitch}[n, t] + \texttt{onswitch}[n, t] \leq 0
+```
 
-    !!! warning "No investments"
-        Note that investments are currently not implemented for this node.
+The operational usage of the node is limited by the variable ``\texttt{on\_off}[n, t]``
 
-  - **Operational capacity conditional on status:**
+```math
+\texttt{cap\_use}[n, t] = \texttt{on\_off}[n, t] \times capacity(n, t)
+```
 
-    ```math
-    \texttt{cap\_use}[n, t] = \texttt{on\_off}[n, t] \cdot capacity(n, t)
-    ```
+and the installed capacity through the variable ``\texttt{cap\_inst}[n, t]``
 
-    ```math
-    \texttt{cap\_use}[n, t] \leq \texttt{cap\_inst}[n, t]
-    ```
+```math
+\texttt{cap\_use}[n, t] \leq \texttt{cap\_inst}[n, t]
+```
 
-- `constraints_flow_in`
+As we want to avoid bilinearities and have not implemented the linear reformulation, we furthermore constrain the function installed capacity to the provided capacity in this function.
 
-  - **Startup-adjusted input flow:**
+```math
+\texttt{cap\_inst}[n, t] = capacity(n, t)
+```
 
-    ```math
-    \texttt{flow\_in}[n, t, p] =
-    inputs(n, p) \cdot \texttt{cap\_use}[n, t] +
-    activation\_consumption(n, p) \cdot \texttt{onswitch}[n, t]
-    ```
+!!! warning "Investments"
+    As we do not call the function `constraints_capacity_installed`, we do not allow for investments in this node type.
 
-    This models additional startup consumption, *e.g.*, diesel or gas during ignition or ramp-up.
+The function `constraints_flow_in` is extended with a new method to account for the additional consumption:
 
-    !!! note "Activation logic"
-        The field `activation_time` is not directly included in the constraint equations above but can be used in more advanced formulations where startup effects extend beyond a single time step.
+```math
+\texttt{flow\_in}[n, t, p] =
+inputs(n, p) \times \texttt{cap\_use}[n, t] +
+activation\_consumption(n, p) \times \texttt{onswitch}[n, t]
+```
 
-    !!! warning "Binary complexity"
-        Similar to [`MinUpDownTimeNode`](@ref), this node is a **mixed-integer** formulation and increases the complexity of the optimization model.
+This models additional startup consumption, *e.g.*, diesel or gas during ignition or ramp-up.
+
+!!! note "Activation logic"
+    The field `activation_time` is not directly included in the constraint equations above but can be used in more advanced formulations where startup effects extend beyond a single time step.
+
+!!! warning "Binary complexity"
+    Similar to [`MinUpDownTimeNode`](@ref), this node is a **mixed-integer** formulation and increases the complexity of the optimization model.

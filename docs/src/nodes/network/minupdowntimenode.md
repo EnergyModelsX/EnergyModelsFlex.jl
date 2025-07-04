@@ -194,11 +194,11 @@ The function `constraints_capacity` receives a new method to handle the minimum 
 - **Capacity conditional on on/off status:**
 
   ```math
-  \texttt{cap\_use}[n, t] \leq \texttt{on\_off}[n, t] \cdot n.maxCapacity
+  \texttt{cap\_use}[n, t] \leq \texttt{on\_off}[n, t] \times n.maxCapacity
   ```
 
   ```math
-  \texttt{cap\_use}[n, t] \geq \texttt{on\_off}[n, t] \cdot n.minCapacity
+  \texttt{cap\_use}[n, t] \geq \texttt{on\_off}[n, t] \times n.minCapacity
   ```
 
 - **Upper bound by installed capacity:**

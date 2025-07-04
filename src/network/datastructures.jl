@@ -96,8 +96,8 @@ extra input when switching on, such as combustion turbines or thermal boilers.
   with conversion value `Real`.
 - **`activation_time::Real`**: Duration of activation effect (currently used to inform
   activation logic in customized formulations).
-- **`activation_consumption::Dict{<:Resource,<:Real}`** Additional input resources required
-  when the unit switches on.
+- **`activation_consumption::Dict{<:Resource,<:Real}`** are the additional input resources
+  required when the unit switches on with their absolute demand.
 - **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
@@ -133,6 +133,19 @@ function ActivationCostNode(
         activation_consumption,
         Data[],
     )
+end
+
+"""
+    activation_consumption(n::ActivationCostNode)
+    activation_consumption(n::ActivationCostNode, p::Resource)
+
+Returns the demand during activation of `ActivationCostNode` `n` as dictionary or for
+input `Resource` `p`. If `p` is not included in the dictionary, it returns a value of 0.
+"""
+activation_consumption(n::ActivationCostNode) = n.activation_consumption
+function activation_consumption(n::ActivationCostNode, p::Resource)
+    con_dict = activation_consumption(n)
+    return haskey(con_dict, p) ? con_dict[p] : 0
 end
 
 """

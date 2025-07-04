@@ -151,7 +151,7 @@ The functions `constraints_flow_in` and `constraints_flow_out` receive new metho
 
     ```math
     \texttt{flow\_in}[n, t, p] \leq
-    \left(\sum_{q \in P^{in}} \texttt{flow\_in}[n, t, q]\right) \cdot limits(n, p)
+    \left(\sum_{q \in P^{in}} \texttt{flow\_in}[n, t, q]\right) \times limits(n, p)
     ```
 
   - **Energy balance including residual heat:**
@@ -169,6 +169,6 @@ The functions `constraints_flow_in` and `constraints_flow_out` receive new metho
   - **Standard output constraint (for non-residual outputs):**
 
     ```math
-    \texttt{flow\_out}[n, t, p] = \texttt{cap\_use}[n, t] \cdot outputs(n, p)
+    \texttt{flow\_out}[n, t, p] = \texttt{cap\_use}[n, t] \times outputs(n, p)
     \qquad \forall p \in outputs(n) \setminus \{heat\_res, CO_2\}
     ```

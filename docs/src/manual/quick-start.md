@@ -15,6 +15,9 @@
    ] add EnergyModelsFlex
    ```
 
+!!! note "Registration"
+   If you receive an error that the pacakge is not yet registered, you must clone the package from GitHub directly.
+
 You also have to install a solver for solving the optimization problem.
 Depending on the type of node you plan to utilize, you can either use a standard solver or a solver supporting `MOI.ScalarQuadraticFunction{Float64}` in `MOI.EqualTo{Float64}`.
 In either case, you have to

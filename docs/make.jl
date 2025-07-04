@@ -8,12 +8,16 @@ using Literate
 const EMB = EnergyModelsBase
 const EMF = EnergyModelsFlex
 
+DocMeta.setdocmeta!(
+    EnergyModelsFlex,
+    :DocTestSetup,
+    :(using EnergyModelsFlex);
+    recursive = true,
+)
+
 # Copy the NEWS.md file
 news = "docs/src/manual/NEWS.md"
 cp("NEWS.md", news; force = true)
-
-#inputfile = joinpath(@__DIR__, "src", "examples", "battery_storage.jl")
-#Literate.markdown(inputfile, joinpath(@__DIR__, "src", "examples"))
 
 links = InterLinks(
     "TimeStruct" => "https://sintefore.github.io/TimeStruct.jl/stable/",
@@ -25,12 +29,11 @@ links = InterLinks(
 makedocs(
     sitename = "EnergyModelsFlex",
     modules = [EnergyModelsFlex],
-    repo = "https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl/blob/{commit}{path}#{line}",
-    format = Documenter.HTML(;
+    format = Documenter.HTML(
         prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl",
         edit_link = "main",
         assets = String[],
+        ansicolor = true,
     ),
     pages = [
         "Home" => "index.md",
@@ -59,7 +62,6 @@ makedocs(
         ],
         "How-to" =>
             Any["Contribute"=>"how-to/contribute.md"],
-        #"Examples" => Any["Battery storage"=>"examples/battery_storage.md"],
         "Library" => Any[
             "Public"=>"library/public.md",
             "Internals"=>String[
@@ -71,4 +73,8 @@ makedocs(
         ],
     ],
     plugins = [links],
+)
+
+deploydocs(;
+    repo = "github.com/EnergyModelsX/EnergyModelsFlex.jl.git",
 )

@@ -13,8 +13,8 @@ Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref
     can consist of multiple operational periods.
 """
 function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
-    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] >= 0)
-    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] >= 0)
+    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
+    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
 end
 
 """
@@ -36,11 +36,10 @@ function EMB.variables_node(
 
     # Declaration of the required subsets.
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
-    𝒫 = unique([p for n ∈ 𝒩 for p ∈ inputs(n)])
 
-    @variable(m, 0 ≤ input_frac_strat[𝒩, 𝒯ᴵⁿᵛ, 𝒫] ≤ 1)
-    @variable(m, sink_surplus_p[𝒩, 𝒯, 𝒫] >= 0)
-    @variable(m, sink_deficit_p[𝒩, 𝒯, 𝒫] >= 0)
+    @variable(m, 0 ≤ input_frac_strat[n ∈ 𝒩, 𝒯ᴵⁿᵛ, inputs(n)] ≤ 1)
+    @variable(m, sink_surplus_p[n ∈ 𝒩, 𝒯, inputs(n)] ≥ 0)
+    @variable(m, sink_deficit_p[n ∈ 𝒩, 𝒯, inputs(n)] ≥ 0)
 end
 
 """
@@ -53,9 +52,8 @@ function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯,
 
     # Declaration of the required subsets.
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
-    𝒫 = unique([p for n ∈ 𝒩 for p ∈ inputs(n)])
 
-    for n ∈ 𝒩, t_inv ∈ 𝒯ᴵⁿᵛ, p ∈ 𝒫
+    for n ∈ 𝒩, t_inv ∈ 𝒯ᴵⁿᵛ, p ∈ inputs(n)
         set_binary(m[:input_frac_strat][n, t_inv, p])
     end
 end
@@ -77,7 +75,7 @@ The individual time periods which allow for load shifting are declared by the pa
 """
 function EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
     ops = collect(𝒯)
-    @variable(m, load_shift_from[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] >= 0, Int)
-    @variable(m, load_shift_to[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] >= 0, Int)
+    @variable(m, load_shift_from[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] ≥ 0, Int)
+    @variable(m, load_shift_to[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] ≥ 0, Int)
     @variable(m, load_shifted[𝒩ᴸˢ, 𝒯])
 end

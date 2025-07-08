@@ -1,6 +1,7 @@
 
 Power = ResourceCarrier("Power", 0.0)
 CO2 = ResourceEmit("CO2", 1.0)
+𝒫 = [Power, CO2]
 
 source_1 = RefSource(
     1,
@@ -38,12 +39,11 @@ sink = RefSink(
 )
 
 # Creating and solving the model
-resources = [Power, CO2]
 𝒯 = TwoLevel(2, 2, SimpleTimes(5, 1))
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
-nodes = [source_1, av, battery, sink]
-links = [
+𝒩 = [source_1, av, battery, sink]
+ℒ = [
     Direct(12, source_1, av),
     Direct(23, av, battery),
     Direct(32, battery, av),
@@ -54,7 +54,7 @@ model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     CO2,
 )
-case = Dict(:T => 𝒯, :nodes => nodes, :links => links, :products => resources)
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
 # Testing the deficit

@@ -57,8 +57,7 @@ function act_node_test_case(
     ]
 
     # Create the case and modeltype
-    case = Dict(:T => 𝒯, :nodes => 𝒩, :links => ℒ, :products => 𝒫)
-    # case = Case(𝒯, 𝒫, [𝒩, ℒ], [[get_nodes, get_links]])
+    case = Case(𝒯, 𝒫, [𝒩, ℒ])
     modeltype = OperationalModel(
         Dict(co2 => FixedProfile(10)),
         Dict(co2 => FixedProfile(0)),
@@ -109,8 +108,8 @@ end
     m, case, modeltype = act_node_test_case(𝒯; demand)
 
     # Extract the values
-    𝒯 = case[:T]
-    𝒩 = case[:nodes]
+    𝒯 = get_time_struct(case)
+    𝒩 = get_nodes(case)
     acn = 𝒩[3]
 
     # Test that the capacity is limited

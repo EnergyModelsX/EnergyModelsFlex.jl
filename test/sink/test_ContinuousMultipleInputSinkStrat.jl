@@ -77,7 +77,7 @@ end
 for t_inv ∈ 𝒯ᴵⁿᵛ
     if t_inv.sp == 1
         @test all(value.(m[:flow_out][source_1, t, NG]) ≈ 10 for t ∈ t_inv)
-        @test all(value.(m[:flow_out][source_2, t, H2]) ≈ 2.9333333 for t ∈ t_inv)
+        @test all(value.(m[:flow_out][source_2, t, H2]) ≈ 2.933333333 for t ∈ t_inv)
     else
         @test all(value.(m[:flow_out][source_1, t, NG]) ≈ 5 for t ∈ t_inv)
         @test all(value.(m[:flow_out][source_2, t, H2]) ≈ 4 for t ∈ t_inv)

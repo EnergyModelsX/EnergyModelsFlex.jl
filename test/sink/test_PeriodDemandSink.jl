@@ -6,13 +6,11 @@ using JuMP
 using Test
 using TimeStruct
 
-include("../utils.jl")
-
 # Resources used in the tests
 Power = ResourceCarrier("Power", 0)
 CO2 = ResourceEmit("CO2", 0)
 
-function create_system(demand; T = TwoLevel(1, 1, SimpleTimes(7 * 24, 1)))
+function create_system(demand; 𝒯 = TwoLevel(1, 1, SimpleTimes(7 * 24, 1)))
     day = [1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2]
     el_cost = [repeat(day, 5)..., fill(0, 2 * 24)...]
 
@@ -24,9 +22,10 @@ function create_system(demand; T = TwoLevel(1, 1, SimpleTimes(7 * 24, 1)))
         Dict(Power => 1),
     )
 
-    nodes = [grid, demand]
-    links = [Direct("grid-demand", grid, demand)]
-    case = Dict(:T => T, :nodes => nodes, :products => [Power, CO2], :links => links)
+    𝒫 = [Power, CO2]
+    𝒩 = [grid, demand]
+    ℒ = [Direct("grid-demand", grid, demand)]
+    case = Case(𝒯, 𝒫, [𝒩, ℒ])
 
     modeltype = OperationalModel(
         Dict(CO2 => FixedProfile(1e6)),
@@ -62,7 +61,7 @@ function test_max_grid_production(force_max_production::Bool)
     case, model, m = create_system(demand)
 
     # Force the grid node to produce at max capacity.
-    source = case[:nodes][1]
+    source = get_nodes(case)[1]
     @show source
 
     set_optimizer(m, OPTIMIZER)
@@ -133,11 +132,11 @@ end
     # Test optimal solution
     @test termination_status(m) == MOI.OPTIMAL
 
-    demand = case[:nodes][2]
-    vals = get_values(m, :cap_use, demand, case[:T])
+    demand = get_nodes(case)[2]
+    vals = get_values(m, :cap_use, demand, get_time_struct(case))
 
     period_length = demand.period_length
-    num_periods = EnergyModelsFlex.number_of_periods(demand, case[:T])
+    num_periods = EnergyModelsFlex.number_of_periods(demand, get_time_struct(case))
 
     # Test that the demand is fulfilled for each period.
     for i ∈ 1:num_periods

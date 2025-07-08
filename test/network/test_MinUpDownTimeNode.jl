@@ -6,14 +6,13 @@ using JuMP
 using Test
 using TimeStruct
 
-include("../utils.jl")
-
 function create_system(line)
-    T = TwoLevel(1, 1, SimpleTimes(7 * 24, 1))
+    𝒯 = TwoLevel(1, 1, SimpleTimes(7 * 24, 1))
 
     Power = ResourceCarrier("Power", 0)
     Product = ResourceCarrier("Product", 0)
     CO2 = ResourceEmit("CO2", 0)
+    𝒫 = [Power, Product, CO2]
 
     day = [1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2]
     el_cost = [repeat(day, 5)..., fill(0, 2 * 24)...]
@@ -43,9 +42,10 @@ function create_system(line)
         Dict(Product => 1),
     )
 
-    nodes = [grid, line, demand]
-    links = [Direct("grid-line", grid, line), Direct("line-demand", line, demand)]
-    case = Dict(:T => T, :nodes => nodes, :products => [Power, Product], :links => links)
+    𝒩 = [grid, line, demand]
+    ℒ = [Direct("grid-line", grid, line), Direct("line-demand", line, demand)]
+
+    case = Case(𝒯, 𝒫, [𝒩, ℒ])
 
     modeltype = OperationalModel(
         Dict(CO2 => FixedProfile(1e6)),
@@ -86,11 +86,11 @@ end
             # Test optimal solution
             @test termination_status(m) == MOI.OPTIMAL
 
-            line = case[:nodes][2]
+            line = get_nodes(case)[2]
 
             # Test that the minimum up time and minimum down time are at least
             # min_up_time and min_down_time.
-            cap_use = get_values(m, :cap_use, line, case[:T])
+            cap_use = get_values(m, :cap_use, line, get_time_struct(case))
             check = check_cyclic_sequence(cap_use, min_up_time, min_down_time)
             @test check
             msg = "check-min_up_time=$min_up_time, min_down_time=$min_down_time"

@@ -101,6 +101,7 @@ desired_cap_use = OperationalProfile([
 
 CO2 = ResourceEmit("CO2", 1.0)
 Power = ResourceCarrier("Power", 0.0)
+products = [Power, CO2]
 
 power_source = RefSource(
     1,
@@ -122,10 +123,9 @@ load_shift_demand = LoadShiftingNode(
     3, # load_shift_times_per_period
 )
 
-links = [Direct(12, power_source, load_shift_demand)]
-nodes = [power_source, load_shift_demand]
-products = [Power, CO2]
-case = Dict(:T => 𝒯, :nodes => nodes, :products => products, :links => links)
+ℒ = [Direct(12, power_source, load_shift_demand)]
+𝒩 = [power_source, load_shift_demand]
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     Dict(CO2 => FixedProfile(100)),

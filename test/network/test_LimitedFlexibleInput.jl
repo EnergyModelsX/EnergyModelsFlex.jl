@@ -3,6 +3,7 @@ NG = ResourceCarrier("NG", 0.2)
 H2 = ResourceCarrier("H2", 0.0)
 gas_LHV = ResourceCarrier("gas LHV", 0)
 CO2 = ResourceEmit("CO2", 1.0)
+𝒫 = [NG, H2, gas_LHV, CO2]
 
 source_1 = RefSource(
     1,
@@ -39,12 +40,11 @@ sink = RefSink(
 )
 
 # Creating and solving the model
-resources = [NG, H2, gas_LHV, CO2]
 𝒯 = TwoLevel(2, 2, SimpleTimes(5, 2))
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
-nodes = [source_1, source_2, combustion, sink]
-links = [
+𝒩 = [source_1, source_2, combustion, sink]
+ℒ = [
     Direct(13, source_1, combustion),
     Direct(23, source_2, combustion),
     Direct(34, combustion, sink),
@@ -54,7 +54,7 @@ model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     CO2,
 )
-case = Dict(:T => 𝒯, :nodes => nodes, :links => links, :products => resources)
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
 # Testing the correct source usage

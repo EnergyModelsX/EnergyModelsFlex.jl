@@ -104,7 +104,7 @@ The variables include:
 
 #### [Additional variables](@id nodes-perioddemandsink-math-add)
 
-[`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_node()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource.
+[`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_element()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource.
 These variables are for a [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) node ``n`` in demand periods ``i``:
 
 - ``\texttt{demand\_sink\_surplus}[n, i]``:\

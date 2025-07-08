@@ -3,6 +3,7 @@ NG = ResourceCarrier("NG", 0.2)
 H2 = ResourceCarrier("H2", 0.0)
 power = ResourceCarrier("Power", 0.0)
 CO2 = ResourceEmit("CO2", 1.0)
+𝒫 = [NG, H2, CO2, power]
 
 source_1 = RefSource(
     1,
@@ -40,7 +41,6 @@ sink_2 = BinaryMultipleInputSinkStrat(
 )
 
 # Creating and solving the model
-𝒫 = [NG, H2, CO2, power]
 𝒯 = TwoLevel(2, 2, SimpleTimes(5, 2))
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
@@ -54,7 +54,7 @@ model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     CO2,
 )
-case = Dict(:T => 𝒯, :nodes => 𝒩, :links => ℒ, :products => 𝒫)
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
 # Test the correct variable definition and that the variable is a sparse axis array

@@ -1,12 +1,25 @@
 # Release notes
 
+## Version 0.2.9 (2025-07-08)
+
+* Adjusted to [`EnergyModelsBase` v0.9.0](https://github.com/EnergyModelsX/EnergyModelsBase.jl/releases/tag/v0.9.0):
+  * Increased version number for EMB.
+  * Replaced `variables_node` with `variables_element`.
+
+### Bugfix
+
+* Fixed a bug in `MultipleInputStrat` nodes:
+  * The variables were declared over all input resources of a nodes of this type.
+  * As a consequence, unconstrained variables were declared when multiple nodes with differing inputs were included.
+  * In the worst case, this could lead to an unbound problem if the surplus penalty was negative.
+
 ## Version 0.2.8 (2025-07-04)
 
 ### Public release on GitHub
 
 * Released the exisiting version so that case studies in the project [FLEX4FACT](https://flex4fact.eu/) are running without any problems.
 * Release depends on old versions of `EnergyModelsBase`.
-* It is planned to update the model to the latest version within a short period of time
+* It is planned to update the model to the latest version within a short period of time.
 
 ## Version 0.2.7 (2025-01-14)
 

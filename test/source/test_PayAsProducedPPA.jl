@@ -1,6 +1,7 @@
 
 Power = ResourceCarrier("Power", 0.0)
 CO2 = ResourceEmit("CO2", 1.0)
+𝒫 = [Power, CO2]
 
 source_1 = PayAsProducedPPA(
     1,
@@ -25,12 +26,11 @@ sink = RefSink(
 )
 
 # Creating and solving the model
-resources = [Power, CO2]
 𝒯 = TwoLevel(2, 2, SimpleTimes(5, 2))
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
-nodes = [source_1, source_2, sink]
-links = [
+𝒩 = [source_1, source_2, sink]
+ℒ = [
     Direct(13, source_1, sink),
     Direct(23, source_2, sink),
 ]
@@ -39,7 +39,7 @@ model = OperationalModel(
     Dict(CO2 => FixedProfile(100)),
     CO2,
 )
-case = Dict(:T => 𝒯, :nodes => nodes, :links => links, :products => resources)
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
 # We only have curtailment in the first strategic period

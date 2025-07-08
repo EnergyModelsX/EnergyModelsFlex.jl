@@ -28,6 +28,8 @@ function run_node_test(node_supertype::String, node_type::String)
     end
 end
 
+include("utils.jl")
+
 @testset "Flex" begin
     # Run all Aqua tests
     include("Aqua.jl")

@@ -1,5 +1,5 @@
 """
-    EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
+    EMB.variables_element(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
 
 Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref) nodes:
 - `demand_sink_surplus[n, i]` is a non-negative variable indicating a surplus in demand in
@@ -12,13 +12,18 @@ Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref
     from `TimeStruct`. Instead, it is a period in which the demand must be satisfied. A period
     can consist of multiple operational periods.
 """
-function EMB.variables_node(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
+function EMB.variables_element(
+    m,
+    𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink},
+    𝒯,
+    ::EnergyModel,
+)
     @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
     @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
 end
 
 """
-    EMB.variables_node(m, 𝒩::Vector{<:AbstractMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
+    EMB.variables_element(m, 𝒩::Vector{<:AbstractMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
 Creates the following additional variables for **ALL** [`AbstractMultipleInputSinkStrat`](@ref)
 subtypes:
@@ -27,7 +32,7 @@ subtypes:
 - `sink_surplus_p[n, t, p]` is the surplus of resource `p` in operational period `t`.
 - `sink_deficit_p[n, t, p]` is the deficit of resource `p` in operational period `t`.
 """
-function EMB.variables_node(
+function EMB.variables_element(
     m,
     𝒩::Vector{<:AbstractMultipleInputSinkStrat},
     𝒯,
@@ -43,12 +48,12 @@ function EMB.variables_node(
 end
 
 """
-    EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
+    EMB.variables_element(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
 Modifies the variable `input_frac_strat[n, t_inv, p]` of [`BinaryMultipleInputSinkStrat`](@ref)
 to be binary to not allow fuel switching within a strategic period.
 """
-function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
+function EMB.variables_element(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
 
     # Declaration of the required subsets.
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
@@ -59,7 +64,7 @@ function EMB.variables_node(m, 𝒩::Vector{BinaryMultipleInputSinkStrat}, 𝒯,
 end
 
 """
-    EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
+    EMB.variables_element(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
 
 Creates the following additional variables for **ALL** [`LoadShiftingNode`](@ref) nodes.
 - `load_shift_from[n, t]` is an integer variable for how many batches are shifted away from
@@ -73,7 +78,7 @@ Creates the following additional variables for **ALL** [`LoadShiftingNode`](@ref
 The individual time periods which allow for load shifting are declared by the parameter
 `load_shift_times`.
 """
-function EMB.variables_node(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
+function EMB.variables_element(m, 𝒩ᴸˢ::Vector{<:LoadShiftingNode}, 𝒯, ::EnergyModel)
     ops = collect(𝒯)
     @variable(m, load_shift_from[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] ≥ 0, Int)
     @variable(m, load_shift_to[n ∈ 𝒩ᴸˢ, ops[n.load_shift_times]] ≥ 0, Int)

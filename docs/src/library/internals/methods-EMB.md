@@ -9,7 +9,7 @@ Pages = ["methods-EMB.md"]
 ## [Extension methods](@id lib-int-met_emb-ext)
 
 ```@docs
-EnergyModelsBase.variables_node
+EnergyModelsBase.variables_element
 ```
 
 ## [Constraint methods](@id lib-int-met_emb-con)

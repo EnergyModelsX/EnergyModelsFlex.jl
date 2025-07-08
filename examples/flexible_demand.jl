@@ -18,10 +18,11 @@ using PrettyTables
 Power = ResourceCarrier("Power", 0)
 Product = ResourceCarrier("Product", 0)
 CO2 = ResourceEmit("CO2", 0)
+𝒫 = [Power, Product]
 
 # Define a timestructure for a single week.
 # The week is modelled with hourly resolution.
-T = TwoLevel(1, 1, SimpleTimes(7 * 24, 1))
+𝒯 = TwoLevel(1, 1, SimpleTimes(7 * 24, 1))
 
 # Some arbitrary electricity prices. Note we let the energy be free in the weekend.
 # This would be a huge incentive to produce during the weekend, if we allowed the
@@ -72,9 +73,9 @@ line = MinUpDownTimeNode(
 )
 
 # Define the simple energy system
-nodes = [grid, line, demand]
-links = [Direct("grid-line", grid, line), Direct("line-demand", line, demand)]
-case = Dict(:T => T, :nodes => nodes, :products => [Power, Product], :links => links)
+𝒩 = [grid, line, demand]
+ℒ = [Direct("grid-line", grid, line), Direct("line-demand", line, demand)]
+case = Case(𝒯, 𝒫, [𝒩, ℒ])
 
 # Define as operational energy model
 modeltype = OperationalModel(
@@ -93,7 +94,7 @@ m = run_model(case, modeltype, HiGHS.Optimizer)
 table = JuMP.Containers.rowtable(value, m[:cap_use]; header = [:Node, :TimePeriod, :CapUse])
 
 # Filter only for `Node == line`
-line = case[:nodes][2]
+line = get_nodes(case)[2]
 filtered = filter(row -> row.Node == line, table)
 
 # Display the filtered table with the resulting optimal production.

@@ -27,19 +27,18 @@ Please refer to the *[documentation](https://energymodelsx.github.io/EnergyModel
 
 ## Cite
 
-If you find `EnergyModelsBase` useful in your work, we kindly request that you cite the following [publication](https://doi.org/10.21105/joss.06619):
+If you find `EnergyModelsFlex` useful in your work, we kindly request that you cite the following [publication](https://doi.org/10.69997/sct.119164):
 
 ```bibtex
-@article{hellemo2024energymodelsx,
-  title = {EnergyModelsX: Flexible Energy Systems Modelling with Multiple Dispatch},
-  author = {Hellemo, Lars and B{\o}dal, Espen Flo and Holm, Sigmund Eggen and Pinel, Dimitri and Straus, Julian},
-  journal = {Journal of Open Source Software},
-  volume = {9},
-  number = {97},
-  pages = {6619},
-  year = {2024},
-  doi = {10.21105/joss.06619},
-  url = {https://doi.org/10.21105/joss.06619},
+@article{venas2025energymodelsflex,
+  title = {Energy system modelling for studying flexibility on industrial sites},
+  author = {Ven{\aa}s, Jon Vegard and Bernardino, Lucas Ferreira and Thorvaldsen, Kasper Emil and Aunsmo, Sigrid and Holm, Sigmund Eggen and Krog, Halvor Aarnes and Wolfgang, Ove and R{\o}e, Ingeborg Treu},
+  journal = {Systems and Control Transactions},
+  volume = {4},
+  pages = {824--830},
+  year = {2025},
+  doi = {10.69997/sct.119164},
+  url = {https://doi.org/10.69997/sct.119164},
 }
 ```
 

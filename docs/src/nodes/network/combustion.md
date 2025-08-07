@@ -83,7 +83,7 @@ The node uses the same variables as a standard [`NetworkNode`](@extref EnergyMod
 - [``\texttt{cap\_inst}``](@extref EnergyModelsBase man-opt_var-cap)
 - [``\texttt{flow\_in}``](@extref EnergyModelsBase man-opt_var-flow)
 - [``\texttt{flow\_out}``](@extref EnergyModelsBase man-opt_var-flow)
-- [``\texttt{emissions\_node}``](@ref EnergyModelsBase man-opt_var-emissions) if `EmissionsData` is added to the field `data`
+- [``\texttt{emissions\_node}``](@extref EnergyModelsBase man-opt_var-emissions) if `EmissionsData` is added to the field `data`
 
 ### [Constraints](@id nodes-combustion-math-con)
 

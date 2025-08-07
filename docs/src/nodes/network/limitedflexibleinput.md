@@ -81,7 +81,7 @@ Like all [`NetworkNode`](@extref EnergyModelsBase nodes-network_node)s, the foll
   Flow of resource $p$ into node $n$ at time $t$.
 - [``\texttt{flow\_out}``](@extref EnergyModelsBase man-opt_var-flow) \
   Output flow of resource $p$ at time $t$.
-- [``\texttt{emissions\_node}``](@ref EnergyModelsBase man-opt_var-emissions) if `EmissionsData` is added to the field `data`
+- [``\texttt{emissions\_node}``](@extref EnergyModelsBase man-opt_var-emissions) if `EmissionsData` is added to the field `data`
 
 ### [Constraints](@id nodes-limitedflexibleinput-math-con)
 

@@ -108,4 +108,10 @@ filtered = filter(row -> row.Node == line, table)
 #   full capacity. This can be explained by the constraint for minimum run time of 8
 #   hours on the `MinUpDownTimeNode`. To maximize production at low prices, it
 #   runs at the minimum capacity of 50 when the electricity is more expensive.
-pretty_table(filtered; crop = :none)
+pretty_table(
+    filtered;
+    fit_table_in_display_horizontally = false,
+    fit_table_in_display_vertically   = false,
+    maximum_number_of_rows            = -1,
+    maximum_number_of_columns         = -1,
+)

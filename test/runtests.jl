@@ -5,6 +5,7 @@ using HiGHS
 using JuMP
 using Test
 using TimeStruct
+using Logging
 
 const EMB = EnergyModelsBase
 const EMF = EnergyModelsFlex
@@ -17,6 +18,8 @@ const OPTIMIZER = optimizer_with_attributes(
     MOI.Silent() => true,
 )
 
+test_dir = joinpath(pkgdir(EMF), "test")
+
 """
     run_node_test(node_supertype::String, node_type::String)
 
@@ -24,18 +27,24 @@ Run the tests for a specific node type.
 """
 function run_node_test(node_supertype::String, node_type::String)
     @testset "$node_type" begin
-        include("$node_supertype/test_$(node_type).jl")
+        include(joinpath(test_dir, "$node_supertype/test_$(node_type).jl"))
     end
 end
 
-include("utils.jl")
+include(joinpath(test_dir, "utils.jl"))
 
 @testset "Flex" begin
     # Run all Aqua tests
-    include("Aqua.jl")
+    include(joinpath(test_dir, "Aqua.jl"))
 
     # Check if there is need for formatting
-    include("JuliaFormatter.jl")
+    include(joinpath(test_dir, "JuliaFormatter.jl"))
+
+    @testset "Flex | links" begin
+        for link_type ∈ ["CapacityCostLink"]
+            run_node_test("link", link_type)
+        end
+    end
 
     @testset "Flex | Sink nodes" begin
         for node_type ∈

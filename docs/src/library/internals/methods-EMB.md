@@ -10,6 +10,11 @@ Pages = ["methods-EMB.md"]
 
 ```@docs
 EnergyModelsBase.variables_element
+EnergyModelsBase.variables_link
+EnergyModelsBase.create_link
+EnergyModelsBase.capacity
+EnergyModelsBase.has_capacity
+EnergyModelsBase.has_opex
 ```
 
 ## [Constraint methods](@id lib-int-met_emb-con)
@@ -26,4 +31,5 @@ EnergyModelsBase.constraints_level_aux
 
 ```@docs
 EnergyModelsBase.check_node
+EnergyModelsBase.check_link
 ```

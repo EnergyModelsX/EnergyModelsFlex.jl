@@ -18,7 +18,7 @@ const TS = TimeStruct
 const EMB = EnergyModelsBase
 const EMR = EnergyModelsRenewableProducers
 
-for node_type ∈ ["source", "sink", "network", "storage"]
+for node_type ∈ ["source", "sink", "network", "storage", "link"]
     include("$node_type/datastructures.jl")
     include("$node_type/model.jl")
     include("$node_type/constraint_functions.jl")
@@ -29,5 +29,6 @@ export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
 export PeriodDemandSink, MultipleInputSink
 export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, Combustion
 export ContinuousMultipleInputSinkStrat, BinaryMultipleInputSinkStrat
+export CapacityCostLink, HighTempProdNode, ExcessHeat
 
 end

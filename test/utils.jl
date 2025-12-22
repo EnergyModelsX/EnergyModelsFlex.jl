@@ -1,5 +1,21 @@
 using JuMP
 
+const ATOL = 1e-7
+
+"""
+    a ≲ b
+
+Approximate ≤ comparison with absolute tolerance `ATOL`.
+"""
+≲(a::Real, b::Real) = a <= b + ATOL
+
+"""
+    a ≳ b
+
+Approximate ≥ comparison with absolute tolerance `ATOL`.
+"""
+≳(a::Real, b::Real) = a + ATOL >= b
+
 function get_values(m, variable, node, iterable)
     return [JuMP.value(m[variable][node, t]) for t ∈ iterable]
 end

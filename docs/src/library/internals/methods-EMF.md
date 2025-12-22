@@ -11,4 +11,9 @@ Pages = ["methods-EMF.md"]
 ```@docs
 EnergyModelsFlex.check_period_ts
 EnergyModelsFlex.check_limits_default
+EnergyModelsFlex.cap_price_periods
+EnergyModelsFlex.cap_resource
+EnergyModelsFlex.cap_price
+EnergyModelsFlex.avg_cap_price
+EnergyModelsFlex.create_sub_periods
 ```

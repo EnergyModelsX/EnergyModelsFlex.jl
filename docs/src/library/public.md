@@ -45,3 +45,11 @@ The following storage node types are implemented in the `EnergyModelsFlex`.
 ElectricBattery
 StorageEfficiency
 ```
+
+## [`Link` types](@id lib-pub-link)
+
+The following link types are implemented in the `EnergyModelsFlex`.
+
+```@docs
+CapacityCostLink
+```

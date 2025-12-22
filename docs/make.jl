@@ -19,6 +19,12 @@ DocMeta.setdocmeta!(
 news = "docs/src/manual/NEWS.md"
 cp("NEWS.md", news; force = true)
 
+inputfile = joinpath(@__DIR__, "..", "examples", "flexible_demand.jl")
+Literate.markdown(inputfile, joinpath(@__DIR__, "src", "examples"))
+
+inputfile = joinpath(@__DIR__, "..", "examples", "capacity_cost_link.jl")
+Literate.markdown(inputfile, joinpath(@__DIR__, "src", "examples"))
+
 links = InterLinks(
     "TimeStruct" => "https://sintefore.github.io/TimeStruct.jl/stable/",
     "EnergyModelsBase" => "https://energymodelsx.github.io/EnergyModelsBase.jl/stable/",
@@ -41,6 +47,7 @@ makedocs(
             "Quick Start"=>"manual/quick-start.md",
             "Examples"=>Any[
                 "Flexible demand"=>"examples/flexible_demand.md",
+                "Capacity cost link"=>"examples/capacity_cost_link.md",
             ],
             "Release notes"=>"manual/NEWS.md",
         ],
@@ -59,6 +66,9 @@ makedocs(
                 "Combustion"=>"nodes/network/combustion.md",
             ],
             "StorageEfficiency"=>"nodes/storage/storageefficiency.md",
+        ],
+        "Links" => Any[
+            "CapacityCostLink"=>"links/capacitycostlink.md",
         ],
         "How-to" =>
             Any["Contribute"=>"how-to/contribute.md"],

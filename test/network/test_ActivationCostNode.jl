@@ -107,6 +107,8 @@ end
     demand = OperationalProfile([10, 20, 30, 0, 30, 0])
     m, case, modeltype = act_node_test_case(𝒯; demand)
 
+    general_tests(m)
+
     # Extract the values
     𝒯 = get_time_struct(case)
     𝒩 = get_nodes(case)

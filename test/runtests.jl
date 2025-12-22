@@ -60,7 +60,7 @@ include(joinpath(test_dir, "utils.jl"))
     end
 
     @testset "Flex | Source nodes" begin
-        for node_type ∈ ["PayAsProducedPPA"]
+        for node_type ∈ ["PayAsProducedPPA", "InflexibleSource"]
             run_node_test("source", node_type)
         end
     end

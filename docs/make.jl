@@ -52,7 +52,10 @@ makedocs(
             "Release notes"=>"manual/NEWS.md",
         ],
         "Nodes" => Any[
-            "PayAsProducedPPA"=>"nodes/source/payasproducedppa.md",
+            "Source nodes"=>Any[
+                "PayAsProducedPPA" => "nodes/source/payasproducedppa.md",
+                "InflexibleSource" => "nodes/source/inflexiblesource.md",
+            ],
             "Sink nodes"=>Any[
                 "PeriodDemandSink"=>"nodes/sink/perioddemand.md",
                 "LoadShiftingNode"=>"nodes/sink/loadshiftingnode.md",

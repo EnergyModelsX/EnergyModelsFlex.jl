@@ -67,6 +67,8 @@ model = OperationalModel(
 case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
+general_tests(m)
+
 # Testing the correct source usage
 for t_inv ∈ 𝒯ᴵⁿᵛ
     if t_inv.sp == 1

@@ -24,6 +24,7 @@ The following source node type is implemented in the `EnergyModelsFlex`.
 
 ```@docs
 PayAsProducedPPA
+InflexibleSource
 ```
 
 ## [Network `Node` types](@id lib-pub-network-node)

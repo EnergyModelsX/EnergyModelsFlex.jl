@@ -97,6 +97,8 @@ m = create_model(case, modeltype)
 set_optimizer(m, optimizer)
 optimize!(m)
 
+general_tests(m)
+
 # Extract the individual elements and resources
 src_cheap, src_exp, sink = get_nodes(case)
 direct_link = get_links(case)[1]

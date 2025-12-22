@@ -84,7 +84,7 @@ end
             m = EnergyModelsBase.run_model(case, model, OPTIMIZER)
 
             # Test optimal solution
-            @test termination_status(m) == MOI.OPTIMAL
+            general_tests(m)
 
             line = get_nodes(case)[2]
 

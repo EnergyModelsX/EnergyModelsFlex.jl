@@ -133,6 +133,8 @@ model = OperationalModel(
 )
 m = EMB.run_model(case, model, OPTIMIZER)
 
+general_tests(m)
+
 𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 for t_inv ∈ 𝒯ᴵⁿᵛ
     @test all(

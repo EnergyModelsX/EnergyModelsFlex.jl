@@ -71,6 +71,7 @@ include(joinpath(test_dir, "utils.jl"))
             "MinUpDownTimeNode",
             "Combustion",
             "ActivationCostNode",
+            "FlexibleOutput",
         ]
             run_node_test("network", node_type)
         end

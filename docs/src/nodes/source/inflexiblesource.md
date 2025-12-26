@@ -125,10 +125,10 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and strategic periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_data`:
   This function is only called for specified additional data, see above.
 
-The function `constraints_capacity` is extended with a new method for inflexible source nodes to allow the fixing if the ``\texttt{cap\_use}[n, t]`` to the variable ``\texttt{cap\_inst}[n, t]``
+The function `constraints_capacity` is extended with a new method for inflexible source nodes to allow the fixing of the ``\texttt{cap\_use}[n, t]`` to the variable ``\texttt{cap\_inst}[n, t]``
 (only replacing inequality with equality compared to [`RefSource`](@extref EnergyModelsBase.RefSource)).
 It now includes the individual constraint:
 

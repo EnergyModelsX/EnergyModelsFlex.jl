@@ -29,6 +29,6 @@ export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
 export PeriodDemandSink, MultipleInputSink
 export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, Combustion
 export ContinuousMultipleInputSinkStrat, BinaryMultipleInputSinkStrat
-export CapacityCostLink, HighTempProdNode, InflexibleSource
+export CapacityCostLink, FlexibleOutput, InflexibleSource
 
 end

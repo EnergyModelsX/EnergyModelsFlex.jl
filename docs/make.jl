@@ -67,6 +67,7 @@ makedocs(
                 "ActivationCostNode"=>"nodes/network/activationcostnode.md",
                 "LimitedFlexibleInput"=>"nodes/network/limitedflexibleinput.md",
                 "Combustion"=>"nodes/network/combustion.md",
+                "FlexibleOutput"=>"nodes/network/flexibleoutput.md",
             ],
             "StorageEfficiency"=>"nodes/storage/storageefficiency.md",
         ],

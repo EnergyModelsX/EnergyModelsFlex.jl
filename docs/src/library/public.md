@@ -36,6 +36,7 @@ MinUpDownTimeNode
 ActivationCostNode
 LimitedFlexibleInput
 Combustion
+FlexibleOutput
 ```
 
 ## [Storage `Node` types](@id lib-pub-storage-node)

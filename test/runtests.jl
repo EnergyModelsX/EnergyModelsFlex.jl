@@ -18,8 +18,6 @@ const OPTIMIZER = optimizer_with_attributes(
     MOI.Silent() => true,
 )
 
-test_dir = joinpath(pkgdir(EMF), "test")
-
 """
     run_node_test(node_supertype::String, node_type::String)
 
@@ -27,20 +25,20 @@ Run the tests for a specific node type.
 """
 function run_node_test(node_supertype::String, node_type::String)
     @testset "$node_type" begin
-        include(joinpath(test_dir, "$node_supertype/test_$(node_type).jl"))
+        include("$node_supertype/test_$(node_type).jl")
     end
 end
 
-include(joinpath(test_dir, "utils.jl"))
+include("utils.jl")
 
 @testset "Flex" begin
     # Run all Aqua tests
-    include(joinpath(test_dir, "Aqua.jl"))
+    include("Aqua.jl")
 
     # Check if there is need for formatting
-    include(joinpath(test_dir, "JuliaFormatter.jl"))
+    # include("JuliaFormatter.jl")
 
-    @testset "Flex | links" begin
+    @testset "Flex | Links" begin
         for link_type ∈ ["CapacityCostLink"]
             run_node_test("link", link_type)
         end

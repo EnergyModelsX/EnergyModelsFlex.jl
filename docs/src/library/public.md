@@ -8,7 +8,7 @@ Pages = ["public.md"]
 
 ## [Sink `Node` types](@id lib-pub-sink-node)
 
-The following sink node types are implemented in the `EnergyModelsFlex`.
+The following sink node types are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 PeriodDemandSink
@@ -20,7 +20,7 @@ LoadShiftingNode
 
 ## [Source `Node` types](@id lib-pub-source-node)
 
-The following source node type is implemented in the `EnergyModelsFlex`.
+The following source node type is implemented in the `EnergyModelsFlex`:
 
 ```@docs
 PayAsProducedPPA
@@ -29,7 +29,7 @@ InflexibleSource
 
 ## [Network `Node` types](@id lib-pub-network-node)
 
-The following network node types are implemented in the `EnergyModelsFlex`.
+The following network node types are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 MinUpDownTimeNode
@@ -41,7 +41,7 @@ FlexibleOutput
 
 ## [Storage `Node` types](@id lib-pub-storage-node)
 
-The following storage node types are implemented in the `EnergyModelsFlex`.
+The following storage node types are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 ElectricBattery
@@ -50,7 +50,7 @@ StorageEfficiency
 
 ## [`Link` types](@id lib-pub-link)
 
-The following link types are implemented in the `EnergyModelsFlex`.
+The following link types are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 CapacityCostLink

@@ -21,10 +21,10 @@ function EMB.check_link(l::CapacityCostLink, 𝒯, ::EnergyModel, ::Bool)
         cap_price_periods(l) > 0,
         "The the number of sub periods of a year must be positive."
     )
-    sub_periods = create_sub_periods(𝒯, l)
+    sub_periods = create_sub_periods(l, 𝒯)
     @assert_or_log(
         vcat(sub_periods...) == collect(𝒯),
-        "The operational period durations could not accumulate into cap_price_periods =
-        $(cap_price_periods(l)) sub periods of each strategic period."
+        "The operational period durations could not accumulate into `cap_price_periods =
+        $(cap_price_periods(l))` sub periods of each strategic period."
     )
 end

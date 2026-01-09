@@ -2,7 +2,7 @@
     CapacityCostLink
 
 A link between two nodes with costs on the link usage for the resource `cap_resource`. All
-other resources have no costs associated with their usage (follows the 
+other resources have no costs associated with their usage (follows the
 [`Direct`](@extref EnergyModelsBase.Direct)).
 
 # Fields
@@ -97,7 +97,7 @@ function CapacityCostLink(
 end
 
 """
-    has_capacity(l::CapacityCostLink)
+    EMB.has_capacity(l::CapacityCostLink)
 
 The [`CapacityCostLink`](@ref) has a capacity, and hence, requires the declaration of capacity
 variables.
@@ -105,25 +105,41 @@ variables.
 EMB.has_capacity(l::CapacityCostLink) = true
 
 """
-    capacity(l::CapacityCostLink)
-    capacity(l::CapacityCostLink, t)
+    EMB.capacity(l::CapacityCostLink)
+    EMB.capacity(l::CapacityCostLink, t)
 
-Returns the capacity of a CapacityCostLink `l` as `TimeProfile` or in operational period `t`.
+Returns the capacity of a capacity cost link `l` as `TimeProfile` or in operational period `t`.
 """
 EMB.capacity(l::CapacityCostLink) = l.cap
 EMB.capacity(l::CapacityCostLink, t) = l.cap[t]
 
 """
-    has_opex(l::CapacityCostLink)
+    EMB.has_opex(l::CapacityCostLink)
 
 A `CapacityCostLink` `l` has operational expenses.
 """
 EMB.has_opex(l::CapacityCostLink) = true
 
 """
+    EMB.inputs(l::CapacityCostLink)
+
+Returns the input resources of a capacity cost link `l`, corresponding to its
+[`cap_resource`](@ref).
+"""
+EMB.inputs(l::CapacityCostLink) = [cap_resource(l)]
+
+"""
+    EMB.outputs(l::CapacityCostLink)
+
+Returns the output resources of a capacity cost link `l`, corresponding to its
+[`cap_resource`](@ref).
+"""
+EMB.outputs(l::CapacityCostLink) = [cap_resource(l)]
+
+"""
     cap_price(l::CapacityCostLink)
 
-Returns the cap_price of a CapacityCostLink `l`.
+Returns the price per unit of maximum capacity usage of a capacity cost link `l`.
 """
 cap_price(l::CapacityCostLink) = l.cap_price
 cap_price(l::CapacityCostLink, t) = l.cap_price[t]
@@ -131,13 +147,15 @@ cap_price(l::CapacityCostLink, t) = l.cap_price[t]
 """
     cap_price_periods(l::CapacityCostLink)
 
-Returns the cap_price_periods of a CapacityCostLink `l`.
+Returns the number of sub-periods within a year for which a price is calculated of a capacity
+cost link `l`.
 """
 cap_price_periods(l::CapacityCostLink) = l.cap_price_periods
 
 """
     cap_resource(l::CapacityCostLink)
 
-Returns the cap_resource of a CapacityCostLink `l`.
+Returns the resource for which the capacity is limited and has a price of a capacity cost
+link `l`.
 """
 cap_resource(l::CapacityCostLink) = l.cap_resource

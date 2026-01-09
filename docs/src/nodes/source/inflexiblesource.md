@@ -2,7 +2,7 @@
 
 Inflexible sources represent energy sources with fixed capacity usage that cannot be varied operationally.
 Unlike flexible sources (*e.g.*, like [`RefSource`](@extref EnergyModelsBase.RefSource)) that can adjust output based on system needs, inflexible sources operate at their full installed capacity in every operational period.
-Examples include must-run generation units or baseload power plants with operational constraints.
+Examples include must-run generation units, baseload power plants with operational constraints, or heat that must be either cooled down or utilized.
 
 The [`InflexibleSource`](@ref) is implemented as a simplified variant of the [`RefSource`](@extref EnergyModelsBase.RefSource) that enforces constant capacity utilization.
 

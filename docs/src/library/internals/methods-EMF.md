@@ -12,7 +12,6 @@ Pages = ["methods-EMF.md"]
 EnergyModelsFlex.check_period_ts
 EnergyModelsFlex.check_limits_default
 EnergyModelsFlex.check_input
-EnergyModelsFlex.check_output
 ```
 
 ## [Utility functions](@id lib-int-links-fun_utils)

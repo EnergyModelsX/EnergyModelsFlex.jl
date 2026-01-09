@@ -8,7 +8,7 @@ CO2 = ResourceEmit("CO₂", 1.0)
 prod1 = ResourceCarrier("Product 1", 0.0)
 prod2 = ResourceCarrier("Product 2", 0.1)
 
-function flexible_factory_graph()
+function flexible_factory_case(; cap=FixedProfile(10))
     # Define sources
     src_ng = RefSource(
         "src_ng",
@@ -36,9 +36,9 @@ function flexible_factory_graph()
     #   prod1/1 + prod2/2 = cap_use
     factory = FlexibleOutput(
         "factory",
-        FixedProfile(10),
-        FixedProfile(0.0),
-        FixedProfile(0.0),
+        cap,
+        FixedProfile(0.2),
+        FixedProfile(0.1),
         Dict(ng => 1, power => 1),
         Dict(prod1 => 1, prod2 => 2),
         [EmissionsEnergy()],
@@ -86,28 +86,60 @@ function flexible_factory_graph()
     resources = [ng, power, prod1, prod2, CO2]
 
     # Define model
-    model = OperationalModel(
+    modeltype = OperationalModel(
         Dict(CO2 => FixedProfile(100)),
         Dict(CO2 => StrategicProfile([0, 2e4, 1e5])),
         CO2,
     )
 
     case = Case(T, resources, [nodes, links], [[get_nodes, get_links]])
-    return run_model(case, model, HiGHS.Optimizer), case, model
+    return create_model(case, modeltype), case, modeltype
 end
 
-m, case, model = flexible_factory_graph()
-𝒯 = get_time_struct(case)
-𝒩 = get_nodes(case)
 
-factory = 𝒩[3]
-sink_prod_1 = 𝒩[4]
-sink_prod_2 = 𝒩[5]
-𝒫ᵒᵘᵗ = EMB.res_not(outputs(factory), co2_instance(model))
+@testset "Check functions" begin
+    # Set the global to true to suppress the error message
+    EMB.TEST_ENV = true
 
-general_tests(m)
+    # Capacity violation
+    @test_throws AssertionError flexible_factory_case(; cap=FixedProfile(-5))
 
-@testset "Constraints" begin
+    # Set the global to true to suppress the error message
+    EMB.TEST_ENV = false
+end
+
+
+@testset "Extraction functions" begin
+    # Create the model and extract the parameters
+    m, case, modeltype = flexible_factory_case()
+    factory = get_nodes(case)[3]
+    𝒯 = get_time_struct(case)
+
+    # Test the EMB extraction functions
+    @test capacity(factory) == FixedProfile(10)
+    @test opex_var(factory) == FixedProfile(0.2)
+    @test opex_fixed(factory) == FixedProfile(0.1)
+    @test inputs(factory) == [ng, power] || inputs(factory) == [power, ng]
+    @test outputs(factory) == [prod1, prod2] || outputs(factory) == [prod2, prod1]
+    @test node_data(factory) == ExtensionData[EmissionsEnergy()]
+end
+
+@testset "Constraint implementation" begin
+    # Create the case and modeltype
+    m, case, modeltype = flexible_factory_case()
+
+    # Optimize the model and conduct the general tests
+    set_optimizer(m, OPTIMIZER)
+    optimize!(m)
+    general_tests(m)
+
+    # Extract the time structure and elements
+    𝒯 = get_time_struct(case)
+    𝒩 = get_nodes(case)
+    factory = 𝒩[3]
+    sink_prod_1 = 𝒩[4]
+    sink_prod_2 = 𝒩[5]
+
     # Test that prod1/1 + prod2/2 = cap_use
     @test all(
         value(m[:cap_use][factory, t]) ≈ sum(

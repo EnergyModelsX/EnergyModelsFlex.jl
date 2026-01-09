@@ -284,7 +284,7 @@ function EMB.constraints_flow_out(
 
     # Definition of custom constraint: node can output multiple resources, but the overall
     # output (sum of all resources) cannot be higher than the available capacity
-    # Constraint for the sum of all output flows to equal cap_use
+    # Constraint for the sum of all output flows to equal `:cap_use`
     @constraint(m, [t ∈ 𝒯],
         sum(m[:flow_out][n, t, p] / outputs(n, p) for p ∈ 𝒫ᵒᵘᵗ) == m[:cap_use][n, t]
     )

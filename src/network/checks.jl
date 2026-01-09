@@ -104,7 +104,10 @@ function EMB.check_node(
     modeltype::EnergyModel,
     check_timeprofiles::Bool,
 )
-    check_output(n)
+    @assert_or_log(
+        all(outputs(n, p) > 0 for p ∈ outputs(n)),
+        "The values for the Dictionary `output` must be positive (as they appear in a denominator)."
+    )
     EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
 end
 
@@ -133,17 +136,5 @@ function check_input(n::Union{LimitedFlexibleInput,Combustion})
     @assert_or_log(
         all(inputs(n, p) > 0 for p ∈ inputs(n)),
         "The values for the Dictionary `input` must be positive (as they appear in a denominator)."
-    )
-end
-
-"""
-    check_output(n::FlexibleOutput)
-
-This function checks that the output of a `FlexibleOutput` node are valid.
-"""
-function check_output(n::FlexibleOutput)
-    @assert_or_log(
-        all(outputs(n, p) > 0 for p ∈ outputs(n)),
-        "The values for the Dictionary `output` must be positive (as they appear in a denominator)."
     )
 end

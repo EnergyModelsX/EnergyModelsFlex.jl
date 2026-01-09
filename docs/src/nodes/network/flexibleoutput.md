@@ -1,41 +1,52 @@
 # [FlexibleOutput](@id nodes-FlexibleOutput)
 
-The [`FlexibleOutput`](@ref) node models a conversion technology that can produce **multiple output resources** while sharing a **single capacity limit**. In contrast to a standard [`NetworkNode`](@extref EnergyModelsBase.NetworkNode), the utilized capacity is defined by the **sum of all output flows**, scaled by their respective output conversion factors.
+The [`FlexibleOutput`](@ref) node models a conversion technology that can produce **multiple output resources** while sharing a **single capacity limit**.
+In contrast to a standard [`NetworkNode`](@extref EnergyModelsBase.NetworkNode), the utilized capacity is defined by the **sum of all output flows**, scaled by their respective output conversion factors.
 
-This formulation enables flexible allocation of production across several co-products (e.g. multiple heat levels or energy carriers) while ensuring that total production remains consistent with the available capacity.
+This formulation enables flexible allocation of production across several co-products (*e.g.*, multiple heat levels or energy carriers) while ensuring that total production remains consistent with the available capacity.
 
 ## [Introduced type and its fields](@id nodes-FlexibleOutput-fields)
 
-The [`FlexibleOutput`](@ref) is a subtype of the [`NetworkNode`](@extref EnergyModelsBase.NetworkNode). It reuses all standard `NetworkNode` functionality except for the output-flow formulation, which is extended to allow flexible output composition.
+The [`FlexibleOutput`](@ref) is a subtype of the [`NetworkNode`](@extref EnergyModelsBase.NetworkNode).
+It reuses all standard `NetworkNode` functionality except for the output-flow formulation, which is extended to allow flexible output composition.
 
 ### [Standard fields](@id nodes-FlexibleOutput-fields-stand)
 
+The standard fields of a [`FlexibleOutput`](@ref) node are given as:
+
 - **`id`**:\
   The field `id` is only used for providing a name to the node.
-  This is similar to the approach utilized in `EnergyModelsBase`.
-
 - **`cap::TimeProfile`**:\
-  Specifies the installed capacity.
-  If the node should contain investments through the application of [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/stable/), it is important to note that you can only use `FixedProfile` or `StrategicProfile` for the capacity, but not `RepresentativeProfile` or `OperationalProfile`.\
+  The installed capacity corresponds to the nominal capacity of the node.\
+  If the node should contain investments through the application of [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/), it is important to note that you can only use `FixedProfile` or `StrategicProfile` for the capacity, but not `RepresentativeProfile` or `OperationalProfile`.
   In addition, all values have to be non-negative.
-
 - **`opex_var::TimeProfile`**:\
   The variable operational expenses are based on the capacity utilization through the variable [`:cap_use`](@extref EnergyModelsBase man-opt_var-cap).
+  Hence, it is directly related to the specified `input` and `output` ratios.
   The variable operating expenses can be provided as `OperationalProfile` as well.
-
 - **`opex_fixed::TimeProfile`**:\
-  The fixed operating expenses are relative to the installed capacity (through the field `cap`) and the chosen duration of a strategic period as outlined on *[Utilize `TimeStruct`](@extref EnergyModelsBase how_to-utilize_TS)*.\
+  The fixed operating expenses are relative to the installed capacity (through the field `cap`) and the chosen duration of an investment period as outlined on *[Utilize `TimeStruct`](@extref EnergyModelsBase how_to-utilize_TS)*.\
   It is important to note that you can only use `FixedProfile` or `StrategicProfile` for the fixed OPEX, but not `RepresentativeProfile` or `OperationalProfile`.
   In addition, all values have to be non-negative.
-
-- **`output::Dict{<:Resource, <:Real}`**:\
-  The field `output` includes the output [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.
-  All values have to be positive.
-
+- **`input::Dict{<:Resource,<:Real}`** and **`output::Dict{<:Resource,<:Real}`**:\
+  Both fields describe the `input` and `output` [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.\
+  CO₂ cannot be directly specified, *i.e.*, you cannot specify a ratio.
+  If you use [`CaptureData`](@extref EnergyModelsBase.CaptureData), it is however necessary to specify CO₂ as output, although the ratio is not important.\
+  All values have to be non-negative.
 - **`data::Vector{<:ExtensionData}`**:\
-  Optional additional data for extensions (e.g. investments or emissions).
-  !!! note
+  An entry for providing additional data to the model.
+  In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
+  !!! note "Constructor for `NewNetworkNode`"
       The field `data` is not required as we include a constructor when the value is excluded.
+
+  !!! warning "Using `CaptureData`"
+      If you plan to use [`CaptureData`](@extref EnergyModelsBase.CaptureData) for a [`NewNetworkNode`] node, it is crucial that you specify your CO₂ resource in the `output` dictionary.
+      The chosen value is however **not** important as the CO₂ flow is automatically calculated based on the process utilization and the provided process emission value.
+      The reason for this necessity is that flow variables are declared through the keys of the `output` dictionary.
+      Hence, not specifying CO₂ as `output` resource results in not creating the corresponding flow variable and subsequent problems in the design.
+
+      We plan to remove this necessity in the future.
+      As it would most likely correspond to breaking changes, we have to be careful to avoid requiring major changes in other packages.
 
 ## [Mathematical description](@id nodes-FlexibleOutput-math)
 
@@ -63,7 +74,7 @@ The [`FlexibleOutput`](@ref) node uses the standard `NetworkNode` optimization v
 
 ### [Constraints](@id nodes-FlexibleOutput-math-con)
 
-The following sections omit the direct inclusion of the vector of heat pump nodes.
+The following sections omit the direct inclusion of the vector of flexible output nodes.
 Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N^{FlexibleOutput}`` for all [`FlexibleOutput`](@ref) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all strategic periods).
 
@@ -124,7 +135,8 @@ The following standard constraints apply:
 
 The function `constraints_flow_out` is extended with a new method for flexible output nodes such that the outputs are flexible within their sum being the capacity usage of the node.
 
-Let ``\mathcal{P}^{out}(n)`` denote the set of output resources of node ``n`` excluding CO₂. The implemented constraint is
+Let ``\mathcal{P}^{out}(n)`` denote the set of output resources of node ``n`` excluding CO₂, obtained through the function [`soutputs`](@extref EnergyModelsBase.outputs).
+The implemented constraint is then given by
 
 ```math
 \sum_{p \in \mathcal{P}^{out}(n)} \frac{\texttt{flow\_out}[n, t, p]}{outputs(n, p)} = \texttt{cap\_use}[n, t]

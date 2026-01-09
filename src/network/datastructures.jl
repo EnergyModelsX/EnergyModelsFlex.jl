@@ -273,8 +273,9 @@ heat_resource(n::Combustion) = n.heat_res
     FlexibleOutput <: NetworkNode
 
 A `FlexibleOutput` node.
-The `FlexibleOutput` is similar to [`NetworkNode`](@extref EnergyModelsBase 
-nodes-network_node)s but introduces flexibility in the output as the capacity use is given 
+
+The `FlexibleOutput` is similar to [`NetworkNode`](@extref EnergyModelsBase
+nodes-network_node)s but introduces flexibility in the output as the capacity use is given
 by the sum of these.
 
 # Fields
@@ -293,12 +294,12 @@ by the sum of these.
 """
 struct FlexibleOutput <: EMB.NetworkNode
     id::Any
-    cap::TimeProfile                        # Capacity
-    opex_var::TimeProfile                   # Variable OPEX in EUR/MWh
-    opex_fixed::TimeProfile                 # Fixed OPEX in EUR/h
+    cap::TimeProfile
+    opex_var::TimeProfile
+    opex_fixed::TimeProfile
     input::Dict{<:Resource,<:Real}
-    output::Dict{<:Resource,<:Real}        # Output Resource (Heat), leave at 1: COP is calculated seperately
-    data::Vector{Data}                      # Optional Investment/Emission Data
+    output::Dict{<:Resource,<:Real}
+    data::Vector{Data}
 end
 function FlexibleOutput(
     id::Any,

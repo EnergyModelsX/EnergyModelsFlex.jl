@@ -33,14 +33,21 @@ The standard fields of a [`FlexibleOutput`](@ref) node are given as:
   CO₂ cannot be directly specified, *i.e.*, you cannot specify a ratio.
   If you use [`CaptureData`](@extref EnergyModelsBase.CaptureData), it is however necessary to specify CO₂ as output, although the ratio is not important.\
   All values have to be non-negative.
+  !!! tip "Conversion factor"
+      The conversion factor for the `input` is used as a multiplier for the capacity usage.
+      A value of ``2`` implies that you need 2 MW input resource/MW capacity usage.\
+      The conversion factor for the `output` is also used as a multiplier for the capacity usage.
+      A value of ``2`` implies that you produce 2 MW output resource/MW capacity usage.
+      This implies that a higher value results in more production based on a given capacity.
+      It is hence important to be careful when choosing values to avoid a perpetual motion machine.
 - **`data::Vector{<:ExtensionData}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for both providing `EmissionsData` and additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
-  !!! note "Constructor for `NewNetworkNode`"
+  !!! note "Constructor for `FlexibleOutput`"
       The field `data` is not required as we include a constructor when the value is excluded.
 
   !!! warning "Using `CaptureData`"
-      If you plan to use [`CaptureData`](@extref EnergyModelsBase.CaptureData) for a [`NewNetworkNode`] node, it is crucial that you specify your CO₂ resource in the `output` dictionary.
+      If you plan to use [`CaptureData`](@extref EnergyModelsBase.CaptureData) for a [`FlexibleOutput`](@ref) node, it is crucial that you specify your CO₂ resource in the `output` dictionary.
       The chosen value is however **not** important as the CO₂ flow is automatically calculated based on the process utilization and the provided process emission value.
       The reason for this necessity is that flow variables are declared through the keys of the `output` dictionary.
       Hence, not specifying CO₂ as `output` resource results in not creating the corresponding flow variable and subsequent problems in the design.
@@ -75,7 +82,7 @@ The [`FlexibleOutput`](@ref) node uses the standard `NetworkNode` optimization v
 ### [Constraints](@id nodes-FlexibleOutput-math-con)
 
 The following sections omit the direct inclusion of the vector of flexible output nodes.
-Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N^{FlexibleOutput}`` for all [`FlexibleOutput`](@ref) types if not stated differently.
+Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ ^{FlexibleOutput}`` for all [`FlexibleOutput`](@ref) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all strategic periods).
 
 #### [Standard constraints](@id nodes-FlexibleOutput-math-con-stand)

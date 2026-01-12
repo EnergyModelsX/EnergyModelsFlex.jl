@@ -30,8 +30,8 @@ function flexible_factory_case(; cap=FixedProfile(10))
     # Interpretation:
     # - Factory has cap = 10
     # - It can produce either prod1 or prod2 (or both)
-    # - prod2 is "more intensive": needs twice as much capacity per unit
-    #
+    # - prod2 is "less intensive": needs half as much capacity per unit (2 units produced
+    #   per capacity usage)
     # Constraint enforced:
     #   prod1/1 + prod2/2 = cap_use
     factory = FlexibleOutput(

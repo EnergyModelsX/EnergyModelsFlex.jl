@@ -207,11 +207,11 @@ end
     )
 
     # Max capacity use per sub-period:
-    #    link_in[t] ≤ ccl_max_cap_use[t_sub_end]
+    #    link_in[t] ≤ ccl_cap_use_max[t_sub_end]
     @test all(
         all(
             value(m[:link_in][cc_link, t, power]) ≲
-            value(m[:ccl_max_cap_use][cc_link, t_sub[end]])
+            value(m[:ccl_cap_use_max][cc_link, t_sub[end]])
             for t ∈ t_sub
         )
         for t_sub ∈ 𝒯ˢᵘᵇ
@@ -219,15 +219,15 @@ end
 
     # Capacity cost at end of sub-period: cap_cost == max_cap_use * avg_cap_price
     @test all(
-        value(m[:ccl_cap_cost][cc_link, t_sub[end]]) ≈
-        value(m[:ccl_max_cap_use][cc_link, t_sub[end]]) * EMF.avg_cap_price(cc_link, t_sub)
+        value(m[:ccl_cap_use_cost][cc_link, t_sub[end]]) ≈
+        value(m[:ccl_cap_use_max][cc_link, t_sub[end]]) * EMF.avg_cap_price(cc_link, t_sub)
         for t_sub ∈ 𝒯ˢᵘᵇ
     )
 
-    # Strategic-period sum: link_opex_var == sum(ccl_cap_cost over t_inv)
+    # Strategic-period sum: link_opex_var == sum(ccl_cap_use_cost over t_inv)
     @test all(
         value(m[:link_opex_var][cc_link, t_inv]) ≈
-            sum(value(m[:ccl_cap_cost][cc_link, t]) for t ∈ t_inv)
+            sum(value(m[:ccl_cap_use_cost][cc_link, t]) for t ∈ t_inv)
         for t_inv ∈ 𝒯ᴵⁿᵛ
     )
 

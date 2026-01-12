@@ -2,14 +2,14 @@
     EMB.variables_element(m, ℒˢᵘᵇ::Vector{<:CapacityCostLink}, 𝒯, modeltype::EnergyModel)
 
 Creates the following additional variable for **ALL** capacity cost links:
-- `ccl_max_cap_use[l, t]` is a continuous variable describing the maximum capacity
+- `ccl_cap_use_max[l, t]` is a continuous variable describing the maximum capacity
   usage over sub periods for a [`CapacityCostLink`](@ref) `l` in operational period `t`.
-- `ccl_cap_cost[l, t]` is a continuous variable describing the cost over sub periods
+- `ccl_cap_use_cost[l, t]` is a continuous variable describing the cost over sub periods
   for a [`CapacityCostLink`](@ref) `l` in operational period `t`.
 """
 function EMB.variables_element(m, ℒˢᵘᵇ::Vector{<:CapacityCostLink}, 𝒯, ::EnergyModel)
-    @variable(m, ccl_max_cap_use[ℒˢᵘᵇ, 𝒯] >= 0)
-    @variable(m, ccl_cap_cost[ℒˢᵘᵇ, 𝒯] >= 0)
+    @variable(m, ccl_cap_use_max[ℒˢᵘᵇ, 𝒯] >= 0)
+    @variable(m, ccl_cap_use_cost[ℒˢᵘᵇ, 𝒯] >= 0)
 end
 
 """
@@ -46,19 +46,19 @@ function EMB.create_link(
 
     # Max capacity use constraints
     @constraint(m, [t_sub ∈ 𝒯ˢᵘᵇ, t ∈ t_sub],
-        m[:link_in][l, t, p_cap] .≤ m[:ccl_max_cap_use][l, t_sub]
+        m[:link_in][l, t, p_cap] .≤ m[:ccl_cap_use_max][l, t_sub]
     )
 
     # Capacity cost constraint
     @constraint(m, [t_sub ∈ 𝒯ˢᵘᵇ],
-        m[:ccl_cap_cost][l, t_sub[end]] ==
-        m[:ccl_max_cap_use][l, t_sub[end]] * avg_cap_price(l, t_sub)
+        m[:ccl_cap_use_cost][l, t_sub[end]] ==
+        m[:ccl_cap_use_max][l, t_sub[end]] * avg_cap_price(l, t_sub)
     )
 
     # Sum up costs for each sub_period into the strategic period cost
     @constraint(m, [t_inv ∈ 𝒯ᴵⁿᵛ],
         m[:link_opex_var][l, t_inv] ==
-            sum(m[:ccl_cap_cost][l, t] for t ∈ t_inv)
+            sum(m[:ccl_cap_use_cost][l, t] for t ∈ t_inv)
     )
 end
 

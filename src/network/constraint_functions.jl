@@ -267,3 +267,25 @@ function EMB.constraints_flow_out(
         m[:flow_out][n, t, p] == m[:cap_use][n, t] * outputs(n, p)
     )
 end
+
+"""
+    constraints_flow_out(m, n::FlexibleOutput, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Function for creating the constraint on the outlet flow from a `FlexibleOutput`.
+"""
+function EMB.constraints_flow_out(
+    m,
+    n::FlexibleOutput,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    # Declaration of the required subsets, excluding CO2, if specified
+    𝒫ᵒᵘᵗ = EMB.res_not(outputs(n), co2_instance(modeltype))
+
+    # Definition of custom constraint: node can output multiple resources, but the overall
+    # output (sum of all resources) cannot be higher than the available capacity
+    # Constraint for the sum of all output flows to equal `:cap_use`
+    @constraint(m, [t ∈ 𝒯],
+        sum(m[:flow_out][n, t, p] / outputs(n, p) for p ∈ 𝒫ᵒᵘᵗ) == m[:cap_use][n, t]
+    )
+end

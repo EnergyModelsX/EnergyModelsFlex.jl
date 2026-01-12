@@ -1,7 +1,7 @@
 name = "EnergyModelsFlex"
 uuid = "a81b9388-333d-4b63-81f2-910b060b544c"
 authors = ["Sigrid Aunsmo, Sigmund Eggen Holm, Jon Vegard Venås, and Per Åslid"]
-version = "0.2.9"
+version = "0.2.10"
 
 [deps]
 EnergyModelsBase = "5d7e687e-f956-46f3-9045-6f5a5fd49f50"

@@ -19,6 +19,12 @@ DocMeta.setdocmeta!(
 news = "docs/src/manual/NEWS.md"
 cp("NEWS.md", news; force = true)
 
+inputfile = joinpath("examples", "flexible_demand.jl")
+Literate.markdown(inputfile, joinpath("docs", "src", "examples"))
+
+inputfile = joinpath("examples", "capacity_cost_link.jl")
+Literate.markdown(inputfile, joinpath("docs", "src", "examples"))
+
 links = InterLinks(
     "TimeStruct" => "https://sintefore.github.io/TimeStruct.jl/stable/",
     "EnergyModelsBase" => "https://energymodelsx.github.io/EnergyModelsBase.jl/stable/",
@@ -41,11 +47,15 @@ makedocs(
             "Quick Start"=>"manual/quick-start.md",
             "Examples"=>Any[
                 "Flexible demand"=>"examples/flexible_demand.md",
+                "Capacity cost link"=>"examples/capacity_cost_link.md",
             ],
             "Release notes"=>"manual/NEWS.md",
         ],
         "Nodes" => Any[
-            "PayAsProducedPPA"=>"nodes/source/payasproducedppa.md",
+            "Source nodes"=>Any[
+                "PayAsProducedPPA" => "nodes/source/payasproducedppa.md",
+                "InflexibleSource" => "nodes/source/inflexiblesource.md",
+            ],
             "Sink nodes"=>Any[
                 "PeriodDemandSink"=>"nodes/sink/perioddemand.md",
                 "LoadShiftingNode"=>"nodes/sink/loadshiftingnode.md",
@@ -57,8 +67,12 @@ makedocs(
                 "ActivationCostNode"=>"nodes/network/activationcostnode.md",
                 "LimitedFlexibleInput"=>"nodes/network/limitedflexibleinput.md",
                 "Combustion"=>"nodes/network/combustion.md",
+                "FlexibleOutput"=>"nodes/network/flexibleoutput.md",
             ],
             "StorageEfficiency"=>"nodes/storage/storageefficiency.md",
+        ],
+        "Links" => Any[
+            "CapacityCostLink"=>"links/capacitycostlink.md",
         ],
         "How-to" =>
             Any["Contribute"=>"how-to/contribute.md"],

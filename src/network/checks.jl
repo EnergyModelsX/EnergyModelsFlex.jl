@@ -35,11 +35,11 @@ end
         check_timeprofiles::Bool,
     )
 
-This method checks that a `LimitedFlexibleInput` or a `Combustion` node is valid.
+This method checks that a `LimitedFlexibleInput` node is valid.
 
 ## Checks
  - The field `cap` is required to be non-negative.
- - The values of the dictionary `input` are required to be non-negative.
+ - The values of the dictionary `input` are required to be positive.
  - The values of the dictionary `output` are required to be non-negative.
  - The value of the field `fixed_opex` is required to be non-negative and
    accessible through a `StrategicPeriod` as outlined in the function
@@ -53,6 +53,7 @@ function EMB.check_node(
     modeltype::EnergyModel,
     check_timeprofiles::Bool,
 )
+    check_input(n)
     EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
     check_limits_default(n)
 end
@@ -60,11 +61,11 @@ end
 """
     EMB.check_node(n::Combustion, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
 
-This method checks that a `LimitedFlexibleInput` or a `Combustion` node is valid.
+This method checks that a `Combustion` node is valid.
 
 ## Checks
  - The field `cap` is required to be non-negative.
- - The values of the dictionary `input` are required to be non-negative.
+ - The values of the dictionary `input` are required to be positive.
  - The values of the dictionary `output` are required to be non-negative.
  - The value of the field `fixed_opex` is required to be non-negative and
    accessible through a `StrategicPeriod` as outlined in the function
@@ -74,6 +75,7 @@ This method checks that a `LimitedFlexibleInput` or a `Combustion` node is valid
  - The resource in the `heat_res` field must be in the dictionary `output`.
 """
 function EMB.check_node(n::Combustion, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
+    check_input(n)
     EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
     check_limits_default(n)
 
@@ -81,6 +83,32 @@ function EMB.check_node(n::Combustion, 𝒯, modeltype::EnergyModel, check_timep
         heat_resource(n) ∈ outputs(n),
         "The resource in the `heat_res` field must be in the dictionary `output`.",
     )
+end
+
+"""
+    EMB.check_node(n::FlexibleOutput, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
+
+This method checks that a `FlexibleOutput` node is valid.
+
+## Checks
+ - The field `cap` is required to be non-negative.
+ - The values of the dictionary `input` are required to be non-negative.
+ - The values of the dictionary `output` are required to be positive.
+ - The value of the field `fixed_opex` is required to be non-negative and
+   accessible through a `StrategicPeriod` as outlined in the function
+   `check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`.
+"""
+function EMB.check_node(
+    n::FlexibleOutput,
+    𝒯,
+    modeltype::EnergyModel,
+    check_timeprofiles::Bool,
+)
+    @assert_or_log(
+        all(outputs(n, p) > 0 for p ∈ outputs(n)),
+        "The values for the Dictionary `output` must be positive (as they appear in a denominator)."
+    )
+    EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
 end
 
 """
@@ -96,5 +124,17 @@ function check_limits_default(n::Union{LimitedFlexibleInput,Combustion})
     @assert_or_log(
         all(limits(n, p) ≥ 0 for p ∈ limits(n)),
         "The values for the Dictionary `limit` must be non-negative."
+    )
+end
+
+"""
+    check_input(n::Union{LimitedFlexibleInput, Combustion})
+
+This function checks that the input of a `LimitedFlexibleInput` or `Combustion` node are valid.
+"""
+function check_input(n::Union{LimitedFlexibleInput,Combustion})
+    @assert_or_log(
+        all(inputs(n, p) > 0 for p ∈ inputs(n)),
+        "The values for the Dictionary `input` must be positive (as they appear in a denominator)."
     )
 end

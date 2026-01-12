@@ -1,5 +1,18 @@
 # Release notes
 
+## Version 0.2.10 (2026-01-05)
+
+### Enhancements
+
+* Added the new link `CapacityCostLink`.
+* Added the nodes `InflexibleSource` and `FlexibleOutput`.
+
+### Adjustments
+
+* Removed `ext/EMGUIExt/descriptive_names.yml` as this will now be provided directly in `EnergyModelsGUI`.
+* Removed `docs/src/example/flexible_demand.md` as the markdown versions of the example files are now generated automatically (and these are thus added to the `.gitignore`-file).
+
+
 ## Version 0.2.9 (2025-07-08)
 
 * Adjusted to [`EnergyModelsBase` v0.9.0](https://github.com/EnergyModelsX/EnergyModelsBase.jl/releases/tag/v0.9.0):

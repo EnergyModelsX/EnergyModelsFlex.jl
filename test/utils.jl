@@ -1,7 +1,39 @@
 using JuMP
 
+const ATOL = 1e-7
+
+"""
+    a ≲ b
+
+Approximate ≤ comparison with absolute tolerance `ATOL`.
+"""
+≲(a::Real, b::Real) = a <= b + ATOL
+
+"""
+    a ≳ b
+
+Approximate ≥ comparison with absolute tolerance `ATOL`.
+"""
+≳(a::Real, b::Real) = a + ATOL >= b
+
 function get_values(m, variable, node, iterable)
     return [JuMP.value(m[variable][node, t]) for t ∈ iterable]
+end
+
+"""
+    general_tests(m)
+
+Perform general tests on the optimization model `m`, such as checking for optimality.
+"""
+function general_tests(m)
+    # Check if the solution is optimal.
+    @testset "optimal solution" begin
+        @test termination_status(m) == MOI.OPTIMAL
+
+        if termination_status(m) != MOI.OPTIMAL
+            @show termination_status(m)
+        end
+    end
 end
 
 function check_cyclic_sequence(arr::Vector, min_up_value::Int, min_down_value::Int)::Bool

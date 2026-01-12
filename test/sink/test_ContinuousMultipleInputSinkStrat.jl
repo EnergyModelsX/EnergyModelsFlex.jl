@@ -57,6 +57,8 @@ model = OperationalModel(
 case = Dict(:T => 𝒯, :nodes => 𝒩, :links => ℒ, :products => 𝒫)
 m = EMB.run_model(case, model, OPTIMIZER)
 
+general_tests(m)
+
 # Test the correct variable definition and that the variable is a sparse axis array
 for var ∈ [:input_frac_strat, :sink_surplus_p, :sink_deficit_p]
     if var == :input_frac_strat

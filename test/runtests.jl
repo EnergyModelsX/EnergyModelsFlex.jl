@@ -5,6 +5,7 @@ using HiGHS
 using JuMP
 using Test
 using TimeStruct
+using Logging
 
 const EMB = EnergyModelsBase
 const EMF = EnergyModelsFlex
@@ -35,7 +36,13 @@ include("utils.jl")
     include("Aqua.jl")
 
     # Check if there is need for formatting
-    include("JuliaFormatter.jl")
+    # include("JuliaFormatter.jl")
+
+    @testset "Flex | Links" begin
+        for link_type ∈ ["CapacityCostLink"]
+            run_node_test("link", link_type)
+        end
+    end
 
     @testset "Flex | Sink nodes" begin
         for node_type ∈
@@ -51,7 +58,7 @@ include("utils.jl")
     end
 
     @testset "Flex | Source nodes" begin
-        for node_type ∈ ["PayAsProducedPPA"]
+        for node_type ∈ ["PayAsProducedPPA", "InflexibleSource"]
             run_node_test("source", node_type)
         end
     end
@@ -62,6 +69,7 @@ include("utils.jl")
             "MinUpDownTimeNode",
             "Combustion",
             "ActivationCostNode",
+            "FlexibleOutput",
         ]
             run_node_test("network", node_type)
         end

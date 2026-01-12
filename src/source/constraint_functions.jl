@@ -1,5 +1,5 @@
 """
-    EMB.constraints_opex_var(m, n::PayAsProducedPPA, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    constraints_opex_var(m, n::PayAsProducedPPA, 𝒯ᴵⁿᵛ, ::EnergyModel)
 
 Function for creating the constraint on the variable OPEX of a `PayAsProducedPPA` node.
 """
@@ -12,4 +12,21 @@ function EMB.constraints_opex_var(m, n::PayAsProducedPPA, 𝒯ᴵⁿᵛ, ::Energ
             opex_var(n, t) * EMB.scale_op_sp(t_inv, t) for t ∈ t_inv
         )
     )
+end
+
+"""
+    constraints_capacity(m, n::InflexibleSource, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Function for fixing the capacity of a `InflexibleSource` to the installed capacity.
+"""
+function EMB.constraints_capacity(
+    m,
+    n::InflexibleSource,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    ## Custom constraint for inflexibility
+    @constraint(m, [t ∈ 𝒯], m[:cap_use][n, t] == m[:cap_inst][n, t])
+
+    constraints_capacity_installed(m, n, 𝒯, modeltype)
 end

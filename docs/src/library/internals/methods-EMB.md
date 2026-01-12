@@ -1,4 +1,4 @@
-# [Methods - `EnergyModelsBase`](@id lib-int-met_emb)
+# [Methods - `EMB`](@id lib-int-met_emb)
 
 ## [Index](@id lib-int-met_emb-idx)
 
@@ -9,21 +9,33 @@ Pages = ["methods-EMB.md"]
 ## [Extension methods](@id lib-int-met_emb-ext)
 
 ```@docs
-EnergyModelsBase.variables_element
+EMB.variables_element
+EMB.create_link
+EMB.has_capacity
+EMB.has_opex
 ```
 
 ## [Constraint methods](@id lib-int-met_emb-con)
 
 ```@docs
-EnergyModelsBase.constraints_capacity
-EnergyModelsBase.constraints_flow_in
-EnergyModelsBase.constraints_flow_out
-EnergyModelsBase.constraints_opex_var
-EnergyModelsBase.constraints_level_aux
+EMB.constraints_capacity
+EMB.constraints_flow_in
+EMB.constraints_flow_out
+EMB.constraints_opex_var
+EMB.constraints_level_aux
 ```
 
 ## [Check methods](@id lib-int-met_emb-check)
 
 ```@docs
-EnergyModelsBase.check_node
+EMB.check_node
+EMB.check_link
+```
+
+## [Field extraction methods](@id lib-int-met_emb-field)
+
+```@docs
+EMB.capacity
+EMB.inputs
+EMB.outputs
 ```

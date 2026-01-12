@@ -247,6 +247,67 @@ function Combustion(
 )
     return Combustion(id, cap, opex_var, opex_fixed, limit, heat_res, input, output, Data[])
 end
+
+"""
+    limits(n::Combustion, p::Resource)
+
+Returns the limit of a resource `p` for a [`Combustion`](@ref) node `n`.
+"""
 limits(n::Combustion, p::Resource) = n.limit[p]
+
+"""
+    limits(n::Combustion)
+
+Returns all resources with defined limits for a [`Combustion`](@ref) node `n`.
+"""
 limits(n::Combustion) = collect(keys(n.limit))
+
+"""
+    heat_resource(n::Combustion)
+
+Returns the heat residual resource of a [`Combustion`](@ref) node `n`.
+"""
 heat_resource(n::Combustion) = n.heat_res
+
+"""
+    FlexibleOutput <: NetworkNode
+
+A `FlexibleOutput` node.
+
+The `FlexibleOutput` is similar to [`NetworkNode`](@extref EnergyModelsBase
+nodes-network_node)s but introduces flexibility in the output as the capacity use is given
+by the sum of these.
+
+# Fields
+- **`id`** is the name/identifier of the node.
+- **`cap::TimeProfile`** is the installed capacity.
+- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+  through the variable `:cap_use`.
+- **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
+  through the variable `:cap_inst`.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+  The field `data` is conditional through usage of a constructor.
+"""
+struct FlexibleOutput <: EMB.NetworkNode
+    id::Any
+    cap::TimeProfile
+    opex_var::TimeProfile
+    opex_fixed::TimeProfile
+    input::Dict{<:Resource,<:Real}
+    output::Dict{<:Resource,<:Real}
+    data::Vector{Data}
+end
+function FlexibleOutput(
+    id::Any,
+    cap::TimeProfile,
+    opex_var::TimeProfile,
+    opex_fixed::TimeProfile,
+    input::Dict{<:Resource,<:Real},
+    output::Dict{<:Resource,<:Real},
+)
+    return FlexibleOutput(id, cap, opex_var, opex_fixed, input, output, Data[])
+end

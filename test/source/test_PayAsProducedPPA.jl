@@ -42,6 +42,8 @@ model = OperationalModel(
 case = Case(𝒯, 𝒫, [𝒩, ℒ])
 m = EMB.run_model(case, model, OPTIMIZER)
 
+general_tests(m)
+
 # We only have curtailment in the first strategic period
 @test sum(value.(m[:curtailment][source_1, t]) > 0 for t ∈ 𝒯) == 3
 @test all(

@@ -11,4 +11,12 @@ Pages = ["methods-EMF.md"]
 ```@docs
 EnergyModelsFlex.check_period_ts
 EnergyModelsFlex.check_limits_default
+EnergyModelsFlex.check_input
+```
+
+## [Utility functions](@id lib-int-links-fun_utils)
+
+```@docs
+EnergyModelsFlex.avg_cap_price
+EnergyModelsFlex.create_sub_periods
 ```

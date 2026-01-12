@@ -130,7 +130,7 @@ end
     optimize!(m)
 
     # Test optimal solution
-    @test termination_status(m) == MOI.OPTIMAL
+    general_tests(m)
 
     demand = get_nodes(case)[2]
     vals = get_values(m, :cap_use, demand, get_time_struct(case))

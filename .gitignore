@@ -17,6 +17,7 @@
 *startup.jl
 docs/build/
 docs/src/manual/NEWS.md
+docs/src/examples/*.md
 *.lp
 *.mps
 dev/

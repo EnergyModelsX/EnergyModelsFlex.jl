@@ -60,6 +60,11 @@ function EMB.create_link(
         m[:link_opex_var][l, t_inv] ==
             sum(m[:ccl_cap_use_cost][l, t] for t ∈ t_inv)
     )
+
+    # Fix the fixed OPEX to avoid unconstrainted variables
+    for t_inv ∈ 𝒯ᴵⁿᵛ
+        fix(m[:link_opex_fixed][l, t_inv], 0; force = true)
+    end
 end
 
 """

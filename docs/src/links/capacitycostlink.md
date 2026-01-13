@@ -91,8 +91,8 @@ with paranthesis.
 
 Two additional variables track capacity utilization and associated costs over sub-periods:
 
-- ``\texttt{ccl\_max\_cap\_use}[l, t_{sub}]``: Maximum capacity usage in sub-period ``t_{sub}`` for link ``l``.
-- ``\texttt{ccl\_cap\_cost}[l, t_{sub}]``: Operational cost in sub-period ``t_{sub}`` for link ``l``.
+- ``\texttt{ccl\_cap\_use\_max}[l, t_{sub}]``: Maximum capacity usage in sub-period ``t_{sub}`` for link ``l``.
+- ``\texttt{ccl\_cap\_use\_cost}[l, t_{sub}]``: Operational cost in sub-period ``t_{sub}`` for link ``l``.
 
 ### [Constraints](@id links-CapacityCostLink-math-con)
 
@@ -117,13 +117,13 @@ All additional constraints are created within a new method for the function [`cr
 The capacity utilization constraint tracks the maximum usage within each sub-period:
 
 ```math
-\texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{ccl\_max\_cap\_use}[l, t_{sub}]
+\texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{ccl\_cap\_use\_max}[l, t_{sub}]
 ```
 
 The capacity cost is calculated as:
 
 ```math
-\texttt{ccl\_cap\_cost}[l, t_{sub}] = \texttt{ccl\_max\_cap\_use}[l, t_{sub}] \times \overline{cap\_price}(l, t_{sub})
+\texttt{ccl\_cap\_use\_cost}[l, t_{sub}] = \texttt{ccl\_cap\_use\_max}[l, t_{sub}] \times \overline{cap\_price}(l, t_{sub})
 ```
 
 where ``\overline{cap\_price}`` is the average capacity price over the sub-period.
@@ -131,7 +131,7 @@ where ``\overline{cap\_price}`` is the average capacity price over the sub-perio
 Finally, costs are aggregated to each strategic period:
 
 ```math
-\texttt{link\_opex\_var}[l, t_{inv}] = \sum_{t_{sub} \in t_{inv}} \texttt{ccl\_cap\_cost}[l, t_{sub}]
+\texttt{link\_opex\_var}[l, t_{inv}] = \sum_{t_{sub} \in t_{inv}} \texttt{ccl\_cap\_use\_cost}[l, t_{sub}]
 ```
 
 In addition, the energy flow of the constrained resource should not exceed the maximum pipe capacity, which is included through the following constraint:

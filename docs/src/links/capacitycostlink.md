@@ -44,10 +44,22 @@ The following additional fields are included for [`CapacityCostLink`](@ref) link
   The price per unit of maximum capacity usage over the sub-periods.
   This value is averaged over sub-periods as defined by `cap_price_periods`.
   All values have to be non-negative.
-- **`cap_price_periods::Int64`** :\
-  The number of sub-periods within a year for which the capacity cost is calculated.
+  !!! danger "Price values"
+
+      The value given in `cap_price` is interpreted on the strategic-period scale (*e.g.*, if a strategic-period duration of `1` corresponds to 1 year, then the natural unit is €/GW/year).
+      Capacity costs are calculated per sub-period and then summed over the strategic period.
+      This means a constant value (*e.g.,* €/GW/year) is effectively applied once for each sub-period (based on the peak within that sub-period), and is not automatically scaled by sub-period duration.
+
+      Example: With `cap_price = 100 €/GW/year`, `cap_price_periods = 12`, and a peak usage of 1 GW in each month, the model computes a total cost of 12 × 100 = 1200 €/year.
+
+      To achieve seasonal/monthly peak charges, define multiple `cap_price_periods` and provide `cap_price` values that represent the intended charge per sub-period (or scale the values accordingly).
+
+      It is planned to change this behavior in the future.
+      The change corresponds to a breaking change as we change the behavior of the model.
+- **`cap_price_periods::Union{Int64, Vector{<:Number}}`** :\
+  The number of sub-periods within a year for which the capacity cost is calculated (if specifying an `Int64`) or the duration of the individual sub periods (if specifying a `Vector{<:Number}`).
   This allows modeling of varying peak demands across seasons.
-  The value must be positive.
+  The value must be positive if your are using an `Int64` (and hence specifiy the number of periods) or all values of be positive and summing up to the specified scaling factor between operational and strategic period durations (the parameter `op_per_strat`) if you are using a `Vector{<:Number}`.
 
   !!! tip "Number of sub-periods"
       For investment periods with many operational periods, consider increasing the number of `cap_price_periods`.
@@ -126,7 +138,11 @@ The capacity cost is calculated as:
 \texttt{ccl\_cap\_use\_cost}[l, t_{sub}] = \texttt{ccl\_cap\_use\_max}[l, t_{sub}] \times \overline{cap\_price}(l, t_{sub})
 ```
 
-where ``\overline{cap\_price}`` is the average capacity price over the sub-period.
+where ``\overline{cap\_price}`` is the average capacity price over the sub-period calculated as:
+
+```math
+\overline{cap\_price}(l, t_{sub}) = \frac{\sum_{t \in t_{sub}} cap\_price(l, t) \times duration(t)}{\sum_{t \in t_{sub}} duration(t)}
+```
 
 Finally, costs are aggregated to each strategic period:
 
@@ -134,7 +150,7 @@ Finally, costs are aggregated to each strategic period:
 \texttt{link\_opex\_var}[l, t_{inv}] = \sum_{t_{sub} \in t_{inv}} \texttt{ccl\_cap\_use\_cost}[l, t_{sub}]
 ```
 
-In addition, the energy flow of the constrained resource should not exceed the maximum pipe capacity, which is included through the following constraint:
+In addition, the energy flow of the constrained resource should not exceed the maximum capacity, which is included through the following constraint:
 
 ```math
 \texttt{flow\_in}[l, t, cap\_resource(l)] \leq \texttt{link\_cap\_inst}[l, t]

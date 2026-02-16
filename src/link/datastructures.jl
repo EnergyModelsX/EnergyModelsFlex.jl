@@ -1,5 +1,5 @@
 """
-    CapacityCostLink
+    struct CapacityCostLink <: Link
 
 A link between two nodes with costs on the link usage for the resource `cap_resource`. All
 other resources have no costs associated with their usage (follows the
@@ -11,12 +11,20 @@ other resources have no costs associated with their usage (follows the
 - **`to::Node`** is the node to which there is flow out of the link.
 - **`cap::TimeProfile`** is the capacity of the link for the `cap_resource`.
 - **`cap_price::TimeProfile`** is the price of capacity usage for the `cap_resource`.
-- **`cap_price_periods::Int64`** is the number of sub periods of a year.
+- **`cap_price_periods::Union{Int64, Vector{<:Number}}`** is either the number of sub periods
+  within a strategic period (if specified as `Int64`) or the minimum durations of the
+  individual sub periods within a strategic period (if specified as `Vector{<:Number}`).
 - **`cap_resource::Resource`** is the resource used by `CapacityCostLink`
-- **`formulation::Formulation`** is the used formulation of links. The field
-  `formulation` is conditional through usage of a constructor.
+- **`formulation::Formulation`** is the used formulation of links. The field `formulation`
+  is conditional through usage of a constructor.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
   field `data` is conditional through usage of a constructor.
+
+!!! note "Sub periods"
+    You can specify either the total number of sub periods within a `CapacityCostLink` as
+    `Int64` or the durations of each sub period if using a `Vector{<:Number}`. The latter
+    requires you to be careful when considering the durations of the individual sub periods
+    and the total duration of sub periods within the operational time structure.
 """
 struct CapacityCostLink <: EMB.Link
     id::Any
@@ -24,7 +32,7 @@ struct CapacityCostLink <: EMB.Link
     to::EMB.Node
     cap::TimeProfile
     cap_price::TimeProfile
-    cap_price_periods::Int64
+    cap_price_periods::Union{Int64, Vector{<:Number}}
     cap_resource::Resource
     formulation::EMB.Formulation
     data::Vector{<:ExtensionData}
@@ -36,7 +44,7 @@ function CapacityCostLink(
     to::EMB.Node,
     cap::TimeProfile,
     cap_price::TimeProfile,
-    cap_price_periods::Int64,
+    cap_price_periods::Union{Int64, Vector{<:Number}},
     cap_resource::Resource,
     formulation::EMB.Formulation,
 )
@@ -58,7 +66,7 @@ function CapacityCostLink(
     to::EMB.Node,
     cap::TimeProfile,
     cap_price::TimeProfile,
-    cap_price_periods::Int64,
+    cap_price_periods::Union{Int64, Vector{<:Number}},
     cap_resource::Resource,
     data::Vector{<:ExtensionData},
 )
@@ -80,7 +88,7 @@ function CapacityCostLink(
     to::EMB.Node,
     cap::TimeProfile,
     cap_price::TimeProfile,
-    cap_price_periods::Int64,
+    cap_price_periods::Union{Int64, Vector{<:Number}},
     cap_resource::Resource,
 )
     return CapacityCostLink(
@@ -147,8 +155,8 @@ cap_price(l::CapacityCostLink, t) = l.cap_price[t]
 """
     cap_price_periods(l::CapacityCostLink)
 
-Returns the number of sub-periods within a year for which a price is calculated of a capacity
-cost link `l`.
+Returns either the number of sub-periods within a strategic period for which a price is
+calculated or the vector of the durations of the sub-periods of a capacity cost link `l`.
 """
 cap_price_periods(l::CapacityCostLink) = l.cap_price_periods
 

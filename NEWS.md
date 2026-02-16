@@ -1,5 +1,11 @@
 # Release notes
 
+## Version 0.2.11 (2026-02-16)
+
+### Enhancements
+
+* Extended the link `CapacityCostLink` to also accept a vector of durations for the individual sub periods.
+
 ## Version 0.2.10 (2026-01-05)
 
 ### Enhancements

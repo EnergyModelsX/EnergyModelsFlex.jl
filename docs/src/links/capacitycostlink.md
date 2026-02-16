@@ -45,9 +45,14 @@ The following additional fields are included for [`CapacityCostLink`](@ref) link
   This value is averaged over sub-periods as defined by `cap_price_periods`.
   All values have to be non-negative.
   !!! danger "Price values"
-      The provided value for the field `cap_price` is an absolute value in a strategic period and only related to the value of a strategic period duration of 1.
-      In the case of a strategic period duration of 1 corresponding to 1 year and a capacity of 1 GW, you must provide the value in €/GW/year, even if the capacity is only used for 1 month.
-      It is hence independent of the chosen number of sub periods or the durations of the sub periods.
+
+      The value given in `cap_price` is interpreted on the strategic-period scale (*e.g.*, if a strategic-period duration of `1` corresponds to 1 year, then the natural unit is €/GW/year).
+      Capacity costs are calculated per sub-period and then summed over the strategic period.
+      This means a constant value (*e.g.,* €/GW/year) is effectively applied once for each sub-period (based on the peak within that sub-period), and is not automatically scaled by sub-period duration.
+
+      Example: With `cap_price = 100 €/GW/year`, `cap_price_periods = 12`, and a peak usage of 1 GW in each month, the model computes a total cost of 12 × 100 = 1200 €/year.
+
+      To achieve seasonal/monthly peak charges, define multiple `cap_price_periods` and provide `cap_price` values that represent the intended charge per sub-period (or scale the values accordingly).
 
       It is planned to change this behavior in the future.
       The change corresponds to a breaking change as we change the behavior of the model.

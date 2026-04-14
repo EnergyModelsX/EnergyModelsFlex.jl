@@ -24,7 +24,7 @@ The fields of a [`PayAsProducedPPA`](@ref) are:
   In addition, all values should be in the range ``[0, 1]``.
 
 - **`opex_var::TimeProfile`**:\
-  The variable operational expenses are based on the capacity utilization through the variable `:cap_use`.
+  The variable operating expenses are based on the capacity utilization through the variable `:cap_use`.
   Hence, they are directly related to the specified `output` ratios.
   The variable operating expenses can be provided as `OperationalProfile` as well.
 
@@ -55,7 +55,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with paranthesis.
+with parantheses.
 
 ### [Variables](@id nodes-payasproducedppa-math-var)
 
@@ -100,8 +100,8 @@ These standard constraints are:
   profile(n, t) \times \texttt{cap\_inst}[n, t]
   ```
 
-
 - `constraints_capacity_installed`:
+
   ```math
   \texttt{cap\_inst}[n, t] = capacity(n, t)
   ```
@@ -111,6 +111,7 @@ These standard constraints are:
       Nodes with investments are then no longer constrained by the parameter capacity.
 
 - `constraints_flow_out`:
+
   ```math
   \texttt{flow\_out}[n, t, p] =
   outputs(n, p) \times \texttt{cap\_use}[n, t]
@@ -118,6 +119,7 @@ These standard constraints are:
   ```
 
 - `constraints_opex_fixed`:
+
   ```math
   \texttt{opex\_fixed}[n, t_{inv}] = opex\_fixed(n, t_{inv}) \times \texttt{cap\_inst}[n, first(t_{inv})]
   ```

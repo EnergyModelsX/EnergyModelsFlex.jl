@@ -55,7 +55,7 @@ function ElectricBattery{T}(
 end
 
 """
-    StorageEfficiency{T} <: EMB.Storage{T}
+    struct StorageEfficiency{T} <: EMB.Storage{T}
 
 A StorageEfficiency node which enables storage efficiency control compared to RefStorage{T}.
 

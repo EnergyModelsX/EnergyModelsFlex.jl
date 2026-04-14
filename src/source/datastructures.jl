@@ -1,5 +1,5 @@
 """
-    PayAsProducedPPA <: AbstractNonDisRES
+    struct PayAsProducedPPA <: AbstractNonDisRES
 
 A pay-as-produced ppa energy source. It extends the existing `AbstractNonDisRES` node through
 including a constraint on the opex_var such that curtailed energy is also included in the opex.
@@ -39,9 +39,9 @@ end
     struct InflexibleSource <: EMB.Source
 
 An inflexible [`Source`](@extref EnergyModelsBase.Source) node with fixed capacity.
-The inflexible [`Source`](@extref EnergyModelsBase.Source) node represents a source with a 
+The inflexible [`Source`](@extref EnergyModelsBase.Source) node represents a source with a
 fixed capacity usage.
-Note, that if you include investments, you can only use `cap` as `TimeProfile` a 
+Note, that if you include investments, you can only use `cap` as `TimeProfile` a
 `FixedProfile` or `StrategicProfile`.
 
 # Fields
@@ -51,7 +51,7 @@ Note, that if you include investments, you can only use `cap` as `TimeProfile` a
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.
-- **`output::Dict{<:Resource,<:Real}`** are the generated 
+- **`output::Dict{<:Resource,<:Real}`** are the generated
   [`Resource`](@extref EnergyModelsBase.Resource)s with conversion value `Real`.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.

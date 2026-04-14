@@ -1,12 +1,12 @@
 """
-    UnitCommitmentNode{} <: EMB.NetworkNode
+    abstract type UnitCommitmentNode{} <: EMB.NetworkNode
 
 Abstract type for unit commitment nodes.
 """
 abstract type UnitCommitmentNode{} <: EMB.NetworkNode end
 
 """
-    MinUpDownTimeNode{} <: UnitCommitmentNode
+    struct MinUpDownTimeNode <: UnitCommitmentNode
 
 `MinUpDownTimeNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
 nodes-network_node) type that introduces unit commitment logic including minimum
@@ -35,7 +35,7 @@ constraints.
 - **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
-struct MinUpDownTimeNode{} <: UnitCommitmentNode
+struct MinUpDownTimeNode <: UnitCommitmentNode
     id::Any
     cap::TimeProfile
     opex_var::TimeProfile
@@ -76,7 +76,7 @@ function MinUpDownTimeNode(
 end
 
 """
-    ActivationCostNode{} <: UnitCommitmentNode
+    struct ActivationCostNode <: UnitCommitmentNode
 
 `ActivationCostNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
 nodes-network_node) that introduces unit commitment logic with additional fuel
@@ -101,7 +101,7 @@ extra input when switching on, such as combustion turbines or thermal boilers.
 - **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
-struct ActivationCostNode{} <: UnitCommitmentNode
+struct ActivationCostNode <: UnitCommitmentNode
     id::Any
     cap::TimeProfile
     opex_var::TimeProfile
@@ -149,7 +149,7 @@ function activation_consumption(n::ActivationCostNode, p::Resource)
 end
 
 """
-    LimitedFlexibleInput <: NetworkNode
+    struct LimitedFlexibleInput <: NetworkNode
 
 A `LimitedFlexibleInput` node.
 The `LimitedFlexibleInput` utilizes a linear, time independent conversion rate of the `input`
@@ -201,7 +201,7 @@ limits(n::LimitedFlexibleInput, p::Resource) = n.limit[p]
 limits(n::LimitedFlexibleInput) = collect(keys(n.limit))
 
 """
-    Combustion <: NetworkNode
+    struct Combustion <: NetworkNode
 
 A `Combustion` node.
 The `Combustion` is similar to [`LimitedFlexibleInput`](@ref)s but requires energy balances
@@ -270,7 +270,7 @@ Returns the heat residual resource of a [`Combustion`](@ref) node `n`.
 heat_resource(n::Combustion) = n.heat_res
 
 """
-    FlexibleOutput <: NetworkNode
+    struct FlexibleOutput <: NetworkNode
 
 A `FlexibleOutput` node.
 

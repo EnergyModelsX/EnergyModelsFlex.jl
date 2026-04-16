@@ -41,7 +41,7 @@ each operational period.
   dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments). The field `data`
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
@@ -51,7 +51,7 @@ struct PeriodDemandSink <: AbstractPeriodDemandSink
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
-    data::Array{Data}
+    data::Vector{<:ExtensionData}
 end
 function PeriodDemandSink(
     id,
@@ -61,7 +61,7 @@ function PeriodDemandSink(
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    PeriodDemandSink(id, period_length, period_demand, cap, penalty, input, Data[])
+    PeriodDemandSink(id, period_length, period_demand, cap, penalty, input, ExtensionData[])
 end
 
 """
@@ -113,7 +113,7 @@ independent of each other.
   dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
 struct MultipleInputSink <: AbstractMultipleInputSink
@@ -121,7 +121,7 @@ struct MultipleInputSink <: AbstractMultipleInputSink
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function MultipleInputSink(
     id,
@@ -129,7 +129,7 @@ function MultipleInputSink(
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    return MultipleInputSink(id, cap, penalty, input, Data[])
+    return MultipleInputSink(id, cap, penalty, input, ExtensionData[])
 end
 
 """
@@ -147,7 +147,7 @@ carriers can satisfy the demand, but only one resource at the time (for each str
   dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 
 !!! warning "Investment options"
@@ -159,7 +159,7 @@ struct BinaryMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function BinaryMultipleInputSinkStrat(
     id,
@@ -167,7 +167,7 @@ function BinaryMultipleInputSinkStrat(
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    return BinaryMultipleInputSinkStrat(id, cap, penalty, input, Data[])
+    return BinaryMultipleInputSinkStrat(id, cap, penalty, input, ExtensionData[])
 end
 
 """
@@ -186,7 +186,7 @@ are given as a variable to be optimized (for each strategic period).
   dictionary requires the  fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 
 !!! warning "Investment options"
@@ -198,7 +198,7 @@ struct ContinuousMultipleInputSinkStrat <: AbstractMultipleInputSinkStrat
     cap::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function ContinuousMultipleInputSinkStrat(
     id,
@@ -206,7 +206,7 @@ function ContinuousMultipleInputSinkStrat(
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    return ContinuousMultipleInputSinkStrat(id, cap, penalty, input, Data[])
+    return ContinuousMultipleInputSinkStrat(id, cap, penalty, input, ExtensionData[])
 end
 
 """
@@ -242,7 +242,7 @@ shifted within this group.
 - **`load_shift_duration::Int`** the number of operational periods in each load shift.
 - **`load_shift_magnitude::Real`** the magnitude for each operational period that is load shifted.
 - **`load_shift_times_per_period::Int`** the number of timeslots (from the loadshifttimes) that can be shifted.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments). The field `data`
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
 struct LoadShiftingNode <: EMB.Sink
@@ -255,7 +255,7 @@ struct LoadShiftingNode <: EMB.Sink
     load_shift_duration::Int
     load_shift_magnitude::Real
     load_shift_times_per_period::Int
-    data::Vector{Data}
+    data::Vector{<:ExtensionData}
 end
 function LoadShiftingNode(
     id::Any,
@@ -278,6 +278,6 @@ function LoadShiftingNode(
         load_shift_duration,
         load_shift_magnitude,
         load_shift_times_per_period,
-        Data[],
+        ExtensionData[],
     )
 end

@@ -38,7 +38,7 @@ The fields of a [`LoadShiftingNode`](@ref) are:
   The magnitude of demand shifted per period in a batch.
 - **`load_shift_times_per_period::Int`**:\
   Number of time steps per shift group in which shifts may occur.
-- **`data::Vector{Data}`**:\
+- **`data::Vector{<:ExtensionData}`**:\
   Optional metadata (e.g., emissions, investment data).
 
 !!! warning

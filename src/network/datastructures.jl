@@ -71,7 +71,7 @@ function MinUpDownTimeNode(
         min_time_down,
         load_min,
         load_max,
-        Data[],
+        ExtensionData[],
     )
 end
 
@@ -98,7 +98,7 @@ extra input when switching on, such as combustion turbines or thermal boilers.
   activation logic in customized formulations).
 - **`activation_consumption::Dict{<:Resource,<:Real}`** are the additional input resources
   required when the unit switches on with their absolute demand.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
 struct ActivationCostNode <: UnitCommitmentNode
@@ -110,7 +110,7 @@ struct ActivationCostNode <: UnitCommitmentNode
     output::Dict{Resource,Real}
     activation_time::Real
     activation_consumption::Dict{Resource,Real}
-    data::Array{Data}
+    data::Vector{<:ExtensionData}
 end
 function ActivationCostNode(
     id,
@@ -131,7 +131,7 @@ function ActivationCostNode(
         output,
         activation_time,
         activation_consumption,
-        Data[],
+        ExtensionData[],
     )
 end
 
@@ -173,7 +173,7 @@ introduces a `limit` on the fraction a given resource can contribute to the tota
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
 struct LimitedFlexibleInput <: NetworkNode
@@ -184,7 +184,7 @@ struct LimitedFlexibleInput <: NetworkNode
     limit::Dict{<:Resource,<:Real}
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function LimitedFlexibleInput(
     id,
@@ -195,7 +195,7 @@ function LimitedFlexibleInput(
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
 )
-    return LimitedFlexibleInput(id, cap, opex_var, opex_fixed, limit, input, output, Data[])
+    return LimitedFlexibleInput(id, cap, opex_var, opex_fixed, limit, input, output, ExtensionData[])
 end
 limits(n::LimitedFlexibleInput, p::Resource) = n.limit[p]
 limits(n::LimitedFlexibleInput) = collect(keys(n.limit))
@@ -221,7 +221,7 @@ in the sense that the output `heat_res` captures the lost energy.
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
 struct Combustion <: NetworkNode
@@ -233,7 +233,7 @@ struct Combustion <: NetworkNode
     heat_res::Resource
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function Combustion(
     id,
@@ -245,7 +245,7 @@ function Combustion(
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
 )
-    return Combustion(id, cap, opex_var, opex_fixed, limit, heat_res, input, output, Data[])
+    return Combustion(id, cap, opex_var, opex_fixed, limit, heat_res, input, output, ExtensionData[])
 end
 
 """
@@ -289,7 +289,7 @@ by the sum of these.
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
 struct FlexibleOutput <: EMB.NetworkNode
@@ -299,7 +299,7 @@ struct FlexibleOutput <: EMB.NetworkNode
     opex_fixed::TimeProfile
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
-    data::Vector{Data}
+    data::Vector{<:ExtensionData}
 end
 function FlexibleOutput(
     id::Any,
@@ -309,5 +309,5 @@ function FlexibleOutput(
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
 )
-    return FlexibleOutput(id, cap, opex_var, opex_fixed, input, output, Data[])
+    return FlexibleOutput(id, cap, opex_var, opex_fixed, input, output, ExtensionData[])
 end

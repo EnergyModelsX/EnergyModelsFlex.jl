@@ -33,7 +33,7 @@ The standard fields are given as:
   CO₂ cannot be directly specified, *i.e.*, you cannot specify a ratio.
   If you use [`CaptureData`](@extref EnergyModelsBase.CaptureData), it is however necessary to specify CO₂ as output, although the ratio is not important.\
   All values have to be non-negative.
-- **`data::Vector{<:Data}`**:\
+- **`data::Vector{<:ExtensionData}`**:\
   Optional metadata (*e.g.*, emissions or investment data). This is initialized to an empty array by default.
 
   !!! note "Constructor for `MinUpDownTimeNode`"

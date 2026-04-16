@@ -12,7 +12,7 @@ including a constraint on the opex_var such that curtailed energy is also includ
 - **`opex_var::TimeProfile`** is the variable operating expense per energy unit produced.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense.
 - **`output::Dict{Resource, Real}`** are the generated `Resource`s, normally Power.
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments). The field `data`
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
 struct PayAsProducedPPA <: AbstractNonDisRES
@@ -22,7 +22,7 @@ struct PayAsProducedPPA <: AbstractNonDisRES
     opex_var::TimeProfile
     opex_fixed::TimeProfile
     output::Dict{<:Resource,<:Real}
-    data::Vector{Data}
+    data::Vector{<:ExtensionData}
 end
 function PayAsProducedPPA(
     id::Any,
@@ -32,7 +32,7 @@ function PayAsProducedPPA(
     opex_fixed::TimeProfile,
     output::Dict{<:Resource,<:Real},
 )
-    return PayAsProducedPPA(id, cap, profile, opex_var, opex_fixed, output, Data[])
+    return PayAsProducedPPA(id, cap, profile, opex_var, opex_fixed, output, ExtensionData[])
 end
 
 """

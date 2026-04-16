@@ -38,7 +38,7 @@ The fields of a [`PayAsProducedPPA`](@ref) are:
   In the case of a pay-as-produced PPA energy source, `output` should include your *electricity* resource.
   In practice, you should use a value of 1.
 
-- **`data::Vector{Data}`**:
+- **`data::Vector{<:ExtensionData}`**:
   An entry for providing additional data to the model.
   In the current version, it is only relevant for additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/stable/) is used.
   !!! note "Constructor for `PayAsProducedPPA`"

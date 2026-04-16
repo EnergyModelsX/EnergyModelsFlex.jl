@@ -30,7 +30,7 @@ The fields of a [`StorageEfficiency`](@ref) are:
 - **`input::Dict{<:Resource,<:Real}`** and **`output::Dict{<:Resource,<:Real}`**:\
   Both fields describe the `input` and `output` [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.
   The stored [`Resource`](@extref EnergyModelsBase.Resource) (outlined above) must be included to create the linking variables.
-- **`data::Vector{<:Data}`**:\
+- **`data::Vector{<:ExtensionData}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
   !!! note "Constructor for `StorageEfficiency`"

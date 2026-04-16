@@ -65,10 +65,10 @@ line = MinUpDownTimeNode(
     FixedProfile(0),
     Dict(Power => 1),
     Dict(Product => 1),
-    min_up_time, # minUpTime
-    min_down_time, # minDownTime
-    50, # minCapacity
-    300, # maxCapacity
+    min_up_time, # min_time_up
+    min_down_time, # min_time_down
+    50, # load_min
+    300, # load_max
     [],
 )
 

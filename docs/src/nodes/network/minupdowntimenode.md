@@ -55,18 +55,18 @@ The standard fields are given as:
 
 [`MinUpDownTimeNode`](@ref) nodes add four additional fields compared to a [`NetworkNode`](@extref EnergyModelsBase nodes-network_node):
 
-- **`minUpTime::Real`**:\
+- **`min_time_up::Real`**:\
   Minimum number of operational periods the unit must remain on after being started.
-- **`minDownTime::Real`**:\
+- **`min_time_down::Real`**:\
   Minimum number of operational periods the unit must remain off after being stopped.
-- **`minCapacity::Real`**:\
+- **`load_min::Real`**:\
   Minimum power output when the unit is on. The value must be larger than zero.
-- **`maxCapacity::Real`**:\
+- **`load_max::Real`**:\
   Maximum power output when the unit is on (usually aligned with `cap`).
-  The value must not be less than `minCapacity`.
+  The value must not be less than `load_min`.
 
 !!! tip
-    The fields `minUpTime` and `minDownTime` are defined in terms of operational period durations and should be consistent with the time granularity of the model.
+    The fields `min_time_up` and `min_time_down` are defined in terms of operational period durations and should be consistent with the time granularity of the model.
 
 ## [Mathematical description](@id nodes-minupdowntimenode-math)
 
@@ -194,11 +194,11 @@ The function `constraints_capacity` receives a new method to handle the minimum 
 - **Capacity conditional on on/off status:**
 
   ```math
-  \texttt{cap\_use}[n, t] \leq \texttt{on\_off}[n, t] \times n.maxCapacity
+  \texttt{cap\_use}[n, t] \leq \texttt{on\_off}[n, t] \times n.load_max
   ```
 
   ```math
-  \texttt{cap\_use}[n, t] \geq \texttt{on\_off}[n, t] \times n.minCapacity
+  \texttt{cap\_use}[n, t] \geq \texttt{on\_off}[n, t] \times n.load_min
   ```
 
 - **Upper bound by installed capacity:**

@@ -1,11 +1,22 @@
 """
     EMB.check_node(n::MinUpDownTimeNode, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
 
-This method checks that a `MinUpDownTimeNode` node is valid.
+This method checks that a [`MinUpDownTimeNode`](@ref) node is valid.
+
+It reuses the standard checks of a `NetworkNode` node through calling the function
+[`EMB.check_node_default`](@extref EnergyModelsBase.check_node_default), but adds an
+additional check on the data.
 
 ## Checks
- - The minimum capacity must be greater than zero.
- - The minimum capacity must not be larger than maximum capacity.
+- The field `cap` is required to be non-negative.
+- The value of the field `fixed_opex` is required to be non-negative and
+  accessible through a `StrategicPeriod` as outlined in the function
+  [`EMB.check_fixed_opex()`](@extref EnergyModelsBase.check_fixed_opex).
+- The values of the dictionary `input` are required to be non-negative.
+- The values of the dictionary `output` are required to be non-negative.
+
+ - The field `load_min` is required to be greater than zero.
+ - The field `load_min` is required to be not larger than the field `load_max`.
 """
 function EMB.check_node(
     n::MinUpDownTimeNode,
@@ -13,16 +24,16 @@ function EMB.check_node(
     modeltype::EnergyModel,
     check_timeprofiles::Bool,
 )
-    # EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
+    EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
 
     # We need the minimum capacity to be greater than zero.
     @assert_or_log(
-        n.minCapacity > 0,
+        n.load_min > 0,
         "The minimum capacity must be greater than zero."
     )
 
     @assert_or_log(
-        n.minCapacity <= n.maxCapacity,
+        n.load_min ≤ n.load_max,
         "The minimum capacity must not be larger than maximum capacity."
     )
 end

@@ -93,7 +93,7 @@ end
     @test opex_fixed(act_cost_node) == FixedProfile(0)
     @test inputs(act_cost_node) == [h2, power] || inputs(act_cost_node) == [power, h2]
     @test outputs(act_cost_node) == [h2]
-    @test node_data(act_cost_node) == Data[]
+    @test node_data(act_cost_node) == ExtensionData[]
 
     # Test the EMF utility functions
     @test EMF.activation_consumption(act_cost_node) == Dict(power => 10)

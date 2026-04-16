@@ -14,7 +14,7 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
     stor_res::Resource
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 
     function ElectricBattery{T}(
         id,
@@ -25,7 +25,7 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
         stor_res::Resource,
         input::Dict{<:Resource,<:Real},
         output::Dict{<:Resource,<:Real},
-        data::Vector{<:Data}) where {T<:EMB.StorageBehavior}
+        data::Vector{<:ExtensionData}) where {T<:EMB.StorageBehavior}
         @warn "Depcrecation note: the development of ElectricBattery node is " *
               "discontinued, and the node will be removed in the next release v0.3.0."
         new{T}(id, charge, level, c_rate, coloumbic_eff, stor_res, input, output, data)
@@ -50,7 +50,7 @@ function ElectricBattery{T}(
         stor_res,
         input,
         output,
-        Data[],
+        ExtensionData[],
     )
 end
 
@@ -91,7 +91,7 @@ struct StorageEfficiency{T} <: EMB.Storage{T}
     stor_res::Resource
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
-    data::Vector{<:Data}
+    data::Vector{<:ExtensionData}
 end
 function StorageEfficiency{T}(
     id,
@@ -101,5 +101,5 @@ function StorageEfficiency{T}(
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
 ) where {T<:EMB.StorageBehavior}
-    return StorageEfficiency{T}(id, charge, level, stor_res, input, output, Data[])
+    return StorageEfficiency{T}(id, charge, level, stor_res, input, output, ExtensionData[])
 end

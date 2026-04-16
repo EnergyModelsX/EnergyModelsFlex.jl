@@ -1,11 +1,13 @@
 # Release notes
 
-## Version 0.7.0 (2026-04-16)
+## Version 0.3.0 (2026-04-16)
 
 ### Breaking changes
 
 * Adjusted to [`EnergyModelsBase` v0.10.0](https://github.com/EnergyModelsX/EnergyModelsBase.jl/releases/tag/v0.10.0) and [`EnergyModelsRenewableProducers` v0.7.0](https://github.com/EnergyModelsX/EnergyModelsRenewableProducers.jl/releases/tag/v0.7.0):
-  * Model worked without adjustments.
+  * Breaking change required as early retirement is now allowed.
+  * Early retirement changes the model behavior.
+  * Model worked without adjustments except for compatibility updates.
   * Breaking change still included to maintain the possibility to do bug fixes in version 0.1.x for existing models with `EnergyModelsBase` v0.9.x.
   * UpdMoved from `Data` to `ExtensionData` in fields and tests.
 * Improved `MinUpDownTimeNode`:

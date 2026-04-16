@@ -69,7 +69,6 @@ line = MinUpDownTimeNode(
     min_down_time, # min_time_down
     50, # load_min
     300, # load_max
-    [],
 )
 
 # Define the simple energy system

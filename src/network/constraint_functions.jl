@@ -24,21 +24,21 @@ function EMB.constraints_capacity(
     𝒯::TimeStructure,
     modeltype::EnergyModel,
 )
+    # Extract the strategic time structure
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
-    sps = collect(𝒯ᴵⁿᵛ)
 
-    for sp ∈ sps
-        ops = collect(sp) #array of al operational periodes
+    for t_inv ∈ 𝒯ᴵⁿᵛ
+        ops = collect(t_inv) #array of al operational periodes
 
-        N_h = n.minDownTime #min down time in the tinme unit used in the case
-        M_h = n.minUpTime
-        durations = [duration(t) for t ∈ ops]
+        N_h = n.min_time_down #min down time in the tinme unit used in the case
+        M_h = n.min_time_up
+        durations = [duration(t) for t ∈ t_inv]
 
-        N_arr = zeros(length(ops))
-        M_arr = zeros(length(ops))
+        N_arr = zeros(length(t_inv))
+        M_arr = zeros(length(t_inv))
 
-        for j ∈ 1:length(ops)
-            sum_duration_N = durations[j]
+        for (j, t) ∈ enumerate(t_inv)
+            sum_duration_N = duration(t)
             count = 1
             while sum_duration_N < N_h
                 sum_duration_N += circshift(durations, -count)[j]
@@ -46,7 +46,7 @@ function EMB.constraints_capacity(
             end
             N_arr[j] = count
             count = 1
-            sum_duration_M = durations[j]
+            sum_duration_M = duration(t)
             while sum_duration_M < M_h
                 sum_duration_M += circshift(durations, -count)[j]
                 count += 1
@@ -54,12 +54,11 @@ function EMB.constraints_capacity(
             M_arr[j] = count
         end
 
-        min_cap = n.minCapacity
-        max_cap = n.maxCapacity
-        for i ∈ 1:length(ops) # i from 1 to number of operational periodes
+        min_cap = n.load_min
+        max_cap = n.load_max
+        for (i, t) ∈ enumerate(t_inv) # i from 1 to number of operational periodes
             M = Int(M_arr[i])
             N = Int(N_arr[i])
-            t = ops[i]
 
             @constraint(
                 m,

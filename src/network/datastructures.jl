@@ -1,12 +1,12 @@
 """
-    UnitCommitmentNode{} <: EMB.NetworkNode
+    abstract type UnitCommitmentNode{} <: EMB.NetworkNode
 
 Abstract type for unit commitment nodes.
 """
 abstract type UnitCommitmentNode{} <: EMB.NetworkNode end
 
 """
-    MinUpDownTimeNode{} <: UnitCommitmentNode
+    struct MinUpDownTimeNode <: UnitCommitmentNode
 
 `MinUpDownTimeNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
 nodes-network_node) type that introduces unit commitment logic including minimum
@@ -25,28 +25,28 @@ constraints.
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`minUpTime::Real`** is the minimum number of operational periods the unit must remain on
+- **`min_time_up::Real`** is the minimum number of operational periods the unit must remain on
   after being started.
-- **`minDownTime::Real`** is the minimum number of operational periods the unit must remain
+- **`min_time_down::Real`** is the minimum number of operational periods the unit must remain
   off after being stopped.
-- **`minCapacity::Real`** is the minimum power output when the unit is on.
-- **`maxCapacity::Real`** is the maximum power output when the unit is on
+- **`load_min::Real`** is the minimum capacity output when the unit is on.
+- **`load_max::Real`** is the maximum capacity output when the unit is on
   (usually aligned with `cap`).
-- **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
-struct MinUpDownTimeNode{} <: UnitCommitmentNode
+struct MinUpDownTimeNode <: UnitCommitmentNode
     id::Any
     cap::TimeProfile
     opex_var::TimeProfile
     opex_fixed::TimeProfile
     input::Dict{Resource,Real}
     output::Dict{Resource,Real}
-    minUpTime::Real #number of operational periodes
-    minDownTime::Real  #number of operational periodes
-    minCapacity::Real
-    maxCapacity::Real
-    data::Array{Data}
+    min_time_up::Real #number of operational periodes
+    min_time_down::Real  #number of operational periodes
+    load_min::Real
+    load_max::Real
+    data::Vector{<:ExtensionData}
 end
 function MinUpDownTimeNode(
     id,
@@ -55,10 +55,10 @@ function MinUpDownTimeNode(
     opex_fixed::TimeProfile,
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
-    minUpTime::Real,
-    minDownTime::Real,
-    minCapacity::Real,
-    maxCapacity::Real,
+    min_time_up::Real,
+    min_time_down::Real,
+    load_min::Real,
+    load_max::Real,
 )
     return MinUpDownTimeNode(
         id,
@@ -67,20 +67,20 @@ function MinUpDownTimeNode(
         opex_fixed,
         input,
         output,
-        minUpTime,
-        minDownTime,
-        minCapacity,
-        maxCapacity,
+        min_time_up,
+        min_time_down,
+        load_min,
+        load_max,
         Data[],
     )
 end
 
 """
-    ActivationCostNode{} <: UnitCommitmentNode
+    struct ActivationCostNode <: UnitCommitmentNode
 
 `ActivationCostNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
 nodes-network_node) that introduces unit commitment logic with additional fuel
-or resource costs incurred upon startup.  It models technologies that consume
+or resource costs incurred upon startup. It models technologies that consume
 extra input when switching on, such as combustion turbines or thermal boilers.
 
 # Fields
@@ -101,7 +101,7 @@ extra input when switching on, such as combustion turbines or thermal boilers.
 - **`data::Vector{Data}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """
-struct ActivationCostNode{} <: UnitCommitmentNode
+struct ActivationCostNode <: UnitCommitmentNode
     id::Any
     cap::TimeProfile
     opex_var::TimeProfile
@@ -149,7 +149,7 @@ function activation_consumption(n::ActivationCostNode, p::Resource)
 end
 
 """
-    LimitedFlexibleInput <: NetworkNode
+    struct LimitedFlexibleInput <: NetworkNode
 
 A `LimitedFlexibleInput` node.
 The `LimitedFlexibleInput` utilizes a linear, time independent conversion rate of the `input`
@@ -201,7 +201,7 @@ limits(n::LimitedFlexibleInput, p::Resource) = n.limit[p]
 limits(n::LimitedFlexibleInput) = collect(keys(n.limit))
 
 """
-    Combustion <: NetworkNode
+    struct Combustion <: NetworkNode
 
 A `Combustion` node.
 The `Combustion` is similar to [`LimitedFlexibleInput`](@ref)s but requires energy balances
@@ -270,7 +270,7 @@ Returns the heat residual resource of a [`Combustion`](@ref) node `n`.
 heat_resource(n::Combustion) = n.heat_res
 
 """
-    FlexibleOutput <: NetworkNode
+    struct FlexibleOutput <: NetworkNode
 
 A `FlexibleOutput` node.
 

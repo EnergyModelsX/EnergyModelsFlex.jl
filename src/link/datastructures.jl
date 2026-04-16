@@ -124,7 +124,7 @@ EMB.capacity(l::CapacityCostLink, t) = l.cap[t]
 """
     EMB.has_opex(l::CapacityCostLink)
 
-A `CapacityCostLink` `l` has operational expenses.
+A `CapacityCostLink` `l` has operating expenses.
 """
 EMB.has_opex(l::CapacityCostLink) = true
 

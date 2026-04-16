@@ -1,5 +1,3 @@
-using JuMP
-
 const ATOL = 1e-7
 
 """

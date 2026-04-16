@@ -1,5 +1,14 @@
 # Release notes
 
+## Unversioned
+
+### Enhancements
+
+* Improved `MinUpDownTimeNode`:
+  * Rewrote the function `constraints_capacity` based on core functionality.
+  * Updated the test set to identify all potential problems with the node.
+
+
 ## Version 0.2.11 (2026-02-16)
 
 ### Enhancements
@@ -17,7 +26,6 @@
 
 * Removed `ext/EMGUIExt/descriptive_names.yml` as this will now be provided directly in `EnergyModelsGUI`.
 * Removed `docs/src/example/flexible_demand.md` as the markdown versions of the example files are now generated automatically (and these are thus added to the `.gitignore`-file).
-
 
 ## Version 0.2.9 (2025-07-08)
 

@@ -210,7 +210,7 @@ function ContinuousMultipleInputSinkStrat(
 end
 
 """
-    LoadShiftingNode <: EMB.Sink
+    struct LoadShiftingNode <: EMB.Sink
 
 A `Sink` node where the demand can be altered by load shifting. The load
 shifting is based on the assumption that the production happens in discrete

@@ -1,13 +1,22 @@
 # Release notes
 
-## Unversioned
+## Version 0.7.0 (2026-04-16)
 
-### Enhancements
+### Breaking changes
 
+* Adjusted to [`EnergyModelsBase` v0.10.0](https://github.com/EnergyModelsX/EnergyModelsBase.jl/releases/tag/v0.10.0) and [`EnergyModelsRenewableProducers` v0.7.0](https://github.com/EnergyModelsX/EnergyModelsRenewableProducers.jl/releases/tag/v0.7.0):
+  * Model worked without adjustments.
+  * Breaking change still included to maintain the possibility to do bug fixes in version 0.1.x for existing models with `EnergyModelsBase` v0.9.x.
+  * UpdMoved from `Data` to `ExtensionData` in fields and tests.
 * Improved `MinUpDownTimeNode`:
   * Rewrote the function `constraints_capacity` based on core functionality.
   * Updated the test set to identify all potential problems with the node.
+  * Renamed field names of the type.
 
+### Additional changes
+
+* Updated CI versions.
+* Fixed errors in the documentation.
 
 ## Version 0.2.11 (2026-02-16)
 

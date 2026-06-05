@@ -30,7 +30,7 @@ function EMB.constraints_capacity(
     @constraint(
         m,
         [t ∈ 𝒯],
-        m[:cap_use][n, t] <= m[:cap_inst][n, t]
+        m[:cap_use][n, t] ≤ m[:cap_inst][n, t]
     )
 
     # Create a list mapping the demand period i to the operational periods it contains.
@@ -43,14 +43,13 @@ function EMB.constraints_capacity(
         end
 
         for k ∈ 1:num_periods
-            # Sum all values inside period k.
-            period_total = sum(m[:cap_use][n, t] for t ∈ period2op[k])
             # Define the demand_sink_deficit as the difference between the period demand and
             # the total capacity used.
             @constraint(
                 m,
-                period_total + m[:demand_sink_deficit][n, t_inv, k] ==
-                period_demand(n, k) + m[:demand_sink_surplus][n, t_inv, k]
+                sum(m[:cap_use][n, t] * duration(t) for t ∈ period2op[k]) +
+                m[:demand_sink_deficit][n, t_inv, k] ==
+                    period_demand(n, k) + m[:demand_sink_surplus][n, t_inv, k]
             )
         end
     end

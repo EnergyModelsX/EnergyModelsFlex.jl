@@ -163,7 +163,7 @@ The function `constraints_capacity` is extended with a new method to account for
 
 ```math
 \begin{aligned}
-\texttt{demand\_sink\_deficit}[n, t_inv, i] + & \sum_{t \in P_i} \texttt{​cap\_use}[n,t] = \\
+\texttt{demand\_sink\_deficit}[n, t_inv, i] + & \sum_{t \in P_i} \texttt{​cap\_use}[n, t] \times duration(t) = \\
 & \texttt{demand\_sink\_surplus}[n, t_inv, i] + period\_demand(n, i)
 \end{aligned}
 ```

@@ -13,6 +13,9 @@ function EMB.constraints_capacity(
     𝒯::TimeStructure,
     modeltype::EnergyModel,
 )
+    # Declaration of the required subsets.
+    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+
     @constraint(
         m,
         [t ∈ 𝒯],
@@ -31,23 +34,25 @@ function EMB.constraints_capacity(
     )
 
     # Create a list mapping the demand period i to the operational periods it contains.
-    num_periods = number_of_periods(n, 𝒯)
-    period2op = [[] for i ∈ 1:num_periods]
-    for t ∈ 𝒯
-        period_id = period_index(n, t)
-        push!(period2op[period_id], t)
-    end
+    for t_inv ∈ 𝒯ᴵⁿᵛ
+        num_periods = number_of_periods(n, t_inv)
+        period2op = [[] for k ∈ 1:num_periods]
+        for t ∈ t_inv
+            period_id = period_index(n, t)
+            push!(period2op[period_id], t)
+        end
 
-    for i ∈ 1:num_periods
-        # Sum all values inside period i.
-        period_total = sum(m[:cap_use][n, t] for t ∈ period2op[i])
-        # Define the demand_sink_deficit as the difference between the period demand and
-        # the total capacity used.
-        @constraint(
-            m,
-            period_total + m[:demand_sink_deficit][n, i] ==
-            period_demand(n, i) + m[:demand_sink_surplus][n, i]
-        )
+        for k ∈ 1:num_periods
+            # Sum all values inside period k.
+            period_total = sum(m[:cap_use][n, t] for t ∈ period2op[k])
+            # Define the demand_sink_deficit as the difference between the period demand and
+            # the total capacity used.
+            @constraint(
+                m,
+                period_total + m[:demand_sink_deficit][n, t_inv, k] ==
+                period_demand(n, k) + m[:demand_sink_surplus][n, t_inv, k]
+            )
+        end
     end
 
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
@@ -69,8 +74,8 @@ function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ,
         [t_inv ∈ 𝒯ᴵⁿᵛ],
         m[:opex_var][n, t_inv] == sum(
             (
-                m[:demand_sink_surplus][n, period_index(n, t)] * surplus_penalty(n, t) +
-                m[:demand_sink_deficit][n, period_index(n, t)] * deficit_penalty(n, t)
+                m[:demand_sink_surplus][n, t_inv, period_index(n, t)] * surplus_penalty(n, t) +
+                m[:demand_sink_deficit][n, t_inv, period_index(n, t)] * deficit_penalty(n, t)
             ) * scale_op_sp(t_inv, t) for t ∈ t_inv
         )
     )

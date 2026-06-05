@@ -107,10 +107,10 @@ The variables include:
 [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_element()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource.
 These variables are for a [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) node ``n`` in demand periods ``i``:
 
-- ``\texttt{demand\_sink\_surplus}[n, i]``:\
-  Surplus of energy delivered beyond the required `period_demand` in demand period `i`.
-- ``\texttt{demand\_sink\_deficit}[n, i]``:\
-  Deficit of energy delivered relative to the `period_demand` in period `i`.
+- ``\texttt{demand\_sink\_surplus}[n, t_inv, i]``:\
+  Surplus of energy delivered beyond the required `period_demand` in demand period `i` of strategic period `t_inv` .
+- ``\texttt{demand\_sink\_deficit}[n, t_inv, i]``:\
+  Deficit of energy delivered relative to the `period_demand` in period `i` of strategic period `t_inv` .
 
 ### [Constraints](@id nodes-perioddemandsink-math-con)
 
@@ -163,8 +163,8 @@ The function `constraints_capacity` is extended with a new method to account for
 
 ```math
 \begin{aligned}
-\texttt{demand\_sink\_deficit}[n, i] + & \sum_{t \in P_i} \texttt{​cap\_use}[n,t]   = \\
-& \texttt{demand\_sink\_surplus}[n, i] + period\_demand(n, i)
+\texttt{demand\_sink\_deficit}[n, t_inv, i] + & \sum_{t \in P_i} \texttt{​cap\_use}[n,t] = \\
+& \texttt{demand\_sink\_surplus}[n, t_inv, i] + period\_demand(n, i)
 \end{aligned}
 ```
 
@@ -174,8 +174,8 @@ As a consequence, `constraints_opex_var` requires as well a new method as we onl
 
 ```math
 \begin{aligned}
-\texttt{opex\_var}[n, t_{inv}] = \sum_{t ∈ t_{inv}}(& \texttt{demand\_sink\_surplus}[n, i_t] \times \texttt{surplus\_penalty}(n, t) + \\
-& \texttt{demand\_sink\_deficit}[n, i_t] \times \texttt{deficit\_penalty}(n, t)) \times \\
+\texttt{opex\_var}[n, t_{inv}] = \sum_{t ∈ t_{inv}}(& \texttt{demand\_sink\_surplus}[n, t_inv, i_t] \times \texttt{surplus\_penalty}(n, t) + \\
+& \texttt{demand\_sink\_deficit}[n, t_inv, i_t] \times \texttt{deficit\_penalty}(n, t)) \times \\
 & scale\_op\_sp(t_{inv}, t)
 \end{aligned}
 ```

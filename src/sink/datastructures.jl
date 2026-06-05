@@ -33,8 +33,7 @@ each operational period.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`period_length::Int`** is the number of periods in which the period demand can be
-  satisfied.
+- **`period_length::Int`** is the number of periods within a given demand period.
 - **`period_demand::Array{<:Real}`** is the demand within each of the periods.
 - **`cap::TimeProfile`** is the installed capacity.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
@@ -68,7 +67,7 @@ end
     period_demand(n::AbstractPeriodDemandSink)
     period_demand(n::AbstractPeriodDemandSink, i::Int)
 
-Returns the period demand of `AbstractPeriodDemandSink` `n` as Array or in demand period `i`.
+Returns the period demands of `AbstractPeriodDemandSink` `n` as Array or in demand period `i`.
 """
 period_demand(n::AbstractPeriodDemandSink) = n.period_demand
 period_demand(n::AbstractPeriodDemandSink, i) = n.period_demand[i]
@@ -76,20 +75,20 @@ period_demand(n::AbstractPeriodDemandSink, i) = n.period_demand[i]
 """
     period_length(n::AbstractPeriodDemandSink)
 
-Returns the length of the demand period of `AbstractPeriodDemandSink` `n`.
+Returns the length of the demand periods of `AbstractPeriodDemandSink` `n`.
 """
 period_length(n::AbstractPeriodDemandSink) = n.period_length
 
 """
     number_of_periods(n::AbstractPeriodDemandSink)
-    number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure)
+    number_of_periods(n::AbstractPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod)
 
-Returns the number of periods for a `PeriodDemandSink` `n`. If a `TimeStructure` is provided
-it calculates it based on the chosen time structure.
+Returns the number of demand periods for a `PeriodDemandSink` `n` within a strategic period.
+If a `TimeStructure` `t_inv` is provided it calculates it based on the chosen time structure.
 """
 number_of_periods(n::AbstractPeriodDemandSink) = length(period_demand(n))
-number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure) =
-    Int(length(𝒯) / period_length(n))
+number_of_periods(n::AbstractPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod) =
+    Int(length(t_inv) / period_length(n))
 
 """
     period_index(n::AbstractPeriodDemandSink, t)

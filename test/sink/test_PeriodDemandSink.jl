@@ -139,7 +139,8 @@ end
 
 @testset "Constraint implementation" begin
     # Create and optimize the model
-    m, case, modeltype = per_dem_snk_case()
+    𝒯 = TwoLevel(2, 1, SimpleTimes(7 * 24, 1), op_per_strat=8760.)
+    m, case, modeltype = per_dem_snk_case(; 𝒯)
     set_optimizer(m, OPTIMIZER)
     optimize!(m)
 
@@ -149,13 +150,18 @@ end
     # Extract the required values from the case and node
     𝒯 = get_time_struct(case)
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+    t_inv = first(𝒯ᴵⁿᵛ)
     src = get_nodes(case)[1]
     snk = get_nodes(case)[2]
     per_len = EMF.period_length(snk)
     per_demand = EMF.period_demand(snk)
-    per_num = EMF.number_of_periods(snk, 𝒯)
+    per_num = EMF.number_of_periods(snk, t_inv)
     val_cap_use = Array(value.(m[:cap_use][snk, :]))
     val_sink_deficit = Array(value.(m[:sink_deficit][snk, :]))
+
+    # Test the variable generation
+    @test length(m[:demand_sink_surplus][snk, :, :]) == 14
+    @test length(m[:demand_sink_deficit][snk, :, :]) == 14
 
     # Tests for the capacity function
     # EMB.constraints_capacity(m, n::AbstractPeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)v
@@ -183,9 +189,9 @@ end
         period_values = val_cap_use[((k-1)*per_len+1):(k*per_len)]
         period_total = sum(val for val ∈ period_values)
         @test period_total ≈ per_demand[k]
-        @test value.(m[:demand_sink_deficit][snk, k]) ≈ 0 atol=TEST_ATOL
+        @test value.(m[:demand_sink_deficit][snk, t_inv, k]) ≈ 0 atol=TEST_ATOL
     end
-    @test value.(m[:demand_sink_deficit][snk, 5]) ≈ 1500
+    @test value.(m[:demand_sink_deficit][snk, t_inv, 5]) ≈ 1500
 
     # Test the upper bound on the installed capacity and the value for the capacity
     @test all(value.(m[:cap_use][snk, t]) ≲ value.(m[:cap_inst][snk, t]) for t ∈ 𝒯)
@@ -203,7 +209,7 @@ end
     @test all(
         value.(m[:opex_var][snk, t_inv]) ≈
             sum(
-                value.(m[:demand_sink_deficit][snk, EMF.period_index(snk, t)]) *
+                value.(m[:demand_sink_deficit][snk, t_inv, EMF.period_index(snk, t)]) *
                  deficit_penalty(snk, t) * scale_op_sp(t_inv, t)
             for t ∈ t_inv)
     for t_inv ∈ 𝒯ᴵⁿᵛ)

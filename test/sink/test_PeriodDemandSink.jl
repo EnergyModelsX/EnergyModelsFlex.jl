@@ -169,13 +169,18 @@ end
     # Test that the individual deficits and surpluses are correctly calculated
     @test all(
         value.(m[:sink_deficit][snk, t]) + value.(m[:cap_use][snk, t]) ≈
-        value.(m[:sink_surplus][snk, t]) + value.(m[:cap_inst][snk, t]) for t ∈ 𝒯,
+        value.(m[:cap_inst][snk, t]) for t ∈ 𝒯,
         atol = TEST_ATOL
     )
+    # Test that the surplus is fixed to 0
+    @test all(is_fixed.(m[:sink_surplus][snk, t]) for t ∈ 𝒯)
+    @test all(value.(m[:sink_surplus][snk, t]) ≈ 0 for t ∈ 𝒯)
+
 
     # Test that the production is as planned based on the cost with no production in period
     # 5 due to the prohibitive costs
     cap = vcat(zeros(6), ones(14)*200, zeros(4))
+    
     prod = vcat(zeros(6), ones(6)*200, zeros(6), [100, 200], zeros(4))
     deficit = cap - prod
     @test all(val_cap_use[24*(k-1)+1:24*k] ≈ prod for k ∈ 1:4)

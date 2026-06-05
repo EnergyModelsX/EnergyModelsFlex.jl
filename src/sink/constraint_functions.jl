@@ -19,24 +19,18 @@ function EMB.constraints_capacity(
     @constraint(
         m,
         [t ∈ 𝒯],
-        m[:cap_use][n, t] + m[:sink_deficit][n, t] ==
-        m[:cap_inst][n, t] + m[:sink_surplus][n, t]
+        m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t]
     )
 
-    # Need to constraint the used capacity to the installed capacity per
-    # operational period. Instead, the node may get input in operational periods
-    # when the cap field is 0. This is ok for regular sink nodes, but this node
-    # only penalizes surplus or deficit over a period.
-    @constraint(
-        m,
-        [t ∈ 𝒯],
-        m[:cap_use][n, t] ≤ m[:cap_inst][n, t]
-    )
+    # Fix the surplus to 0
+    for t ∈ 𝒯
+        fix(m[:sink_surplus][n, t], 0; force = true)
+    end
 
     # Create a list mapping the demand period i to the operational periods it contains.
     for t_inv ∈ 𝒯ᴵⁿᵛ
         num_periods = number_of_periods(n, t_inv)
-        period2op = [[] for k ∈ 1:num_periods]
+        period2op = [[] for _ ∈ 1:num_periods]
         for t ∈ t_inv
             period_id = period_index(n, t)
             push!(period2op[period_id], t)

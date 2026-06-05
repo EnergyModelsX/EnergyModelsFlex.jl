@@ -155,11 +155,17 @@ These standard constraints are:
 - `constraints_data`:\
   This function is only called for specified additional data, see above.
 
-The function `constraints_capacity` is extended with a new method to account for the calculation of the period demand deficit and surplus through:
+The function `constraints_capacity` is extended with a new method to account for the calculation of the period demand deficit and surplus.
+
+The overall balance is modified as
 
 ```math
-\texttt{cap\_use}[n, t] + \texttt{sink\_deficit}[n, t] = \texttt{cap\_inst}[n, t] + \texttt{sink\_surplus}[n, t]
+\texttt{cap\_use}[n, t] + \texttt{sink\_deficit}[n, t] = \texttt{cap\_inst}[n, t]
 ```
+
+while operational period surplus ``\texttt{sink\_surplus}[n, t]`` is fixed to 0.
+
+The surplus and deficit of the demand period can then be calculated as
 
 ```math
 \begin{aligned}

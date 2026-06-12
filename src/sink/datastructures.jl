@@ -45,57 +45,57 @@ each operational period.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
     id::Any
-    period_length::Int
-    period_demand::Array{<:Real}
     cap::TimeProfile
+    period_duration::Union{Number, Vector{<:Number}}
+    period_demand::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
     data::Vector{<:ExtensionData}
 end
 function PeriodDemandSink(
     id,
-    period_length::Int,
-    period_demand::Vector{<:Real},
     cap::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}},
+    period_demand::TimeProfile,
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    PeriodDemandSink(id, period_length, period_demand, cap, penalty, input, ExtensionData[])
+    PeriodDemandSink(id, cap, period_duration, period_demand, penalty, input, ExtensionData[])
 end
 
 """
     period_demand(n::AbstractPeriodDemandSink)
-    period_demand(n::AbstractPeriodDemandSink, i::Int)
+    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration)
 
-Returns the period demands of `AbstractPeriodDemandSink` `n` as Array or in demand period `i`.
+Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
+demand period `i`.
 """
 period_demand(n::AbstractPeriodDemandSink) = n.period_demand
-period_demand(n::AbstractPeriodDemandSink, i) = n.period_demand[i]
+period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =
+    n.period_demand[t_pd]
 
 """
-    period_length(n::AbstractPeriodDemandSink)
+    period_duration(n::AbstractPeriodDemandSink)
 
-Returns the length of the demand periods of `AbstractPeriodDemandSink` `n`.
+Returns the duration vector or number of the demand periods of `AbstractPeriodDemandSink` `n`.
 """
-period_length(n::AbstractPeriodDemandSink) = n.period_length
-
-"""
-    number_of_periods(n::AbstractPeriodDemandSink)
-    number_of_periods(n::AbstractPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod)
-
-Returns the number of demand periods for a `PeriodDemandSink` `n` within a strategic period.
-If a `TimeStructure` `t_inv` is provided it calculates it based on the chosen time structure.
-"""
-number_of_periods(n::AbstractPeriodDemandSink) = length(period_demand(n))
-number_of_periods(n::AbstractPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod) =
-    Int(length(t_inv) / period_length(n))
+period_duration(n::AbstractPeriodDemandSink) = n.period_duration
 
 """
-    period_index(n::AbstractPeriodDemandSink, t)
+    periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure)
 
-Returns the index of the period (*e.g.*, day) that a operational period `t` belongs to.
+Returns the demand periods for a `PeriodDemandSink` `n` for the given time structure.
 """
-period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / period_length(n)))
+periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure) =
+    partition_duration(ts, period_duration(n))
+
+"""
+    number_of_periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure)
+
+Returns the number of demand periods for a `PeriodDemandSink` `n` for the given time structure.
+"""
+number_of_periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure) =
+    length(periods(n, ts))
 
 """
     struct MultipleInputSink <: AbstractMultipleInputSink

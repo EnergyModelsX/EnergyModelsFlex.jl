@@ -18,11 +18,8 @@ function EMB.variables_element(
     𝒯,
     ::EnergyModel,
 )
-    # Declaration of the required subsets.
-    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
-
-    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, t_inv ∈ 𝒯ᴵⁿᵛ, i=1:number_of_periods(n, t_inv)] ≥ 0)
-    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, t_inv ∈ 𝒯ᴵⁿᵛ, i=1:number_of_periods(n, t_inv)] ≥ 0)
+    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, periods(n, 𝒯)] ≥ 0)
+    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ,periods(n, 𝒯)] ≥ 0)
 end
 
 """

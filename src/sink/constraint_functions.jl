@@ -14,7 +14,7 @@ function EMB.constraints_capacity(
     modeltype::EnergyModel,
 )
     # Declaration of the required subsets.
-    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+    𝒯ᵖᵈ = periods(n, 𝒯)
 
     @constraint(
         m,
@@ -27,26 +27,14 @@ function EMB.constraints_capacity(
         fix(m[:sink_surplus][n, t], 0; force = true)
     end
 
-    # Create a list mapping the demand period i to the operational periods it contains.
-    for t_inv ∈ 𝒯ᴵⁿᵛ
-        num_periods = number_of_periods(n, t_inv)
-        period2op = [[] for _ ∈ 1:num_periods]
-        for t ∈ t_inv
-            period_id = period_index(n, t)
-            push!(period2op[period_id], t)
-        end
-
-        for k ∈ 1:num_periods
-            # Define the demand_sink_deficit as the difference between the period demand and
-            # the total capacity used.
-            @constraint(
-                m,
-                sum(m[:cap_use][n, t] * duration(t) for t ∈ period2op[k]) +
-                m[:demand_sink_deficit][n, t_inv, k] ==
-                    period_demand(n, k) + m[:demand_sink_surplus][n, t_inv, k]
-            )
-        end
-    end
+    # Set the energy balance for the partition duration
+    @constraint(
+        m,
+        [t_pd ∈ 𝒯ᵖᵈ],
+        m[:demand_sink_deficit][n, t_pd] +
+        sum(m[:cap_use][n, t] * duration(t) for t ∈ t_pd) ==
+            m[:demand_sink_surplus][n, t_pd] + period_demand(n, t_pd)
+    )
 
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
@@ -66,10 +54,11 @@ function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ,
         m,
         [t_inv ∈ 𝒯ᴵⁿᵛ],
         m[:opex_var][n, t_inv] == sum(
-            (
-                m[:demand_sink_surplus][n, t_inv, period_index(n, t)] * surplus_penalty(n, t) +
-                m[:demand_sink_deficit][n, t_inv, period_index(n, t)] * deficit_penalty(n, t)
-            ) * scale_op_sp(t_inv, t) for t ∈ t_inv
+                (
+                    m[:demand_sink_surplus][n, t_pd] * surplus_penalty(n, t_pd) +
+                    m[:demand_sink_deficit][n, t_pd] * deficit_penalty(n, t_pd)
+                ) * scale_op_sp(t_inv, first(t_pd)) / duration(first(t_pd))
+            for t_pd ∈ periods(n, t_inv)
         )
     )
 end

@@ -11,11 +11,13 @@ additional checks on the data.
 - The field `cap` is required to be non-negative.
 - The values of the dictionary `input` are required to be non-negative.
 - The dictionary `penalty` is required to have the keys `:deficit` and `:surplus`.
+- The values `:deficit` and `:surplus` of the dictionary `penalty` are required to be
+  indexable by a `PartitionDuration`.
 - The sum of the values `:deficit` and `:surplus` in the dictionary `penalty` has to be
   non-negative to avoid an infeasible model.
-- The remainder of the divison of the lowest time structure by the period length must be 0.
-- The length of the period demand must equal the length of the lowest period times the
-  parameter period length.
+- The individual periods must all satisfy the specified duration(s).
+- The field `period_demand` is required to be non-negative and indexable by a
+  `PartitionDuration`.
 """
 function EMB.check_node(
     n::PeriodDemandSink,
@@ -23,15 +25,66 @@ function EMB.check_node(
     modeltype::EnergyModel,
     check_timeprofiles::Bool,
 )
-    EMB.check_node_default(n, 𝒯, modeltype, check_timeprofiles)
+    𝒯ᵖᵈ = periods(n, 𝒯)
+    per_dur = period_duration(n)
+    bool = true
 
-    # Check that the period length and demand is working with the time structure
-    # The check will only be activated in 0.3
-    # for (idx_sp, ts_oper) ∈ enumerate(𝒯.operational)
-    #     sub_msg = "the operational time structure in strategic period $(idx_sp)"
-    #     check_period_ts(ts_oper, n, sub_msg)
-    # end
+    @assert_or_log(
+        all(capacity(n, t) ≥ 0 for t ∈ 𝒯),
+        "The capacity must be non-negative."
+    )
+    @assert_or_log(
+        all(inputs(n, p) ≥ 0 for p ∈ inputs(n)),
+        "The values for the Dictionary `input` must be non-negative."
+    )
+    @assert_or_log(
+        :surplus ∈ keys(n.penalty) && :deficit ∈ keys(n.penalty),
+        "The entries `:surplus` and `:deficit` are required in the dictionary `penalty`."
+    )
+    if :surplus ∈ keys(n.penalty)
+        message = "are not allowed for the key `:surplus` in the dictionary `penalty`."
+        bool *= EMB.check_scenario_profile(surplus_penalty(n), message)
+    else
+        bool = false
+    end
+    if :deficit ∈ keys(n.penalty)
+        message = "are not allowed for the key `:deficit` in the dictionary `penalty`."
+        bool *= EMB.check_scenario_profile(deficit_penalty(n), message)
+    else
+        bool = false
+    end
+
+    if bool
+        @assert_or_log(
+            all(surplus_penalty(n, t_pd) + deficit_penalty(n, t_pd) ≥ 0 for t_pd ∈ 𝒯ᵖᵈ),
+            "An inconsistent combination of `:surplus` and `:deficit` leads to an infeasible model."
+        )
+    end
+    if isa(per_dur, Vector)
+        @assert_or_log(
+            all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[TS._part(t_pd)] for t_pd ∈ 𝒯ᵖᵈ),
+            "The duration of the last period on the `SimpleTimes` level is shorter than " *
+            "specified. This is caused by inconsistently specified `period_duration` and" *
+            "time structure."
+        )
+    else
+        @assert_or_log(
+            all(sum(duration(t) for t ∈ t_pd) ≥ per_dur for t_pd ∈ 𝒯ᵖᵈ),
+            "The duration of the last period on the `SimpleTimes` level is shorter than " *
+            "specified. This is caused by inconsistently specified `period_duration` and " *
+            "the time structure."
+        )
+    end
+    message = "are not allowed for the field `:period_demand`."
+    bool = EMB.check_scenario_profile(period_demand(n), message)
+    if bool
+        @assert_or_log(
+            all(period_demand(n, t_pd) ≥ 0 for t_pd ∈ 𝒯ᵖᵈ),
+            "The period demand must be non-negative."
+        )
+    end
 end
+
 
 """
     check_period_ts(ts::RepresentativePeriods, n::PeriodDemandSink, msg::String)

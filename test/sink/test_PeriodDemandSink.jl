@@ -3,6 +3,7 @@ Power = ResourceCarrier("Power", 0)
 CO2 = ResourceEmit("CO₂", 0)
 
 function per_dem_snk_case(;
+    snk = nothing,
     𝒯 = TwoLevel(
         1, 1,
         SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7)),
@@ -25,19 +26,21 @@ function per_dem_snk_case(;
     weekday_prod = vcat(zeros(3), ones(14)*200, [0])
     week_prod = vcat(repeat(weekday_prod, 5), zeros(36))
 
-     # Demand for 1500 units per day, and nothing (0) in the weekend with a maximum production
-     # of 200 per hour in between 6:00 and 20:00
-    snk = PeriodDemandSink(
-        "demand_product",
-        OperationalProfile(week_prod),
-        24,
-        PartitionProfile([fill(1500, 5)..., 0, 0]),
-        Dict(
-            :surplus => PartitionProfile(vcat([-8], zeros(6))),
-            :deficit => FixedProfile(1e4),
-        ),
-        Dict(Power => 1),
-    )
+    # Demand for 1500 units per day, and nothing (0) in the weekend with a maximum production
+    # of 200 per hour in between 6:00 and 20:00
+    if isnothing(snk)
+        snk = PeriodDemandSink(
+            "demand_product",
+            OperationalProfile(week_prod),
+            24,
+            PartitionProfile([fill(1500, 5)..., 0, 0]),
+            Dict(
+                :surplus => PartitionProfile(vcat([-8], zeros(6))),
+                :deficit => FixedProfile(1e4),
+            ),
+            Dict(Power => 1),
+        )
+    end
 
     𝒫 = [Power, CO2]
     𝒩 = [src, snk]
@@ -55,49 +58,65 @@ end
 
 # Test that the fields of a `PeriodDemandSink` are correctly checked
 # - EMB.check_node(n::PeriodDemandSink, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
-# @testset "Utility - Check functions" begin
-#     function create_check_case(;
-#         cap = FixedProfile(10),
-#         per_len = 24,
-#         per_demand = [fill(1500, 5)..., 0, 0],
-#         T = TwoLevel(1, 1, SimpleTimes(7 * 24, 1)),
-#     )
-#         snk = PeriodDemandSink(
-#             "demand_product",
-#             per_len,
-#             per_demand,
-#             cap,
-#             Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e8)),
-#             Dict(Power => 1),
-#         )
+@testset "Check functions" begin
+    # Set the global to true to suppress the error message
+    EMB.TEST_ENV = true
 
-#         return per_dem_snk_case(snk; T)
-#     end
-#     # Test that a wrong capacity is caught by the checks
-#     # this implies that the default checks are working
-#     @test_throws AssertionError create_check_case(cap=FixedProfile(-25))
+    function check_per_dem_sink(;
+        cap = FixedProfile(10),
+        per_len = 24,
+        per_demand = PartitionProfile([fill(1500, 5)..., 0, 0]),
+        penalty = Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+        input = Dict(Power => 1),
+        𝒯 = TwoLevel(1, 1, SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))),
+    )
+        snk = PeriodDemandSink(
+            "demand_product",
+            cap,
+            per_len,
+            per_demand,
+            penalty,
+            input,
+        )
 
-#     # Test that a wrong period length is caught by the checks., including in other time
-#     # structures
-#     @test_throws AssertionError create_check_case(per_len=25)
-#     week = SimpleTimes(168, 1);
-#     opscen = OperationalScenarios(2, [week, week], [0.5, 0.5]);
-#     T = TwoLevel(1, 1, opscen; op_per_strat=8760.);
-#     @test_throws AssertionError create_check_case(;per_len=25, T)
-#     rep = RepresentativePeriods(2, 8760., [.5, .5], [week, week]);
-#     T = TwoLevel(1, 1, rep; op_per_strat=8760.);
-#     @test_throws AssertionError create_check_case(;per_len=25, T)
+        return per_dem_snk_case(; snk, 𝒯)
+    end
+    # Test that a wrong capacity is caught by the checks
+    @test_throws AssertionError check_per_dem_sink(; cap=FixedProfile(-25))
 
-#     # Test that a wrong period demand is caught by the checks
-#     @test_throws AssertionError create_check_case(per_demand=[25])
+    # Test that a wrong input is caught by the checks
+    @test_throws AssertionError check_per_dem_sink(; input = Dict(Power => -1))
 
-#     # Test that larger period demands are caught by the checks and print a warning
-#     msg =
-#         "The vector `period_demand` is longer than required in " *
-#         "the operational time structure in strategic period 1. " *
-#         "The last 23 values will be omitted."
-#     @test_logs (:warn, msg) create_check_case(per_demand=ones(30));
-# end
+    # Test that a wrong penalty dictionary is caught
+    penalties = [
+        Dict(:surplus => FixedProfile(0)),
+        Dict(:deficit => FixedProfile(0)),
+        Dict(:surplus => OperationalProfile([0]), :deficit => FixedProfile(1e4)),
+        Dict(:surplus => FixedProfile(0), :deficit => OperationalProfile([1e4])),
+        Dict(:surplus => FixedProfile(-1e5), :deficit => FixedProfile(1e4)),
+    ]
+    for penalty ∈ penalties
+        @test_throws AssertionError check_per_dem_sink(; penalty)
+    end
+
+    # Test that a wrong period length is caught by the checks, including in other time
+    # structures
+    @test_throws AssertionError check_per_dem_sink(; per_len=25)
+    week = SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))
+    opscen = OperationalScenarios(2, [week, week], [0.5, 0.5])
+    𝒯 = TwoLevel(1, 1, opscen; op_per_strat=8760.)
+    @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
+    rep = RepresentativePeriods(2, 8760., [.5, .5], [week, week])
+    𝒯 = TwoLevel(1, 1, rep; op_per_strat=8760.)
+    @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
+
+    # Test that a wrong period demand is caught by the checks
+    @test_throws AssertionError check_per_dem_sink(; per_demand=OperationalProfile([25]))
+    @test_throws AssertionError check_per_dem_sink(; per_demand=FixedProfile(-10))
+
+    # Set the global again to false
+    EMB.TEST_ENV = false
+end
 
 @testset "Utility functions" begin
     # Create the node and time structure

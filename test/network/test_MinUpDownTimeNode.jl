@@ -18,7 +18,7 @@ function test_case_minupdown(
     𝒫 = [power, product, CO2]
 
     day = [1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2]
-    el_cost = [repeat(day, 5)..., fill(0, 2 * 24)...]
+    el_cost = vcat(repeat(day, 5), zeros(48))
 
     src = RefSource(
         "src",
@@ -43,15 +43,15 @@ function test_case_minupdown(
 
     # The demand can only be satisfied between 6-20 on weekdays, with a capacity of 200.
     # No production on weekends.
-    weekday_prod = [fill(0, 6)..., fill(200, 14)..., fill(0, 4)...]
-    week_prod = [repeat(weekday_prod, 5)..., fill(0, 2 * 24)...]
+    weekday_prod = vcat(zeros(6), fill(300, 14), zeros(4))
+    week_prod = vcat(repeat(weekday_prod, 5), fill(0, 2 * 24))
 
     snk = PeriodDemandSink(
         "demand_product",
-        24,                         # 24 hours per day
-        [fill(1500, 5)..., 0, 0],   # Demand 1500 units per day, and nothing (0) in the weekend.
-        OperationalProfile(week_prod), # kW - installed capacity
-        Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e8)), # € / Demand - Price for not delivering products
+        OperationalProfile(week_prod),
+        24,
+        PartitionProfile([fill(1500, 5)..., 0, 0]),
+        Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)), # € / Demand - Price for not delivering products
         Dict(product => 1),
     )
 

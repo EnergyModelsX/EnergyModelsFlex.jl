@@ -33,12 +33,11 @@ The standard fields are given as:
 - **`penalty::Dict{Symbol,<:TimeProfile}`**:\
   The penalty dictionary is used for providing penalties for soft constraints to allow for both over and under delivering the demand.\
   It must include the fields `:surplus` and `:deficit`.
-  In addition, it is crucial that the sum of both values is larger than 0 to avoid an unconstrained model.
+  In addition, it is crucial that the sum of both values in each demand period is larger than 0 to avoid an unconstrained model.
 
   !!! warning "Chosen values"
-      The current implementation does not represent the proper cost due to the summation.
-      Instead, you must consider the duration of an operational period and the field `period_length` when providing a value.
-      In this case, the value should be multiplied by ``1/period\_length(n) \times duration(t)``.
+      The implementation is relative to the chosen `period_duration` (see below).
+      If the period duration is ``24``, then the cost is for the unsatisfied demand within the ``24`` demand period, multiplied with the probablity and the repititons within a strategic period.
 
 - **`input::Dict{<:Resource,<:Real}`**:\
   The field `input` includes [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.\
@@ -60,18 +59,24 @@ The standard fields are given as:
 
 [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)s require additional fields to specify both the periods and their respective demands:
 
-- **`period_length::Int`**:\
-  Defines how many operational periods are included in a single demand period.\
-  For instance, if the duration of the operational periods is 1 hour and `period_length = 24`, then each demand period spans one day.
-  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled.
+- **`period_duration::Union{Number, Vector{<:Number}}`**:\
+  Defines what the total duration of a single demand period.\
+  For instance, if the duration of 1 of the operation time structure is 1 hour and `period_duration = 24`, then each demand period spans one day.
+  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled given the available capacity.
 
-- **`period_demand::Vector{<:Real}`**:\
-  The total demand to be met during each demand period. The length of this vector should match the number of periods (*e.g.*, days) in the time structure. If the time structure represents on year with hourly resolution, this vector must then have 365 elements.
+- **`period_demand::TimeProfile`**:\
+  The total demand to be met during each demand period.
+  The length of this vector should match the number of periods (*e.g.*, days) in the time structure.
+  If the time structure represents on year with hourly resolution and the demand periods correspond to a day, this vector must then have 365 elements.
+
+  It is best to utilize the [`PartitionProfile`]() type if the demand is varying.
+  If it is constent, you can also utilize [`StrategicProfile`][@extref TimeStruct.StrategicProfile], [`RepresentativeProfile`][@extref TimeStruct.RepresentativeProfile], or [`ScenarioProfile`][@extref TimeStruct.ScenarioProfile], depending on your chosen time structure.
 
   !!! warning "Time consistency"
-      Ensure that the `period_demand` vector length aligns with the total time horizon divided by `period_length`. Mismatches can lead to indexing errors or inconsistent demand enforcement.
+      Ensure that the `period_demand` time profile length aligns with the operational time horizon duration divided by `period_length`
+      Mismatches can lead to indexing errors or inconsistent demand enforcement.
 
-These fields are at the 2ⁿᵈ and 3ʳᵈ position below the field `id` as shown in [`PeriodDemandSink`](@ref).
+These fields are at the 3ʳᵈ and 4ᵗʰ position below the field `cap` as shown in [`PeriodDemandSink`](@ref).
 
 ## [Mathematical description](@id nodes-perioddemandsink-math)
 
@@ -105,12 +110,12 @@ The variables include:
 #### [Additional variables](@id nodes-perioddemandsink-math-add)
 
 [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_element()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource.
-These variables are for a [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) node ``n`` in demand periods ``i``:
+These variables are for a [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink) node ``n`` in demand periods ``t_pd``:
 
-- ``\texttt{demand\_sink\_surplus}[n, t_inv, i]``:\
-  Surplus of energy delivered beyond the required `period_demand` in demand period `i` of strategic period `t_inv` .
-- ``\texttt{demand\_sink\_deficit}[n, t_inv, i]``:\
-  Deficit of energy delivered relative to the `period_demand` in period `i` of strategic period `t_inv` .
+- ``\texttt{demand\_sink\_surplus}[n, t_pd]``:\
+  Surplus of energy delivered beyond the required `period_demand` of demand period `t_pd` .
+- ``\texttt{demand\_sink\_deficit}[n, t_pd]``:\
+  Deficit of energy delivered relative to the `period_demand` of demand period `t_pd` .
 
 ### [Constraints](@id nodes-perioddemandsink-math-con)
 
@@ -169,25 +174,23 @@ The surplus and deficit of the demand period can then be calculated as
 
 ```math
 \begin{aligned}
-\texttt{demand\_sink\_deficit}[n, t_inv, i] + & \sum_{t \in P_i} \texttt{​cap\_use}[n, t] \times duration(t) = \\
-& \texttt{demand\_sink\_surplus}[n, t_inv, i] + period\_demand(n, i)
+\texttt{demand\_sink\_deficit}[n, t_{pd}] + & \sum_{t \in t_{pd}} \texttt{​cap\_use}[n, t] \times duration(t) = \\
+& \texttt{demand\_sink\_surplus}[n, t_{pd}] + period\_demand(n, t_{pd})
 \end{aligned}
 ```
 
-where ``P_i`` is the set of operational periods in demand period ``i``.
+where ``t_{pd}`` is the demand period consisting of a set of operational periods.
 
 As a consequence, `constraints_opex_var` requires as well a new method as we only consider the deficit within a complete period:
 
 ```math
 \begin{aligned}
-\texttt{opex\_var}[n, t_{inv}] = \sum_{t ∈ t_{inv}}(& \texttt{demand\_sink\_surplus}[n, t_inv, i_t] \times \texttt{surplus\_penalty}(n, t) + \\
-& \texttt{demand\_sink\_deficit}[n, t_inv, i_t] \times \texttt{deficit\_penalty}(n, t)) \times \\
-& scale\_op\_sp(t_{inv}, t)
+\texttt{opex\_var}[n, t_{inv}] = \sum_{t_{pd} ∈ periods(t_{inv})}(& \texttt{demand\_sink\_surplus}[n, t_{pd}] \times \texttt{surplus\_penalty}(n, t_{pd}) + \\
+& \texttt{demand\_sink\_deficit}[n, t_{pd}] \times \texttt{deficit\_penalty}(n, t_{pd})) \times \\
+& scale\_op\_sp(t_{inv}, first(t_{pd})) / duration(first(t_{pd}))
 \end{aligned}
 ```
 
-where ``i_t`` is the period index such that ``t \in P_{i_t}``.
-
-!!! tip "The function `scale_op_sp`"
-    The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
-    It also takes into account potential operational scenarios and their probability as well as representative periods.
+!!! note "`scale_op_sp` and `duration`"
+    The function [`scale_op_sp(t_inv, t)`](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods including the `duration` of each operational period.
+    It hence must be divided by the `duration` of the first operational period to avoid including the duration of the operational period.

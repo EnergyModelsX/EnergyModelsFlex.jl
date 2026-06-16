@@ -44,8 +44,9 @@ end
 
 Function for creating the constraint on the variable OPEX of an [`AbstractPeriodDemandSink`](@ref).
 
-The method is adjusted from the default method through utilizing the period demand surplus
-and deficit instead of the operational period deficit or surplus.
+The method is changed from the standard approach through calculating both the demand period
+surplus and deficit in addition to the operational period deficit. The operational period
+surplus is fixed to 0 to avoid problems in the calculations.
 """
 function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the

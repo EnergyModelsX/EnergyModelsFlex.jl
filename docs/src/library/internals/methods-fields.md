@@ -11,8 +11,8 @@ Pages = ["methods-fields.md"]
 
 ```@docs
 EnergyModelsFlex.period_demand
-EnergyModelsFlex.period_length
-EnergyModelsFlex.period_index
+EnergyModelsFlex.period_duration
+EnergyModelsFlex.periods
 EnergyModelsFlex.number_of_periods
 ```
 

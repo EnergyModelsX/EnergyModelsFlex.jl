@@ -26,18 +26,22 @@ abstract type AbstractMultipleInputSinkStrat <: AbstractMultipleInputSink end
 
 A `PeriodDemandSink` is a [`Sink`](@extref EnergyModelsBase.Sink) that has a demand that can
 be satisfied any time during a period of defined length. If the chosen time structure has
-operational periods of  a duration of 1 hour and the  demand should be fulfilled daily,
-`period_length` should be 24. The demand for each day is then set as an array as the
+operational periods of a duration of 1 hour and the  demand should be fulfilled daily,
+`period_duration` should be 24. The demand for each day is then set as a time profile in the
 `period_demand` field. The `cap` field is the maximum capacity that can be fulfilled in
 each operational period.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`period_length::Int`** is the number of periods within a given demand period.
-- **`period_demand::Array{<:Real}`** is the demand within each of the periods.
 - **`cap::TimeProfile`** is the installed capacity.
+- **`period_duration::Union{Number, Vector{<:Number}}`** is the sum of the durations of the
+  individual operational periods within a given demand period. I can be either specified as
+  number (the same duration in all demand periods) or as a vector (varying duration of each
+  demand period).
+- **`period_demand::TimeProfile`** is the demand within each of the periods as `TimeProfile`.
+  It cannot be specified as `OperationalProfile`.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
-  dictionary requires the  fields `:surplus` and `:deficit`.
+  dictionary requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
@@ -68,7 +72,7 @@ end
     period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration)
 
 Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
-demand period `i`.
+demand period `t_pd`.
 """
 period_demand(n::AbstractPeriodDemandSink) = n.period_demand
 period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =

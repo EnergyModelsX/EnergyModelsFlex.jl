@@ -42,15 +42,15 @@ function per_dem_snk_case(;
         ])
         per_dem = RepresentativeProfile([fill(1500, 5)..., 0, 0])
         snk_sur = RepresentativeProfile(vcat([-8], zeros(6)))
-        period_min = RepresentativeProfile(vcat(ones(5)*.10, [0, 0]))
-        period_max = RepresentativeProfile(vcat(ones(5)*.25, [0, 0]))
+        per_min = RepresentativeProfile(vcat(ones(5)*.10, [0, 0]))
+        per_max = RepresentativeProfile(vcat(ones(5)*.25, [0, 0]))
     else
         el_cost = OperationalProfile(vcat(day_1, repeat(day_rest, 3), fill(1e9, 18), zeros(36)))
         week_prod = OperationalProfile(vcat(repeat(weekday_prod, 5), zeros(36)))
         per_dem = PartitionProfile([fill(1500, 5)..., 0, 0])
         snk_sur = PartitionProfile(vcat([-8], zeros(6)))
-        period_min = PartitionProfile(vcat(ones(5)*.10, [0, 0]))
-        period_max = PartitionProfile(vcat(ones(5)*.25, [0, 0]))
+        per_min = PartitionProfile(vcat(ones(5)*.10, [0, 0]))
+        per_max = PartitionProfile(vcat(ones(5)*.25, [0, 0]))
     end
 
     src = RefSource(
@@ -84,8 +84,8 @@ function per_dem_snk_case(;
                 week_prod,
                 StrategicProfile(ones(length(strategic_periods(𝒯))) * strat_demand),
                 24,
-                period_min,
-                period_max,
+                per_min,
+                per_max,
                 Dict(
                     :surplus => FixedProfile(0),
                     :deficit => FixedProfile(1e4),
@@ -173,6 +173,87 @@ end
         @test_throws AssertionError check_per_dem_sink(; per_dem=FixedProfile(-10))
     end
 
+    # Test that the fields of a `StratPeriodDemandSink` are correctly checked
+    # - EMB.check_node(n::StratPeriodDemandSink, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
+    @testset "Check - StratPeriodDemandSink" begin
+        function check_per_dem_sink(;
+            cap = FixedProfile(10),
+            strat_demand = FixedProfile(1500*5/168),
+            per_dur = 24,
+            per_min = PartitionProfile([10, 10, 10, 10, 0, 0]./100),
+            per_max = PartitionProfile([25, 25, 25, 25, 0, 0]./100),
+            penalty = Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            input = Dict(Power => 1),
+            𝒯 = TwoLevel(1, 1, SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))),
+        )
+            snk = StratPeriodDemandSink(
+                "demand_product",
+                cap,
+                strat_demand,
+                per_dur,
+                per_min,
+                per_max,
+                penalty,
+                input,
+            )
+
+            return per_dem_snk_case(; snk, 𝒯)
+        end
+
+        # Test that a wrong capacity is caught by the checks
+        @test_throws AssertionError check_per_dem_sink(; cap=FixedProfile(-25))
+
+        # Test that a wrong strategic demand is caught by the checks
+        @test_throws AssertionError check_per_dem_sink(; strat_demand=FixedProfile(-25))
+        @test_throws AssertionError check_per_dem_sink(; strat_demand=OperationalProfile([1]))
+
+        # Test that a wrong input is caught by the checks
+        @test_throws AssertionError check_per_dem_sink(; input = Dict(Power => -1))
+
+        # Test that a wrong penalty dictionary is caught
+        penalties = [
+            Dict(:surplus => FixedProfile(0)),
+            Dict(:deficit => FixedProfile(0)),
+            Dict(:surplus => OperationalProfile([0]), :deficit => FixedProfile(1e4)),
+            Dict(:surplus => FixedProfile(0), :deficit => OperationalProfile([1e4])),
+            Dict(:surplus => RepresentativeProfile([0]), :deficit => FixedProfile(1e4)),
+            Dict(:surplus => FixedProfile(0), :deficit => RepresentativeProfile([1e4])),
+            Dict(:surplus => FixedProfile(-1e5), :deficit => FixedProfile(1e4)),
+        ]
+        for penalty ∈ penalties
+            @test_throws AssertionError check_per_dem_sink(; penalty)
+        end
+
+        # Test that a wrong period length is caught by the checks, including in other time
+        # structures
+        @test_throws AssertionError check_per_dem_sink(; per_dur=25)
+        week = SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))
+        opscen = OperationalScenarios(2, [week, week], [0.5, 0.5])
+        𝒯 = TwoLevel(1, 1, opscen; op_per_strat=8760.)
+        @test_throws AssertionError check_per_dem_sink(; per_dur=25, 𝒯)
+        rep = RepresentativePeriods(2, 8760., [.5, .5], [week, week])
+        𝒯 = TwoLevel(1, 1, rep; op_per_strat=8760.)
+        @test_throws AssertionError check_per_dem_sink(; per_dur=25, 𝒯)
+
+        # Test that a wrong period limits are caught by the checks
+        @test_throws AssertionError check_per_dem_sink(; per_min=OperationalProfile([25]))
+        @test_throws AssertionError check_per_dem_sink(; per_min=FixedProfile(-1))
+        @test_throws AssertionError check_per_dem_sink(; per_min=FixedProfile(1.1))
+        @test_throws AssertionError check_per_dem_sink(; per_max=OperationalProfile([25]))
+        @test_throws AssertionError check_per_dem_sink(; per_max=FixedProfile(-1))
+        @test_throws AssertionError check_per_dem_sink(; per_max=FixedProfile(1.1))
+
+        # Test that warnings are provided if the period limits enforce using the penalties
+        msg = "The sum of the minimum period demands is in at least one strategic period " *
+            "larger than 1. As a consequence, a deficit for `demand_sink_deficit` is " *
+            "guaranteed."
+        @test_logs (:warn, msg) check_per_dem_sink(; per_min=FixedProfile(0.5))
+        msg = "The sum of the maximum period demands is in at least one strategic period " *
+            "smaller than 1. As a consequence, a surplus for `demand_sink_surplus` is " *
+            "guaranteed."
+        @test_logs (:warn, msg) check_per_dem_sink(; per_max=FixedProfile(0.1))
+    end
+
     # Set the global again to false
     EMB.TEST_ENV = false
 end
@@ -191,28 +272,28 @@ end
         Dict(Power => 0.5),
     )
     strat_demand = FixedProfile(1500*5/168)
-    period_min = PartitionProfile([10, 10, 10, 10, 0, 0])
-    period_max = PartitionProfile([25, 25, 25, 25, 0, 0])
+    per_min = PartitionProfile([10, 10, 10, 10, 0, 0])
+    per_max = PartitionProfile([25, 25, 25, 25, 0, 0])
     strat_snk = StratPeriodDemandSink(
         "demand_product",
         cap,
         strat_demand,
         per_dur,
-        period_min,
-        period_max,
+        per_min,
+        per_max,
         Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
         Dict(Power => 0.5),
     )
     strat_demand = FixedProfile(1500*5/168)
-    period_min = PartitionProfile([10, 10, 10, 10, 0, 0])
-    period_max = PartitionProfile([25, 25, 25, 25, 0, 0])
+    per_min = PartitionProfile([10, 10, 10, 10, 0, 0])
+    per_max = PartitionProfile([25, 25, 25, 25, 0, 0])
     strat_snk = StratPeriodDemandSink(
         "demand_product",
         cap,
         strat_demand,
         per_dur,
-        period_min,
-        period_max,
+        per_min,
+        per_max,
         Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
         Dict(Power => 0.5),
     )
@@ -256,7 +337,6 @@ end
             Dict(Power => 0.5),
         )
         snk_6 = PeriodDemandSink(
-
             "demand_product",
             per_dur,
             [fill(1500, 5)..., 0, 0],
@@ -299,8 +379,8 @@ end
                 cap,
                 strat_demand,
                 per_dur,
-                period_min,
-                period_max,
+                per_min,
+                per_max,
                 Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
                 Dict(Power => 0.5),
                 ExtensionData[]
@@ -310,8 +390,8 @@ end
                 cap,
                 strat_demand,
                 FixedProfile(per_dur),
-                period_min,
-                period_max,
+                per_min,
+                per_max,
                 Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
                 Dict(Power => 0.5),
             )
@@ -320,8 +400,8 @@ end
                 cap,
                 strat_demand,
                 PartitionProfile(ones(7)*24),
-                period_min,
-                period_max,
+                per_min,
+                per_max,
                 Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
                 Dict(Power => 0.5),
             )
@@ -401,13 +481,13 @@ end
             @test all(
                 EMF.strategic_demand(strat_snk, t_inv) == strat_demand[t_inv]
             for t_inv ∈ strategic_periods(𝒯))
-            @test EMF.period_demand_min(strat_snk) == period_min
+            @test EMF.period_demand_min(strat_snk) == per_min
             @test all(
-                EMF.period_demand_min(strat_snk, t_dp) == period_min[t_dp]
+                EMF.period_demand_min(strat_snk, t_dp) == per_min[t_dp]
             for t_dp ∈ EMF.periods(strat_snk, 𝒯))
-            @test EMF.period_demand_max(strat_snk) == period_max
+            @test EMF.period_demand_max(strat_snk) == per_max
             @test all(
-                EMF.period_demand_max(strat_snk, t_dp) == period_max[t_dp]
+                EMF.period_demand_max(strat_snk, t_dp) == per_max[t_dp]
             for t_dp ∈ EMF.periods(strat_snk, 𝒯))
         end
     end

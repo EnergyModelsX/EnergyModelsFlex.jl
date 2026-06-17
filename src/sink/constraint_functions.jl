@@ -65,6 +65,93 @@ function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ,
 end
 
 """
+    EMB.constraints_capacity(m, n::StratPeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
+
+Function for creating the constraint on the maximum capacity utilization of an
+[`StratPeriodDemandSink`](@ref).
+
+The method is changed from the standard approach through calculating both the strategic and
+demand period surplus and deficit in addition to the operational period deficit. The
+operational period surplus is fixed to 0 to avoid problems in the calculations.
+"""
+function EMB.constraints_capacity(
+    m,
+    n::StratPeriodDemandSink,
+    𝒯::TimeStructure,
+    modeltype::EnergyModel,
+)
+    # Declaration of the required subsets.
+    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+
+    @constraint(
+        m,
+        [t ∈ 𝒯],
+        m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t]
+    )
+
+    # Fix the surplus to 0
+    for t ∈ 𝒯
+        fix(m[:sink_surplus][n, t], 0; force = true)
+    end
+
+    # Provide the bounds for the partitions
+    @constraint(
+        m,
+        [t_inv ∈ 𝒯ᴵⁿᵛ, t_pd ∈ periods(n, t_inv)],
+        m[:demand_sink_deficit][n, t_pd] +
+        sum(m[:cap_use][n, t] * duration(t) for t ∈ t_pd) ≥
+            period_demand_min(n, t_pd) * strategic_demand(n, t_inv) /
+            (multiple(first(t_pd)) / duration_strat(t_inv))
+    )
+    @constraint(
+        m,
+        [t_inv ∈ 𝒯ᴵⁿᵛ, t_pd ∈ periods(n, t_inv)],
+        sum(m[:cap_use][n, t] * duration(t) for t ∈ t_pd) ≤
+            m[:demand_sink_surplus][n, t_pd] +
+            period_demand_max(n, t_pd) * strategic_demand(n, t_inv) /
+            (multiple(first(t_pd)) / duration_strat(t_inv))
+    )
+
+    # Set the energy balance for the strategic period
+    @constraint(
+        m,
+        [t_inv ∈ 𝒯ᴵⁿᵛ,],
+        m[:demand_sink_strat_deficit][n, t_inv] +
+        sum(m[:cap_use][n, t] * scale_op_sp(t_inv, t) for t ∈ t_inv) ==
+            m[:demand_sink_strat_surplus][n, t_inv] + strategic_demand(n, t_inv)
+    )
+
+    EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
+end
+
+"""
+    EMB.constraints_opex_var(m, n::StratPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+
+Function for creating the constraint on the variable OPEX of a [`StratPeriodDemandSink`](@ref).
+
+The method is adjusted from the default method through utilizing the strategic demand and
+demand period surplus and deficit instead of the operational period surplus and deficit.
+"""
+function EMB.constraints_opex_var(m, n::StratPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
+    # Only penalise the total surplus and deficit in each period, not in the
+    # operational periods.
+    @constraint(
+        m,
+        [t_inv ∈ 𝒯ᴵⁿᵛ],
+        m[:opex_var][n, t_inv] ==
+            m[:demand_sink_strat_surplus][n, t_inv] * surplus_penalty(n, t_inv) +
+            m[:demand_sink_strat_deficit][n, t_inv] * deficit_penalty(n, t_inv) +
+            sum(
+                (
+                    m[:demand_sink_surplus][n, t_pd] * surplus_penalty(n, t_pd) +
+                    m[:demand_sink_deficit][n, t_pd] * deficit_penalty(n, t_pd)
+                ) * scale_op_sp(t_inv, first(t_pd)) / duration(first(t_pd))
+            for t_pd ∈ periods(n, t_inv)
+        )
+    )
+end
+
+"""
     EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure)
 
 Function for creating the constraint on the inlet flow of a `MultipleInputSink`.

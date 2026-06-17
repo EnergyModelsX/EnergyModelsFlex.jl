@@ -23,6 +23,32 @@ function EMB.variables_element(
     @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, periods(n, 𝒯)] ≥ 0)
 end
 
+"""
+    EMB.variables_element(m, 𝒩ˢⁱⁿᵏ::Vector{<:StratPeriodDemandSink}, 𝒯, ::EnergyModel)
+
+Creates the following additional variables for **ALL** [`StratPeriodDemandSink`](@ref) nodes:
+- `demand_sink_strat_surplus[n, t_inv]` is a non-negative variable indicating a surplus in
+  demand in each strategic period `t_inv`.
+- `demand_sink_strat_deficit[n, t_inv]` is a non-negative variable indicating a deficit in
+  demand in each strategic period `t_inv`.
+
+!!! note "Definition of period"
+    The period in the description above does not correspond to an operational period as known
+    from `TimeStruct`. Instead, it is a period in which the demand must be satisfied. A period
+    can consist of multiple operational periods.
+"""
+function EMB.variables_element(
+    m,
+    𝒩ˢⁱⁿᵏ::Vector{<:StratPeriodDemandSink},
+    𝒯,
+    ::EnergyModel,
+)
+    # Declaration of the required subsets.
+    𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+
+    @variable(m, demand_sink_strat_surplus[𝒩ˢⁱⁿᵏ, 𝒯ᴵⁿᵛ] ≥ 0)
+    @variable(m, demand_sink_strat_deficit[𝒩ˢⁱⁿᵏ, 𝒯ᴵⁿᵛ] ≥ 0)
+end
 
 """
     EMB.variables_element(m, 𝒩::Vector{<:AbstractMultipleInputSinkStrat}, 𝒯, ::EnergyModel)
@@ -40,7 +66,6 @@ function EMB.variables_element(
     𝒯,
     ::EnergyModel,
 )
-
     # Declaration of the required subsets.
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 

@@ -28,7 +28,7 @@ end
 include("legacy_constructors.jl")
 
 export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
-export PeriodDemandSink, MultipleInputSink
+export PeriodDemandSink, StratPeriodDemandSink, MultipleInputSink
 export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, Combustion
 export ContinuousMultipleInputSinkStrat, BinaryMultipleInputSinkStrat
 export CapacityCostLink, FlexibleOutput, InflexibleSource

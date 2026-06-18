@@ -59,10 +59,12 @@ The standard fields are given as:
 
 [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)s require additional fields to specify both the periods and their respective demands:
 
-- **`period_duration::Union{Number, Vector{<:Number}}`**:\
+- **`period_duration::TimeProfile`**:\
   Defines what the total duration of a single demand period.\
   For instance, if the duration of 1 of the operation time structure is 1 hour and `period_duration = 24`, then each demand period spans one day.
-  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled given the available capacity.
+  The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled given the available capacity.\
+  Due to a constructor, it can either be specified as number (the same duration in all demand periods), as a vector (varying duration of each demand period), or as a time profile (*e.g.*, varying period durations due to varying operational time structures).
+  It cannot be specified as `OperationalProfile`.
 
 - **`period_demand::TimeProfile`**:\
   The total demand to be met during each demand period.

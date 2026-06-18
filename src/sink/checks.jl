@@ -60,21 +60,18 @@ function EMB.check_node(
             "An inconsistent combination of `:surplus` and `:deficit` leads to an infeasible model."
         )
     end
-    if isa(per_dur, Vector)
+
+    message = "are not allowed for the field `:period_duration`."
+    bool = EMB.check_scenario_profile(period_duration(n), message)
+    if bool
         @assert_or_log(
-            all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[TS._part(t_pd)] for t_pd ∈ 𝒯ᵖᵈ),
+            all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[t_pd] for t_pd ∈ 𝒯ᵖᵈ),
             "The duration of the last period on the `SimpleTimes` level is shorter than " *
             "specified. This is caused by inconsistently specified `period_duration` and" *
             "time structure."
         )
-    else
-        @assert_or_log(
-            all(sum(duration(t) for t ∈ t_pd) ≥ per_dur for t_pd ∈ 𝒯ᵖᵈ),
-            "The duration of the last period on the `SimpleTimes` level is shorter than " *
-            "specified. This is caused by inconsistently specified `period_duration` and " *
-            "the time structure."
-        )
     end
+
     message = "are not allowed for the field `:period_demand`."
     bool = EMB.check_scenario_profile(period_demand(n), message)
     if bool

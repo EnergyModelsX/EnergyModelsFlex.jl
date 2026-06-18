@@ -68,7 +68,7 @@ end
         per_demand = PartitionProfile([fill(1500, 5)..., 0, 0]),
         penalty = Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
         input = Dict(Power => 1),
-        𝒯 = TwoLevel(1, 1, SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))),
+        𝒯 = TwoLevel(2, 1, SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))),
     )
         snk = PeriodDemandSink(
             "demand_product",
@@ -102,13 +102,16 @@ end
     # Test that a wrong period length is caught by the checks, including in other time
     # structures
     @test_throws AssertionError check_per_dem_sink(; per_len=25)
+    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]))
     week = SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))
     opscen = OperationalScenarios(2, [week, week], [0.5, 0.5])
-    𝒯 = TwoLevel(1, 1, opscen; op_per_strat=8760.)
+    𝒯 = TwoLevel(2, 1, opscen; op_per_strat=8760.)
     @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]), 𝒯)
     rep = RepresentativePeriods(2, 8760., [.5, .5], [week, week])
-    𝒯 = TwoLevel(1, 1, rep; op_per_strat=8760.)
+    𝒯 = TwoLevel(2, 1, rep; op_per_strat=8760.)
     @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]), 𝒯)
 
     # Test that a wrong period demand is caught by the checks
     @test_throws AssertionError check_per_dem_sink(; per_demand=OperationalProfile([25]))
@@ -132,6 +135,54 @@ end
         Dict(Power => 0.5),
     )
     𝒯 = TwoLevel(1, 1, SimpleTimes(7 * 24, 1))
+    𝒯ᵖᵈ = EMF.periods(snk, 𝒯)
+
+    @testset "Utility - constructor" begin
+        # Test that all constructor methods are working
+        snk_2 = PeriodDemandSink(
+            "demand_product",
+            cap,
+            per_len,
+            per_demand,
+            Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            Dict(Power => 0.5),
+            ExtensionData[]
+        )
+        snk_3 = PeriodDemandSink(
+            "demand_product",
+            cap,
+            FixedProfile(per_len),
+            per_demand,
+            Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            Dict(Power => 0.5),
+        )
+        snk_4 = PeriodDemandSink(
+            "demand_product",
+            cap,
+            PartitionProfile(ones(7)*24),
+            per_demand,
+            Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            Dict(Power => 0.5),
+        )
+
+        for field ∈ fieldnames(PeriodDemandSink)
+            if field ≠ :period_duration
+                @test getproperty(snk, field) == getproperty(snk_2, field)
+                @test getproperty(snk, field) == getproperty(snk_3, field)
+                @test getproperty(snk, field) == getproperty(snk_4, field)
+            else
+                @test all(
+                    getproperty(snk, field)[t_pd] == getproperty(snk_2, field)[t_pd]
+                for t_pd ∈ 𝒯ᵖᵈ)
+                @test all(
+                    getproperty(snk, field)[t_pd] == getproperty(snk_3, field)[t_pd]
+                for t_pd ∈ 𝒯ᵖᵈ)
+                @test all(
+                    getproperty(snk, field)[t_pd] == getproperty(snk_4, field)[t_pd]
+                for t_pd ∈ 𝒯ᵖᵈ)
+            end
+        end
+    end
 
     @testset "Utility - Identification functions" begin
         # Test that all identification functions are working

@@ -34,23 +34,24 @@ each operational period.
 # Fields
 - **`id::Any`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`period_duration::Union{Number, Vector{<:Number}}`** is the sum of the durations of the
-  individual operational periods within a given demand period. I can be either specified as
-  number (the same duration in all demand periods) or as a vector (varying duration of each
-  demand period).
-- **`period_demand::TimeProfile`** is the demand within each of the periods as `TimeProfile`.
+- **`period_duration::TimeProfile`** is the sum of the durations of the individual
+  operational periods within a given demand period. Due to a constructor, it can either be
+  specified as number (the same duration in all demand periods), as a vector (varying
+  duration of each demand period), or as a time profile (*e.g.*, varying period durations
+  due to varying operational time structures). It cannot be specified as `OperationalProfile`.
+- **`period_demand::TimeProfile`** is the demand within each of the periods as time profile.
   It cannot be specified as `OperationalProfile`.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
   dictionary requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
-  is conditional through usage of a constructor.
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
+  field `data` is conditional through usage of a constructor.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
     id::Any
     cap::TimeProfile
-    period_duration::Union{Number, Vector{<:Number}}
+    period_duration::TimeProfile
     period_demand::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
@@ -63,8 +64,24 @@ function PeriodDemandSink(
     period_demand::TimeProfile,
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
+    data::Vector{<:ExtensionData},
 )
-    PeriodDemandSink(id, cap, period_duration, period_demand, penalty, input, ExtensionData[])
+    if isa(period_duration, Number)
+        per_dur = FixedProfile(period_duration)
+    elseif isa(period_duration, Vector{<:Number})
+        per_dur = PartitionProfile(period_duration)
+    end
+    return PeriodDemandSink(id, cap, per_dur, period_demand, penalty, input, data)
+end
+function PeriodDemandSink(
+    id,
+    cap::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}, TimeProfile},
+    period_demand::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+)
+    return PeriodDemandSink(id, cap, period_duration, period_demand, penalty, input, ExtensionData[])
 end
 
 """
@@ -81,9 +98,12 @@ period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =
 """
     period_duration(n::AbstractPeriodDemandSink)
 
-Returns the duration vector or number of the demand periods of `AbstractPeriodDemandSink` `n`.
+Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or in demand
+oeriod `t_pd`.
 """
 period_duration(n::AbstractPeriodDemandSink) = n.period_duration
+period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =
+    n.period_duration[t_pd]
 
 """
     periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure)

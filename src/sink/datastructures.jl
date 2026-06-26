@@ -86,13 +86,13 @@ end
 
 """
     period_demand(n::AbstractPeriodDemandSink)
-    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration)
+    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition)
 
 Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
 demand period `t_pd`.
 """
 period_demand(n::AbstractPeriodDemandSink) = n.period_demand
-period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =
+period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
     n.period_demand[t_pd]
 
 """
@@ -102,7 +102,7 @@ Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or
 oeriod `t_pd`.
 """
 period_duration(n::AbstractPeriodDemandSink) = n.period_duration
-period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PartitionDuration) =
+period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
     n.period_duration[t_pd]
 
 """

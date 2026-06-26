@@ -12,12 +12,12 @@ additional checks on the data.
 - The values of the dictionary `input` are required to be non-negative.
 - The dictionary `penalty` is required to have the keys `:deficit` and `:surplus`.
 - The values `:deficit` and `:surplus` of the dictionary `penalty` are required to be
-  indexable by a `PartitionDuration`.
+  indexable by a `PeriodPartition`.
 - The sum of the values `:deficit` and `:surplus` in the dictionary `penalty` has to be
   non-negative to avoid an infeasible model.
 - The individual periods must all satisfy the specified duration(s).
 - The field `period_demand` is required to be non-negative and indexable by a
-  `PartitionDuration`.
+  `PeriodPartition`.
 """
 function EMB.check_node(
     n::PeriodDemandSink,

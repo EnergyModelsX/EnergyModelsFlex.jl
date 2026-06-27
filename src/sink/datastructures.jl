@@ -99,7 +99,7 @@ period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
     period_duration(n::AbstractPeriodDemandSink)
 
 Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or in demand
-oeriod `t_pd`.
+period `t_pd`.
 """
 period_duration(n::AbstractPeriodDemandSink) = n.period_duration
 period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =

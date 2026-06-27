@@ -7,7 +7,7 @@
 #### Rework of `PeriodDemandSink`
 
 * Rewrote `PeriodDemandSink` with `PeriodPartition` (introduced in `TimeStruct` 0.9.12) to increase flexibility of node with respect to the time structure.
-* Rewritting changed input arguments as well as behavior of the node.
+* Rewriting changed input arguments as well as behavior of the node.
 
 ## Version 0.3.0 (2026-04-16)
 

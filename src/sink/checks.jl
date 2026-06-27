@@ -89,7 +89,7 @@ end
     check_period_ts(ts::SimpleTimes, n::PeriodDemandSink, msg::String)
 
 Function for checking that the timestructure is valid in combination with the chosen period
-structure in a [`PeriodDemandSink`(@ref).
+structure in a [`PeriodDemandSink`](@ref).
 """
 function check_period_ts(ts::RepresentativePeriods, n::PeriodDemandSink, msg::String)
     for (idx, ts_oper) ∈ enumerate(ts.rep_periods)

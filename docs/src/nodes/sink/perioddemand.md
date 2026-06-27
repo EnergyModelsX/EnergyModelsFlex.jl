@@ -37,7 +37,7 @@ The standard fields are given as:
 
   !!! warning "Chosen values"
       The implementation is relative to the chosen `period_duration` (see below).
-      If the period duration is ``24``, then the cost is for the unsatisfied demand within the ``24`` demand period, multiplied with the probablity and the repititons within a strategic period.
+      If the period duration is ``24``, then the cost is for the unsatisfied demand within the ``24`` demand period, multiplied with the probability and the repetitons within a strategic period.
 
 - **`input::Dict{<:Resource,<:Real}`**:\
   The field `input` includes [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.\
@@ -69,10 +69,10 @@ The standard fields are given as:
 - **`period_demand::TimeProfile`**:\
   The total demand to be met during each demand period.
   The length of this vector should match the number of periods (*e.g.*, days) in the time structure.
-  If the time structure represents on year with hourly resolution and the demand periods correspond to a day, this vector must then have 365 elements.
+  If the time structure represents one year with hourly resolution and the demand periods correspond to a day, this vector must then have 365 elements.
 
   It is best to utilize the [`PartitionProfile`]() type if the demand is varying.
-  If it is constent, you can also utilize [`StrategicProfile`][@extref TimeStruct.StrategicProfile], [`RepresentativeProfile`][@extref TimeStruct.RepresentativeProfile], or [`ScenarioProfile`][@extref TimeStruct.ScenarioProfile], depending on your chosen time structure.
+  If it is constant, you can also utilize [`StrategicProfile`][@extref TimeStruct.StrategicProfile], [`RepresentativeProfile`][@extref TimeStruct.RepresentativeProfile], or [`ScenarioProfile`][@extref TimeStruct.ScenarioProfile], depending on your chosen time structure.
 
   !!! warning "Time consistency"
       Ensure that the `period_demand` time profile length aligns with the operational time horizon duration divided by `period_length`

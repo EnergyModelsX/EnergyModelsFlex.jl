@@ -197,7 +197,7 @@ end
             Dict(Power => 0.5),
         )
         snk_6 = PeriodDemandSink(
-            
+
             "demand_product",
             per_dur,
             [fill(1500, 5)..., 0, 0],
@@ -208,10 +208,12 @@ end
         )
 
         for field ∈ fieldnames(PeriodDemandSink)
-            if field ≠ :period_duration
+            if field ≠ :period_duration && field ≠ :period_demand
                 @test getproperty(snk, field) == getproperty(snk_2, field)
                 @test getproperty(snk, field) == getproperty(snk_3, field)
                 @test getproperty(snk, field) == getproperty(snk_4, field)
+                @test getproperty(snk, field) == getproperty(snk_5, field)
+                @test getproperty(snk, field) == getproperty(snk_6, field)
             else
                 @test all(
                     getproperty(snk, field)[t_pd] == getproperty(snk_2, field)[t_pd]
@@ -221,6 +223,12 @@ end
                 for t_pd ∈ 𝒯ᵖᵈ)
                 @test all(
                     getproperty(snk, field)[t_pd] == getproperty(snk_4, field)[t_pd]
+                for t_pd ∈ 𝒯ᵖᵈ)
+                @test all(
+                    getproperty(snk, field)[t_pd] == getproperty(snk_5, field)[t_pd]
+                for t_pd ∈ 𝒯ᵖᵈ)
+                @test all(
+                    getproperty(snk, field)[t_pd] == getproperty(snk_6, field)[t_pd]
                 for t_pd ∈ 𝒯ᵖᵈ)
             end
         end

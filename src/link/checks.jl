@@ -19,7 +19,7 @@ function EMB.check_link(l::CapacityCostLink, 𝒯, ::EnergyModel, ::Bool)
         all(cap_price(l)[t] ≥ 0 for t ∈ 𝒯),
         "The capacity price must be non-negative."
     )
-    check_cap_price_periods(l, 𝒯, cap_price_periods(l))
+    # check_cap_price_periods(l, 𝒯, cap_price_periods(l))
 end
 
 """

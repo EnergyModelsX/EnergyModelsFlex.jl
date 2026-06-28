@@ -25,6 +25,8 @@ for node_type ∈ ["source", "sink", "network", "storage", "link"]
     include("$node_type/checks.jl")
 end
 
+include("legacy_constructors.jl")
+
 export MinUpDownTimeNode, ActivationCostNode, ElectricBattery, LoadShiftingNode
 export PeriodDemandSink, MultipleInputSink
 export PayAsProducedPPA, StorageEfficiency, LimitedFlexibleInput, Combustion

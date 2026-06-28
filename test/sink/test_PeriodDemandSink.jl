@@ -188,6 +188,24 @@ end
             Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
             Dict(Power => 0.5),
         )
+        snk_5 = PeriodDemandSink(
+            "demand_product",
+            per_dur,
+            [fill(1500, 5)..., 0, 0],
+            cap,
+            Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            Dict(Power => 0.5),
+        )
+        snk_6 = PeriodDemandSink(
+            
+            "demand_product",
+            per_dur,
+            [fill(1500, 5)..., 0, 0],
+            cap,
+            Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
+            Dict(Power => 0.5),
+            ExtensionData[]
+        )
 
         for field ∈ fieldnames(PeriodDemandSink)
             if field ≠ :period_duration

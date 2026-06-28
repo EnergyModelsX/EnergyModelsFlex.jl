@@ -10,7 +10,12 @@ This node can, *e.g.*, be combined with [`MinUpDownTimeNode`](@ref), to allow pr
 
 !!! warning "TimeStructure for node"
     This node is designed for **uniform or repetitive duration of operational periods**.
-    Irregular durations may cause misalignment of shifted loads, especially if the field `period_length` does not align with the chosen [`SimpleTimes`](@extref TimeStruct.SimpleTimes) structure representing the operational periods.
+    Irregular durations may cause misalignment of shifted loads, especially if the field `period_duration` does not align with the chosen [`SimpleTimes`](@extref TimeStruct.SimpleTimes) structure representing the operational periods.
+
+!!! warning "`PeriodDemandSink` and `EnergyModelsGUI`"
+    Some of the fields of this node cannot be represented in `EnergyModelsGUI`.
+    The reason for that limitation is that `EnergyModelsGUI` does not yet support partitions of `TimePeriod`s.
+    `EnergyModelsGUI` can still be utilized for all other fields.
 
 ## [Introduced type and its fields](@id nodes-perioddemandsink-fields)
 
@@ -60,22 +65,23 @@ The standard fields are given as:
 [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)s require additional fields to specify both the periods and their respective demands:
 
 - **`period_duration::TimeProfile`**:\
-  Defines what the total duration of a single demand period.\
-  For instance, if the duration of 1 of the operation time structure is 1 hour and `period_duration = 24`, then each demand period spans one day.
+  Defines the total duration of a single demand period.\
+  For instance, if the duration of 1 of the operational time structure is 1 hour and `period_duration = FixedProfile(24)`, then each demand period spans one day.
   The demand of this node (for a given day, see below) must then be filled on a daily basis, without any restrictions on *when* during the day the demand must be filled given the available capacity.\
   Due to a constructor, it can either be specified as number (the same duration in all demand periods), as a vector (varying duration of each demand period), or as a time profile (*e.g.*, varying period durations due to varying operational time structures).
   It cannot be specified as `OperationalProfile`.
 
 - **`period_demand::TimeProfile`**:\
   The total demand to be met during each demand period.
-  The length of this vector should match the number of periods (*e.g.*, days) in the time structure.
-  If the time structure represents one year with hourly resolution and the demand periods correspond to a day, this vector must then have 365 elements.
+  The length of this time profile should match the number of periods (*e.g.*, days) in the time structure.
+  If the time structure represents one year with hourly resolution and the demand periods correspond to a day, this time profile must then have 365 elements.
 
-  It is best to utilize the [`PartitionProfile`]() type if the demand is varying.
+  It is best to utilize the [`PartitionProfile`](@extref TimeStruct.PartitionProfile) type if the demand is varying.
   If it is constant, you can also utilize [`StrategicProfile`][@extref TimeStruct.StrategicProfile], [`RepresentativeProfile`][@extref TimeStruct.RepresentativeProfile], or [`ScenarioProfile`][@extref TimeStruct.ScenarioProfile], depending on your chosen time structure.
+  It cannot be specified as `OperationalProfile`.
 
   !!! warning "Time consistency"
-      Ensure that the `period_demand` time profile length aligns with the operational time horizon duration divided by `period_length`
+      Ensure that the `period_demand` time profile length aligns with the operational time horizon duration divided by `period_duration`
       Mismatches can lead to indexing errors or inconsistent demand enforcement.
 
 These fields are at the 3ʳᵈ and 4ᵗʰ position below the field `cap` as shown in [`PeriodDemandSink`](@ref).

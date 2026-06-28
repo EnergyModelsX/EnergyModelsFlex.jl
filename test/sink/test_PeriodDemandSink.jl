@@ -88,8 +88,8 @@ end
 
     function check_per_dem_sink(;
         cap = FixedProfile(10),
-        per_len = 24,
-        per_demand = PartitionProfile([fill(1500, 5)..., 0, 0]),
+        per_dur = 24,
+        per_dem = PartitionProfile([fill(1500, 5)..., 0, 0]),
         penalty = Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
         input = Dict(Power => 1),
         𝒯 = TwoLevel(2, 1, SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))),
@@ -97,8 +97,8 @@ end
         snk = PeriodDemandSink(
             "demand_product",
             cap,
-            per_len,
-            per_demand,
+            per_dur,
+            per_dem,
             penalty,
             input,
         )
@@ -123,23 +123,23 @@ end
         @test_throws AssertionError check_per_dem_sink(; penalty)
     end
 
-    # Test that a wrong period length is caught by the checks, including in other time
+    # Test that a wrong period duration is caught by the checks, including in other time
     # structures
-    @test_throws AssertionError check_per_dem_sink(; per_len=25)
-    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]))
+    @test_throws AssertionError check_per_dem_sink(; per_dur=25)
+    @test_throws AssertionError check_per_dem_sink(; per_dur=StrategicProfile([25, 24]))
     week = SimpleTimes(repeat(vcat([2, 2, 2], ones(14), [4]), 7))
     opscen = OperationalScenarios(2, [week, week], [0.5, 0.5])
     𝒯 = TwoLevel(2, 1, opscen; op_per_strat=8760.)
-    @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
-    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]), 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_dur=25, 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_dur=StrategicProfile([25, 24]), 𝒯)
     rep = RepresentativePeriods(2, 8760., [.5, .5], [week, week])
     𝒯 = TwoLevel(2, 1, rep; op_per_strat=8760.)
-    @test_throws AssertionError check_per_dem_sink(; per_len=25, 𝒯)
-    @test_throws AssertionError check_per_dem_sink(; per_len=StrategicProfile([25, 24]), 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_dur=25, 𝒯)
+    @test_throws AssertionError check_per_dem_sink(; per_dur=StrategicProfile([25, 24]), 𝒯)
 
     # Test that a wrong period demand is caught by the checks
-    @test_throws AssertionError check_per_dem_sink(; per_demand=OperationalProfile([25]))
-    @test_throws AssertionError check_per_dem_sink(; per_demand=FixedProfile(-10))
+    @test_throws AssertionError check_per_dem_sink(; per_dem=OperationalProfile([25]))
+    @test_throws AssertionError check_per_dem_sink(; per_dem=FixedProfile(-10))
 
     # Set the global again to false
     EMB.TEST_ENV = false
@@ -148,13 +148,13 @@ end
 @testset "Utility functions" begin
     # Create the node and time structure
     cap = FixedProfile(10)
-    per_len = 24
-    per_demand = PartitionProfile([fill(1500, 5)..., 0, 0])
+    per_dur = 24
+    per_dem = PartitionProfile([fill(1500, 5)..., 0, 0])
     snk = PeriodDemandSink(
         "demand_product",
         cap,
-        per_len,
-        per_demand,
+        per_dur,
+        per_dem,
         Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
         Dict(Power => 0.5),
     )
@@ -166,8 +166,8 @@ end
         snk_2 = PeriodDemandSink(
             "demand_product",
             cap,
-            per_len,
-            per_demand,
+            per_dur,
+            per_dem,
             Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
             Dict(Power => 0.5),
             ExtensionData[]
@@ -175,8 +175,8 @@ end
         snk_3 = PeriodDemandSink(
             "demand_product",
             cap,
-            FixedProfile(per_len),
-            per_demand,
+            FixedProfile(per_dur),
+            per_dem,
             Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
             Dict(Power => 0.5),
         )
@@ -184,7 +184,7 @@ end
             "demand_product",
             cap,
             PartitionProfile(ones(7)*24),
-            per_demand,
+            per_dem,
             Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e4)),
             Dict(Power => 0.5),
         )
@@ -228,10 +228,10 @@ end
         @test node_data(snk) == ExtensionData[]
 
         # Test that all EMF extraction functions are working
-        @test EMF.period_demand(snk) == per_demand
-        @test EMF.periods(snk, 𝒯) == partition_duration(𝒯, per_len)
+        @test EMF.period_demand(snk) == per_dem
+        @test EMF.periods(snk, 𝒯) == partition_duration(𝒯, per_dur)
         @test all(
-            EMF.period_demand(snk, t_dp) == per_demand[t_dp] for t_dp ∈ EMF.periods(snk, 𝒯)
+            EMF.period_demand(snk, t_dp) == per_dem[t_dp] for t_dp ∈ EMF.periods(snk, 𝒯)
         )
     end
 

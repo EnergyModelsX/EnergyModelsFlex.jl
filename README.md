@@ -13,9 +13,9 @@
 > The different node types are partly experimental.
 > They have furthermore some limitations with respect to the chosen `TimeStructure` or whether they are able to handle investments.
 > As a consequence, it is advised to read the documentation for each node to identify their usefulness.
-> Is is planned to removesome nodes and rewrite the behaviour of other nodes to improve their flexibility.
+> Is is planned to remove some nodes and rewrite the behaviour of other nodes to improve their flexibility.
 >
-> Version 0.2.8 is based on [`EnergyModelsBase` v0.8](https://energymodelsx.github.io/EnergyModelsBase.jl/v0.8/) while version 0.2.9 is adding support for [`EnergyModelsBase` v0.9](https://energymodelsx.github.io/EnergyModelsBase.jl/v0.9/).
+> Among others, using `PeriodDemandSink` in combination with `EnergyModelsGUI` results in errors when trying to access field values with `PartitionProfile`.
 
 ## Usage
 
@@ -26,7 +26,7 @@ Please refer to the *[documentation](https://energymodelsx.github.io/EnergyModel
 
 ## Cite
 
-If you find `EnergyModelsFlex` useful in your work, we kindly request that you cite the following [publication](https://doi.org/10.69997/sct.119164):
+If you find `EnergyModelsFlex` useful in your work, we kindly request that you cite the following *[publication](https://doi.org/10.69997/sct.119164)*:
 
 ```bibtex
 @article{venas2025energymodelsflex,

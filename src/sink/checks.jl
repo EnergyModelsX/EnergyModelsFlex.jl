@@ -43,13 +43,13 @@ function EMB.check_node(
     )
     if :surplus ∈ keys(n.penalty)
         message = "are not allowed for the key `:surplus` in the dictionary `penalty`."
-        bool *= EMB.check_scenario_profile(surplus_penalty(n), message)
+        bool *= EMB.check_partition_profile(surplus_penalty(n), message)
     else
         bool = false
     end
     if :deficit ∈ keys(n.penalty)
         message = "are not allowed for the key `:deficit` in the dictionary `penalty`."
-        bool *= EMB.check_scenario_profile(deficit_penalty(n), message)
+        bool *= EMB.check_partition_profile(deficit_penalty(n), message)
     else
         bool = false
     end
@@ -62,7 +62,7 @@ function EMB.check_node(
     end
 
     message = "are not allowed for the field `:period_duration`."
-    bool = EMB.check_scenario_profile(period_duration(n), message)
+    bool = EMB.check_partition_profile(period_duration(n), message)
     if bool
         @assert_or_log(
             all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[t_pd] for t_pd ∈ 𝒯ᵖᵈ),
@@ -73,52 +73,11 @@ function EMB.check_node(
     end
 
     message = "are not allowed for the field `:period_demand`."
-    bool = EMB.check_scenario_profile(period_demand(n), message)
+    bool = EMB.check_partition_profile(period_demand(n), message)
     if bool
         @assert_or_log(
             all(period_demand(n, t_pd) ≥ 0 for t_pd ∈ 𝒯ᵖᵈ),
             "The period demand must be non-negative."
-        )
-    end
-end
-
-
-"""
-    check_period_ts(ts::RepresentativePeriods, n::PeriodDemandSink, msg::String)
-    check_period_ts(ts::OperationalScenarios, n::PeriodDemandSink, msg::String)
-    check_period_ts(ts::SimpleTimes, n::PeriodDemandSink, msg::String)
-
-Function for checking that the timestructure is valid in combination with the chosen period
-structure in a [`PeriodDemandSink`](@ref).
-"""
-function check_period_ts(ts::RepresentativePeriods, n::PeriodDemandSink, msg::String)
-    for (idx, ts_oper) ∈ enumerate(ts.rep_periods)
-        sub_msg = msg * " in representative period $(idx)"
-        check_period_ts(ts_oper, n, sub_msg)
-    end
-end
-function check_period_ts(ts::OperationalScenarios, n::PeriodDemandSink, msg::String)
-    for (idx, ts_oper) ∈ enumerate(ts.scenarios)
-        sub_msg = msg * " in operational scenario $(idx)"
-        check_period_ts(ts_oper, n, sub_msg)
-    end
-end
-function check_period_ts(ts::SimpleTimes, n::PeriodDemandSink, msg::String)
-    len = period_length(n)
-    n_per = number_of_periods(n)
-    @assert_or_log(
-        length(ts)%len == 0,
-        "The specified period length does not work with $(msg)."
-    )
-    @assert_or_log(
-        length(ts)/len ≤ n_per,
-        "The vector `period_demand` is shorter than the $(msg)."
-    )
-    if length(ts)%len == 0 & length(ts)/len < n_per
-        @warn(
-            "The vector `period_demand` is longer than required in $(msg). " *
-            "The last $(Int(n_per-length(ts)/len)) values will be omitted.",
-            maxlog=1,
         )
     end
 end

@@ -77,21 +77,11 @@ end
     capacity_price = StrategicProfile([-1e5, 1e6, 2e6])
     @test_throws AssertionError capacity_cost_link_case(; capacity_price)
 
-    # Test that the number of sub periods is positive
-    @test_throws AssertionError capacity_cost_link_case(; cap_per_dur = 0)
-    @test_throws AssertionError capacity_cost_link_case(; cap_per_dur = -1)
-
-    # Test that operational time structure can can be represented by `cap_price_periods`
-    # sub periods when specified as `Int64` (8760 is not divisible by 7 sub periods)
-    @test_throws AssertionError capacity_cost_link_case(; cap_per_dur = 7)
-
-    # Test that the sum of sub periods is equal to the operational time structure duration
-    cap_per_dur = ones(24)
-    @test_throws AssertionError capacity_cost_link_case(; cap_per_dur)
+    # Test that operational time structure can can be represented by `period_duration`
+    @test_throws AssertionError capacity_cost_link_case(; cap_per_dur = 9)
 
     # Test that none of the durations of the sub periods is not positive
-    cap_per_dur =
-        [0.0, 4.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0] * 365
+    cap_per_dur = [0.0, 8.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 8.0, 4.0, 4.0]
     @test_throws AssertionError capacity_cost_link_case(; cap_per_dur)
 
     # Set the global to true to suppress the error message

@@ -15,7 +15,8 @@
 > As a consequence, it is advised to read the documentation for each node to identify their usefulness.
 > Is is planned to remove some nodes and rewrite the behaviour of other nodes to improve their flexibility.
 >
-> Among others, using `PeriodDemandSink` in combination with `EnergyModelsGUI` results in errors when trying to access field values with `PartitionProfile`.
+> Among others, using `PeriodDemandSink` and `CapacityCostLink` in combination with `EnergyModelsGUI` results in errors when trying to access fields that have as values `PartitionProfile`.
+> The same holds for variables that are defined over `PeriodPartition`s where you cannot see the results.
 
 ## Usage
 

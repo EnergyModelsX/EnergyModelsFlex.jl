@@ -10,29 +10,30 @@ Pages = ["methods-fields.md"]
 ## [`PeriodDemandSink` types](@id lib-int-met_field-PeriodDemandSink)
 
 ```@docs
-EnergyModelsFlex.period_demand
-EnergyModelsFlex.period_duration
-EnergyModelsFlex.periods
-EnergyModelsFlex.number_of_periods
+EMF.period_demand
+EMF.period_duration(n::EMF.AbstractPeriodDemandSink)
+EMF.periods(n::EMF.AbstractPeriodDemandSink, ts::TS.TimeStructure)
+EMF.number_of_periods
 ```
 
 ## [`ActivationCostNode` types](@id lib-int-met_field-ActivationCostNode)
 
 ```@docs
-EnergyModelsFlex.activation_consumption
+EMF.activation_consumption
 ```
 
 ## [`CapacityCostLink` types](@id lib-int-met_field-CapacityCostLink)
 
 ```@docs
-EnergyModelsFlex.cap_price_periods
-EnergyModelsFlex.cap_resource
-EnergyModelsFlex.cap_price
+EMF.cap_price
+EMF.period_duration(l::CapacityCostLink)
+EMF.periods(l::CapacityCostLink, ts::TS.TimeStructure)
+EMF.cap_resource
 ```
 
 ## [`Combustion` types](@id lib-int-met_field-Combustion)
 
 ```@docs
-EnergyModelsFlex.limits
-EnergyModelsFlex.heat_resource
+EMF.limits
+EMF.heat_resource
 ```

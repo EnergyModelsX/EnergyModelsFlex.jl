@@ -6,14 +6,47 @@ This is useful for applications such as transmission networks, pipelines, or int
 
 In addition, they only allow the transport of a single, specified [`Resource`](@extref EnergyModelsBase.Resource).
 
+!!! warning "`CapacityCostLink` and `EnergyModelsGUI`"
+    Some of the fields of this link cannot be represented in `EnergyModelsGUI`.
+    The reason for that limitation is that `EnergyModelsGUI` does not yet support partitions of `TimePeriod`s.
+    `EnergyModelsGUI` can still be utilized for all other fields.
+
+!!! warning "Changed behavior between 0.3 and 0.4"
+    The meaning of the field `cap_period_duration` was changed when moving from 0.3 to 0.4:
+
+    1. When specifying a number, the previous meaning of the number of operational periods was changed to the sum of the durations of the operational periods.
+       The reason for this change is to make the link behavior less dependent on the operational resolution.
+       The following change is hence required if you have operational durations differing from 1:
+
+       ```julia
+       # time structure
+       ts = SimpleTimes(10, 2)
+
+       # old behavior, corresponding to 2 periods
+       cap_period_duration = 2
+
+       # new behavior, corresponding to periods whocse duration sums to at least 4
+       cap_period_duration = 4
+       ```
+
+    2. When specifying a vector, the previous scaling based on the chosen value of `op_per_strat` was removed as it is in our opinion more straightforward to base it on the actual operational time structure.
+       The following change is hence required:
+
+       ```julia
+       # time structure
+       ts = Twolevel(2, 1, SimpleTimes(10, 2); op_per_strat=8760.0)
+
+       # old behavior, corresponding to 5 periods a 1752 duration based on `op_per_strat`
+       cap_period_duration = [1752, 1752, 1752, 1752, 1752]
+
+       # new behavior, corresponding to 5 periods a 4 duration based on `SimpleTimes`
+       cap_period_duration = [4, 4, 4, 4, 4]
+       ```
+
 ## [Introduced type and its fields](@id links-CapacityCostLink-fields)
 
 [`CapacityCostLink`](@ref) is implemented as equivalent to an abstract type [`Link`](@extref EnergyModelsBase.Link).
 Hence, it utilizes the same functions declared in `EnergyModelsBase`.
-
-!!! warning "Application of the link"
-    The current implementation is not very flexible with respect to the chosen time structure.
-    Specifically, if you use [`OperationalScenarios`](@extref TimeStruct.OperationalScenarios), [`RepresentativePeriods`](@extref TimeStruct.RepresentativePeriods), or differing operational structures within your [`TwoLevel`](@extref TimeStruct.TwoLevel), you must be careful when choosing the parameter `cap_price_periods`.
 
 ### [Standard fields](@id links-CapacityCostLink-fields-stand)
 
@@ -50,19 +83,33 @@ The following additional fields are included for [`CapacityCostLink`](@ref) link
       Capacity costs are calculated per sub-period and then summed over the strategic period.
       This means a constant value (*e.g.,* €/GW/year) is effectively applied once for each sub-period (based on the peak within that sub-period), and is not automatically scaled by sub-period duration.
 
-      Example: With `cap_price = 100 €/GW/year`, `cap_price_periods = 12`, and a peak usage of 1 GW in each month, the model computes a total cost of 12 × 100 = 1200 €/year.
+      **Example:**
+
+      ```julia
+      # Modelling a full year with hourly resolution
+      ts = TwoLevel(1, 1, SimpleTimes(8760, 1); op_per_strat=8760.0)
+
+       # 12 price periods corresponding to months
+      cap_price_periods = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] .* 24
+
+      cap_price = 100 # €/GW/year
+      ```
+
+      If the peak usage is 1 GW in each month, the model computes a total cost of 12 × 100 = 1200 €/year.
 
       To achieve seasonal/monthly peak charges, define multiple `cap_price_periods` and provide `cap_price` values that represent the intended charge per sub-period (or scale the values accordingly).
 
       It is planned to change this behavior in the future.
       The change corresponds to a breaking change as we change the behavior of the model.
-- **`cap_price_periods::Union{Int64, Vector{<:Number}}`** :\
-  The number of sub-periods within a year for which the capacity cost is calculated (if specifying an `Int64`) or the duration of the individual sub periods (if specifying a `Vector{<:Number}`).
-  This allows modeling of varying peak demands across seasons.
-  The value must be positive if your are using an `Int64` (and hence specifiy the number of periods) or all values of be positive and summing up to the specified scaling factor between operational and strategic period durations (the parameter `op_per_strat`) if you are using a `Vector{<:Number}`.
+- **`cap_period_duration::TimeProfile`** :\
+  Defines the total duration of a capacity price period.\
+  For instance, if the duration of 1 of the operational time structure is 1 hour and `period_duration = FixedProfile(24)`, then each capacity price period spans one day.
+  The capacity price of this node (for a given day, see below) is the given by the maximum capacity usage within a day.\
+  Due to a constructor, it can either be specified as number (the same duration in all capacity price periods), as a vector (varying duration of each capacity price period), or as a time profile (*e.g.*, varying period durations due to varying operational time structures).
+  It cannot be specified as `OperationalProfile` and must be positive for each individual value.
 
-  !!! tip "Number of sub-periods"
-      For investment periods with many operational periods, consider increasing the number of `cap_price_periods`.
+  !!! tip "Duration of capacity price periods"
+      For investment periods with many operational periods, consider decreasing `cap_period_duration`.
       The [`CapacityCostLink`](@ref) capacity constraints couple operational periods and can significantly increase solve time.
       Splitting the horizon into multiple sub-periods reduces this coupling and often makes the problem much easier to solve.
       In some cases, this also means using more than one capacity price period even if capacity costs occur only annually in reality, depending on model size and complexity.
@@ -103,8 +150,8 @@ with parantheses.
 
 Two additional variables track capacity utilization and associated costs over sub-periods:
 
-- ``\texttt{ccl\_cap\_use\_max}[l, t_{sub}]``: Maximum capacity usage in sub-period ``t_{sub}`` for link ``l``.
-- ``\texttt{ccl\_cap\_use\_cost}[l, t_{sub}]``: Operational cost in sub-period ``t_{sub}`` for link ``l``.
+- ``\texttt{ccl\_cap\_use\_max}[l, t_{pd}]``: Maximum capacity usage in sub-period ``t_{pd}`` for link ``l``.
+- ``\texttt{ccl\_cap\_use\_cost}[l, t_{pd}]``: Operational cost in sub-period ``t_{pd}`` for link ``l``.
 
 ### [Constraints](@id links-CapacityCostLink-math-con)
 
@@ -126,28 +173,28 @@ and the no-loss constraint
 
 All additional constraints are created within a new method for the function [`create_link`](@extref EnergyModelsBase.create_link).
 
-The capacity utilization constraint tracks the maximum usage within each sub-period:
+The capacity utilization constraint tracks the maximum usage within each sub-period ``t_{sub}``:
 
 ```math
-\texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{ccl\_cap\_use\_max}[l, t_{sub}]
+\texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{ccl\_cap\_use\_max}[l, t_{pd}]
 ```
 
 The capacity cost is calculated as:
 
 ```math
-\texttt{ccl\_cap\_use\_cost}[l, t_{sub}] = \texttt{ccl\_cap\_use\_max}[l, t_{sub}] \times \overline{cap\_price}(l, t_{sub})
+\texttt{ccl\_cap\_use\_cost}[l, t_{pd}] = \texttt{ccl\_cap\_use\_max}[l, t_{pd}] \times \overline{cap\_price}(l, t_{pd})
 ```
 
 where ``\overline{cap\_price}`` is the average capacity price over the sub-period calculated as:
 
 ```math
-\overline{cap\_price}(l, t_{sub}) = \frac{\sum_{t \in t_{sub}} cap\_price(l, t) \times duration(t)}{\sum_{t \in t_{sub}} duration(t)}
+\overline{cap\_price}(l, t_{pd}) = \frac{\sum_{t \in t_{pd}} cap\_price(l, t) \times duration(t)}{\sum_{t \in t_{pd}} duration(t)}
 ```
 
 Finally, costs are aggregated to each strategic period:
 
 ```math
-\texttt{link\_opex\_var}[l, t_{inv}] = \sum_{t_{sub} \in t_{inv}} \texttt{ccl\_cap\_use\_cost}[l, t_{sub}]
+\texttt{link\_opex\_var}[l, t_{inv}] = \sum_{t_{pd} \in t_{inv}} \texttt{ccl\_cap\_use\_cost}[l, t_{pd}]
 ```
 
 In addition, the energy flow of the constrained resource should not exceed the maximum capacity, which is included through the following constraint:

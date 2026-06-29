@@ -1,18 +1,16 @@
-const ATOL = 1e-7
-
 """
     a ≲ b
 
-Approximate ≤ comparison with absolute tolerance `ATOL`.
+Approximate ≤ comparison with absolute tolerance `TEST_ATOL`.
 """
-≲(a::Real, b::Real) = a <= b + ATOL
+≲(a::Real, b::Real) = a ≤ b + TEST_ATOL
 
 """
     a ≳ b
 
-Approximate ≥ comparison with absolute tolerance `ATOL`.
+Approximate ≥ comparison with absolute tolerance `TEST_ATOL`.
 """
-≳(a::Real, b::Real) = a + ATOL >= b
+≳(a::Real, b::Real) = a + TEST_ATOL ≥ b
 
 function get_values(m, variable, node, iterable)
     return [JuMP.value(m[variable][node, t]) for t ∈ iterable]

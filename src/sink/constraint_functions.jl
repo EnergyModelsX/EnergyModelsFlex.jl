@@ -13,42 +13,28 @@ function EMB.constraints_capacity(
     𝒯::TimeStructure,
     modeltype::EnergyModel,
 )
+    # Declaration of the required subsets.
+    𝒯ᵖᵈ = periods(n, 𝒯)
+
     @constraint(
         m,
         [t ∈ 𝒯],
-        m[:cap_use][n, t] + m[:sink_deficit][n, t] ==
-        m[:cap_inst][n, t] + m[:sink_surplus][n, t]
+        m[:cap_use][n, t] + m[:sink_deficit][n, t] == m[:cap_inst][n, t]
     )
 
-    # Need to constraint the used capacity to the installed capacity per
-    # operational period. Instead, the node may get input in operational periods
-    # when the cap field is 0. This is ok for regular sink nodes, but this node
-    # only penalizes surplus or deficit over a period.
-    @constraint(
-        m,
-        [t ∈ 𝒯],
-        m[:cap_use][n, t] <= m[:cap_inst][n, t]
-    )
-
-    # Create a list mapping the demand period i to the operational periods it contains.
-    num_periods = number_of_periods(n, 𝒯)
-    period2op = [[] for i ∈ 1:num_periods]
+    # Fix the surplus to 0
     for t ∈ 𝒯
-        period_id = period_index(n, t)
-        push!(period2op[period_id], t)
+        fix(m[:sink_surplus][n, t], 0; force = true)
     end
 
-    for i ∈ 1:num_periods
-        # Sum all values inside period i.
-        period_total = sum(m[:cap_use][n, t] for t ∈ period2op[i])
-        # Define the demand_sink_deficit as the difference between the period demand and
-        # the total capacity used.
-        @constraint(
-            m,
-            period_total + m[:demand_sink_deficit][n, i] ==
-            period_demand(n, i) + m[:demand_sink_surplus][n, i]
-        )
-    end
+    # Set the energy balance for the partition duration
+    @constraint(
+        m,
+        [t_pd ∈ 𝒯ᵖᵈ],
+        m[:demand_sink_deficit][n, t_pd] +
+        sum(m[:cap_use][n, t] * duration(t) for t ∈ t_pd) ==
+            m[:demand_sink_surplus][n, t_pd] + period_demand(n, t_pd)
+    )
 
     EMB.constraints_capacity_installed(m, n, 𝒯, modeltype)
 end
@@ -58,8 +44,9 @@ end
 
 Function for creating the constraint on the variable OPEX of an [`AbstractPeriodDemandSink`](@ref).
 
-The method is adjusted from the default method through utilizing the period demand surplus
-and deficit instead of the operational period deficit or surplus.
+The method is changed from the standard approach through calculating both the demand period
+surplus and deficit in addition to the operational period deficit. The operational period
+surplus is fixed to 0 to avoid problems in the calculations.
 """
 function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the
@@ -68,10 +55,11 @@ function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ,
         m,
         [t_inv ∈ 𝒯ᴵⁿᵛ],
         m[:opex_var][n, t_inv] == sum(
-            (
-                m[:demand_sink_surplus][n, period_index(n, t)] * surplus_penalty(n, t) +
-                m[:demand_sink_deficit][n, period_index(n, t)] * deficit_penalty(n, t)
-            ) * scale_op_sp(t_inv, t) for t ∈ t_inv
+                (
+                    m[:demand_sink_surplus][n, t_pd] * surplus_penalty(n, t_pd) +
+                    m[:demand_sink_deficit][n, t_pd] * deficit_penalty(n, t_pd)
+                ) * scale_op_sp(t_inv, first(t_pd)) / duration(first(t_pd))
+            for t_pd ∈ periods(n, t_inv)
         )
     )
 end

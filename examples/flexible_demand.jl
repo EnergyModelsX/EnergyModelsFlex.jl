@@ -28,7 +28,7 @@ CO2 = ResourceEmit("CO2", 0)
 # This would be a huge incentive to produce during the weekend, if we allowed the
 # `PeriodDemandSink` capacity during the weekend.
 day = [1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2]
-el_cost = [repeat(day, 5)..., fill(0, 2 * 24)...]
+el_cost = vcat(repeat(day, 5), zeros(48))
 
 grid = RefSource(
     "grid",
@@ -41,16 +41,16 @@ grid = RefSource(
 # The production can only run between 6-20 on weekdays, with a capacity of 300 kW.
 # First, define the maximum capacity for a regular weekday (24 hours).
 # The capacity is 0 between 0 am and 6 am, 300 kW between 6 am and 8 pm, and 0 again between 8 pm and midnight.
-weekday_prod = [fill(0, 6)..., fill(300, 14)..., fill(0, 4)...]
-@assert length(weekday_prod) == 24
+weekday_prod = vcat(zeros(6), fill(300, 14), zeros(4))
+
 # Repeat a weekday 5 times, for a workweek, then no production on the weekends.
-week_prod = [repeat(weekday_prod, 5)..., fill(0, 2 * 24)...]
+week_prod = vcat(repeat(weekday_prod, 5), fill(0, 2 * 24))
 
 demand = PeriodDemandSink(
     "demand_product",
-    24, # 24 hours per day.
-    [fill(1500, 5)..., 0, 0], # Demand of 1500 units per day, and nothing (0) in the weekend.
     OperationalProfile(week_prod), # kW - installed capacity
+    24, # 24 hours per day.
+    PartitionProfile(vcat(ones(5)*1500, [0, 0])), # Demand of 1500 units per day, and nothing (0) in the weekend.
     Dict(:surplus => FixedProfile(0), :deficit => FixedProfile(1e8)), # € / Demand - Price for not delivering products
     Dict(Product => 1),
 )

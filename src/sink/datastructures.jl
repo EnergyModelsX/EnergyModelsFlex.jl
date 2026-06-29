@@ -26,77 +26,100 @@ abstract type AbstractMultipleInputSinkStrat <: AbstractMultipleInputSink end
 
 A `PeriodDemandSink` is a [`Sink`](@extref EnergyModelsBase.Sink) that has a demand that can
 be satisfied any time during a period of defined length. If the chosen time structure has
-operational periods of  a duration of 1 hour and the  demand should be fulfilled daily,
-`period_length` should be 24. The demand for each day is then set as an array as the
+operational periods of a duration of 1 hour and the  demand should be fulfilled daily,
+`period_duration` should be 24. The demand for each day is then set as a time profile in the
 `period_demand` field. The `cap` field is the maximum capacity that can be fulfilled in
 each operational period.
 
 # Fields
 - **`id::Any`** is the name/identifier of the node.
-- **`period_length::Int`** is the number of periods in which the period demand can be
-  satisfied.
-- **`period_demand::Array{<:Real}`** is the demand within each of the periods.
 - **`cap::TimeProfile`** is the installed capacity.
+- **`period_duration::TimeProfile`** is the sum of the durations of the individual
+  operational periods within a given demand period. Due to a constructor, it can either be
+  specified as number (the same duration in all demand periods), as a vector (varying
+  duration of each demand period), or as a time profile (*e.g.*, varying period durations
+  due to varying operational time structures). It cannot be specified as `OperationalProfile`.
+- **`period_demand::TimeProfile`** is the demand within each of the periods as time profile.
+  It cannot be specified as `OperationalProfile`.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
-  dictionary requires the  fields `:surplus` and `:deficit`.
+  dictionary requires the fields `:surplus` and `:deficit`.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
-  is conditional through usage of a constructor.
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
+  field `data` is conditional through usage of a constructor.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
     id::Any
-    period_length::Int
-    period_demand::Array{<:Real}
     cap::TimeProfile
+    period_duration::TimeProfile
+    period_demand::TimeProfile
     penalty::Dict{Symbol,<:TimeProfile}
     input::Dict{<:Resource,<:Real}
     data::Vector{<:ExtensionData}
 end
 function PeriodDemandSink(
     id,
-    period_length::Int,
-    period_demand::Vector{<:Real},
     cap::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}},
+    period_demand::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+    data::Vector{<:ExtensionData},
+)
+    if isa(period_duration, Number)
+        per_dur = FixedProfile(period_duration)
+    elseif isa(period_duration, Vector{<:Number})
+        per_dur = PartitionProfile(period_duration)
+    end
+    return PeriodDemandSink(id, cap, per_dur, period_demand, penalty, input, data)
+end
+function PeriodDemandSink(
+    id,
+    cap::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}, TimeProfile},
+    period_demand::TimeProfile,
     penalty::Dict{Symbol,<:TimeProfile},
     input::Dict{<:Resource,<:Real},
 )
-    PeriodDemandSink(id, period_length, period_demand, cap, penalty, input, ExtensionData[])
+    return PeriodDemandSink(id, cap, period_duration, period_demand, penalty, input, ExtensionData[])
 end
 
 """
     period_demand(n::AbstractPeriodDemandSink)
-    period_demand(n::AbstractPeriodDemandSink, i::Int)
+    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition)
 
-Returns the period demand of `AbstractPeriodDemandSink` `n` as Array or in demand period `i`.
+Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
+demand period `t_pd`.
 """
 period_demand(n::AbstractPeriodDemandSink) = n.period_demand
-period_demand(n::AbstractPeriodDemandSink, i) = n.period_demand[i]
+period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
+    n.period_demand[t_pd]
 
 """
-    period_length(n::AbstractPeriodDemandSink)
+    period_duration(n::AbstractPeriodDemandSink)
 
-Returns the length of the demand period of `AbstractPeriodDemandSink` `n`.
+Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or in demand
+period `t_pd`.
 """
-period_length(n::AbstractPeriodDemandSink) = n.period_length
-
-"""
-    number_of_periods(n::AbstractPeriodDemandSink)
-    number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure)
-
-Returns the number of periods for a `PeriodDemandSink` `n`. If a `TimeStructure` is provided
-it calculates it based on the chosen time structure.
-"""
-number_of_periods(n::AbstractPeriodDemandSink) = length(period_demand(n))
-number_of_periods(n::AbstractPeriodDemandSink, 𝒯::TimeStructure) =
-    Int(length(𝒯) / period_length(n))
+period_duration(n::AbstractPeriodDemandSink) = n.period_duration
+period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
+    n.period_duration[t_pd]
 
 """
-    period_index(n::AbstractPeriodDemandSink, t)
+    periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure)
 
-Returns the index of the period (*e.g.*, day) that a operational period `t` belongs to.
+Returns the demand periods for a `PeriodDemandSink` `n` for the given time structure.
 """
-period_index(n::AbstractPeriodDemandSink, t) = Int(ceil(t.period.op / period_length(n)))
+periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure) =
+    partition_duration(ts, period_duration(n))
+
+"""
+    number_of_periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure)
+
+Returns the number of demand periods for a `PeriodDemandSink` `n` for the given time structure.
+"""
+number_of_periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure) =
+    length(periods(n, ts))
 
 """
     struct MultipleInputSink <: AbstractMultipleInputSink

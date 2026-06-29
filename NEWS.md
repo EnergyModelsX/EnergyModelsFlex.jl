@@ -1,5 +1,14 @@
 # Release notes
 
+## Unversioned
+
+### Breaking changes
+
+#### Rework of `PeriodDemandSink`
+
+* Rewrote `PeriodDemandSink` with `PeriodPartition` (introduced in `TimeStruct` 0.9.12) to increase flexibility of node with respect to the time structure.
+* Rewriting changed input arguments as well as behavior of the node.
+
 ## Version 0.3.0 (2026-04-16)
 
 ### Breaking changes
@@ -9,7 +18,7 @@
   * Early retirement changes the model behavior.
   * Model worked without adjustments except for compatibility updates.
   * Breaking change still included to maintain the possibility to do bug fixes in version 0.1.x for existing models with `EnergyModelsBase` v0.9.x.
-  * UpdMoved from `Data` to `ExtensionData` in fields and tests.
+  * Moved from `Data` to `ExtensionData` in fields and tests.
 * Improved `MinUpDownTimeNode`:
   * Rewrote the function `constraints_capacity` based on core functionality.
   * Updated the test set to identify all potential problems with the node.

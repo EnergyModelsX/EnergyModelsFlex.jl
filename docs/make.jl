@@ -74,8 +74,10 @@ makedocs(
         "Links" => Any[
             "CapacityCostLink"=>"links/capacitycostlink.md",
         ],
-        "How-to" =>
-            Any["Contribute"=>"how-to/contribute.md"],
+        "How-to" => Any[
+            "Contribute"=>"how-to/contribute.md",
+            "Update models"=>"how-to/update-models.md",
+        ],
         "Library" => Any[
             "Public"=>"library/public.md",
             "Internals"=>String[

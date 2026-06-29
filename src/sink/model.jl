@@ -1,11 +1,12 @@
 """
     EMB.variables_element(m, 𝒩ˢⁱⁿᵏ::Vector{<:AbstractPeriodDemandSink}, 𝒯, ::EnergyModel)
 
-Creates the following additional variables for **ALL** [`PeriodDemandSink`](@ref) nodes:
-- `demand_sink_surplus[n, i]` is a non-negative variable indicating a surplus in demand in
-  each period `i`.
-- `demand_sink_deficit[n, i]` is a non-negative variable indicating a deficit in demand for
-  each period `i`.
+Creates the following additional variables for **ALL** [`AbstractPeriodDemandSink`](@ref)
+nodes:
+- `demand_sink_surplus[n, t_pd]` is a non-negative variable indicating a surplus in demand in
+  each demand period `t_pd`.
+- `demand_sink_deficit[n, t_pd]` is a non-negative variable indicating a deficit in demand for
+  each demand period `t_pd`.
 
 !!! note "Definition of period"
     The period in the description above does not correspond to an operational period as known
@@ -18,9 +19,10 @@ function EMB.variables_element(
     𝒯,
     ::EnergyModel,
 )
-    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
-    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, i=1:number_of_periods(n, 𝒯)] ≥ 0)
+    @variable(m, demand_sink_surplus[n ∈ 𝒩ˢⁱⁿᵏ, periods(n, 𝒯)] ≥ 0)
+    @variable(m, demand_sink_deficit[n ∈ 𝒩ˢⁱⁿᵏ, periods(n, 𝒯)] ≥ 0)
 end
+
 
 """
     EMB.variables_element(m, 𝒩::Vector{<:AbstractMultipleInputSinkStrat}, 𝒯, ::EnergyModel)

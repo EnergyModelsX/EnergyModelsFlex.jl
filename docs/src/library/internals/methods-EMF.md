@@ -9,7 +9,6 @@ Pages = ["methods-EMF.md"]
 ## [Check methods](@id lib-int-met-check)
 
 ```@docs
-EMF.check_period_ts
 EMF.check_limits_default
 EMF.check_input
 EMF.check_cap_price_periods

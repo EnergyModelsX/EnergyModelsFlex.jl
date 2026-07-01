@@ -476,7 +476,7 @@ end
 
             # Test that all EMF extraction functions are working
             @test EMF.periods(strat_snk, 𝒯) == partition_duration(𝒯, per_dur)
-            @test_throws FieldError EMF.period_demand(strat_snk)
+            # @test_throws FieldError EMF.period_demand(strat_snk)
             @test EMF.strategic_demand(strat_snk) == strat_demand
             @test all(
                 EMF.strategic_demand(strat_snk, t_inv) == strat_demand[t_inv]

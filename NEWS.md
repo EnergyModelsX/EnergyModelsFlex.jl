@@ -6,8 +6,13 @@
 
 #### Rework of `PeriodDemandSink`
 
-* Rewrote `PeriodDemandSink` with `PeriodPartition` (introduced in `TimeStruct` 0.9.12) to increase flexibility of node with respect to the time structure.
+* Rewrote `PeriodDemandSink` with `PeriodPartition` (introduced in *[`TimeStruct` 0.9.12](https://github.com/sintefore/TimeStruct.jl/releases/tag/v0.9.12)*) to increase flexibility of the node with respect to the time structure.
 * Rewriting changed input arguments as well as behavior of the node.
+
+#### Rework of `CapacityCostLink`
+
+* Rewrote `CapacityCostLink` with `PeriodPartition` (introduced in *[`TimeStruct` 0.9.12](https://github.com/sintefore/TimeStruct.jl/releases/tag/v0.9.12)*) to increase flexibility of the link with respect to the time structure.
+* Rewriting requires adjustment of the parameters due to changed meaning of some of the values.
 
 ## Version 0.3.0 (2026-04-16)
 

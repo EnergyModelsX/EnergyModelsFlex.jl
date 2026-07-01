@@ -7,6 +7,7 @@ using Literate
 
 const EMB = EnergyModelsBase
 const EMF = EnergyModelsFlex
+const TS = TimeStruct
 
 DocMeta.setdocmeta!(
     EnergyModelsFlex,

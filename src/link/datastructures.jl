@@ -22,11 +22,10 @@ within specified price periods. All other resources have no costs associated wit
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
   field `data` is conditional through usage of a constructor.
 
-!!! note "Sub periods"
-    You can specify either the total number of sub periods within a `CapacityCostLink` as
-    `Int64` or the durations of each sub period if using a `Vector{<:Number}`. The latter
-    requires you to be careful when considering the durations of the individual sub periods
-    and the total duration of sub periods within the operational time structure.
+!!! note "Changed behavior"
+    The field `cap_price_periods` was replaced with the field `cap_period_duration` with a
+    change in meaning. This is explained in the
+    *[documentation](https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/03/CapacityCostLink)*.
 """
 struct CapacityCostLink <: EMB.Link
     id::Any

@@ -47,6 +47,11 @@ each operational period.
   with conversion value `Real`.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
   field `data` is conditional through usage of a constructor.
+
+!!! note "Changed behavior"
+    The field `period_length` was replaced with the field `period_duration` with a
+    change in meaning. In addition, the position was changed. This is explained in the
+    *[documentation](https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/03/PeriodDemandSink)*.
 """
 struct PeriodDemandSink <: AbstractPeriodDemandSink
     id::Any

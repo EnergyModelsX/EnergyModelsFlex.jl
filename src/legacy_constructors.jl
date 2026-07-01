@@ -18,7 +18,7 @@ function PeriodDemandSink(
         "3ʳᵈ position, and can accept as well a `Vector` or `TimeProfile`s as input, and\n" *
         " 3. `period_demand` is moved to the 4ᵗʰ position and requires as input a " *
         "`PartitionProfile` of the previously provided `Vector`.\n" *
-        "See the documentation (https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/#Adjustments-from-0.3.0) " *
+        "See the documentation (https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/03/PeriodDemandSink) " *
         "on how to update your model to the latest version.",
         maxlog = 1
     )

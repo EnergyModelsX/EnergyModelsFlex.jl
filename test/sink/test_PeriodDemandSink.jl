@@ -177,7 +177,7 @@ end
     # - EMB.check_node(n::StratPeriodDemandSink, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
     @testset "Check - StratPeriodDemandSink" begin
         function check_per_dem_sink(;
-            cap = FixedProfile(10),
+            cap = FixedProfile(1500),
             strat_demand = FixedProfile(1500*5/168),
             per_dur = 24,
             per_min = PartitionProfile([10, 10, 10, 10, 0, 0]./100),
@@ -206,6 +206,13 @@ end
         # Test that a wrong strategic demand is caught by the checks
         @test_throws AssertionError check_per_dem_sink(; strat_demand=FixedProfile(-25))
         @test_throws AssertionError check_per_dem_sink(; strat_demand=OperationalProfile([1]))
+
+        # Test that a warning is thrown if the operational capacity is to small to satisfy
+        # the strategic period demand
+        msg = "The scaled summation of the capacity in each operational period is smaller " *
+            "than the strategic demand in at least one strategic period. As a consequence, " *
+            "a deficit for `demand_sink_strat_deficit` is guaranteed."
+        @test_logs (:warn, msg) check_per_dem_sink(; cap=FixedProfile(0.1))
 
         # Test that a wrong input is caught by the checks
         @test_throws AssertionError check_per_dem_sink(; input = Dict(Power => -1))

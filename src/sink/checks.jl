@@ -91,12 +91,14 @@ This method checks that a [`StratPeriodDemandSink`](@ref) node is valid.
 - The sum of the values `:deficit` and `:surplus` in the dictionary `penalty` has to be
   non-negative to avoid an infeasible model.
 - The strategic demand must be positive and indexable by a strategic period.
+- The maximum capacity per operational period must be sufficient to satisfy the annual demand
+  A warning is printed if this is not the case.
 - The individual periods must all satisfy the specified duration(s).
 - The field `period_min` is required to be in the range [0, 1], indexable by a
-  `PeriodPartition`, and the sum within a strategic period must be smaller than 1
+  `PeriodPartition`. Te sum within a strategic period should be smaller than or equal to 1
   (only a warning is thrown, as the model is still solvable).
 - The field `period_max` is required to be in the range [0, 1] and indexable by a
-  `PeriodPartition`, and the sum within a strategic period must be larger than 1
+  `PeriodPartition`. The sum within a strategic period should be larger than or equal to 1
   (only a warning is thrown, as the model is still solvable).
 """
 function EMB.check_node(
@@ -110,10 +112,8 @@ function EMB.check_node(
     per_dur = period_duration(n)
     bool = true
 
-    @assert_or_log(
-        all(capacity(n, t) ≥ 0 for t ∈ 𝒯),
-        "The capacity must be non-negative."
-    )
+    bool_cap = all(capacity(n, t) ≥ 0 for t ∈ 𝒯)
+    @assert_or_log(bool_cap, "The capacity must be non-negative.")
     @assert_or_log(
         all(inputs(n, p) ≥ 0 for p ∈ inputs(n)),
         "The values for the Dictionary `input` must be non-negative."
@@ -145,10 +145,20 @@ function EMB.check_node(
     message = "are not allowed for the field `:strat_demand`."
     bool = EMB.check_strategic_profile(strategic_demand(n), message)
     if bool
-        @assert_or_log(
-            all(strategic_demand(n, t_inv) ≥ 0 for t_inv ∈ 𝒯ᴵⁿᵛ),
-            "The strategic demand must be non-negative."
-        )
+        bool_strat = all(strategic_demand(n, t_inv) ≥ 0 for t_inv ∈ 𝒯ᴵⁿᵛ)
+        @assert_or_log(bool_strat, "The strategic demand must be non-negative." )
+        bool_strat *= any(
+                sum(capacity(n, t) * scale_op_sp(t_inv, t) for t ∈ t_inv) ≤
+                    strategic_demand(n, t_inv)
+            for t_inv ∈ 𝒯ᴵⁿᵛ) * all(capacity(n, t) ≥ 0 for t ∈ 𝒯)
+        if bool_strat
+            @warn(
+                "The scaled summation of the capacity in each operational period is " *
+                "smaller than the strategic demand in at least one strategic period. As a " *
+                "consequence, a deficit for `demand_sink_strat_deficit` is guaranteed.",
+                maxlog=1
+            )
+        end
     end
 
     @assert_or_log(
@@ -161,14 +171,15 @@ function EMB.check_node(
     message = "are not allowed for the field `:period_min`."
     bool = EMB.check_partition_profile(period_demand_min(n), message)
     if bool
+        bool_min = all(0 ≤ period_demand_min(n, t_pd) ≤ 1 for t_pd ∈ 𝒯ᵖᵈ)
         @assert_or_log(
-            all(0 ≤ period_demand_min(n, t_pd) ≤ 1 for t_pd ∈ 𝒯ᵖᵈ),
+            bool_min,
             "The minimum demand to be satisfied in a period must be in the range [0, 1]."
         )
-        bool = any(
+        bool_min *= any(
             sum(period_demand_min(n, t_pd) for t_pd ∈ periods(n, t_inv)) > 1
         for t_inv ∈ 𝒯ᴵⁿᵛ)
-        if bool
+        if bool_min
             @warn(
                 "The sum of the minimum period demands is in at least one strategic period " *
                 "larger than 1. As a consequence, a deficit for `demand_sink_deficit` is " *
@@ -181,14 +192,15 @@ function EMB.check_node(
     message = "are not allowed for the field `:period_max`."
     bool = EMB.check_partition_profile(period_demand_max(n), message)
     if bool
+        bool_max = all(0 ≤ period_demand_max(n, t_pd) ≤ 1 for t_pd ∈ 𝒯ᵖᵈ)
         @assert_or_log(
-            all(0 ≤ period_demand_max(n, t_pd) ≤ 1 for t_pd ∈ 𝒯ᵖᵈ),
+            bool_max,
             "The maximum demand to be satisfied in a period must be in the range [0, 1]."
         )
-        bool = any(
+        bool_max *= any(
             sum(period_demand_max(n, t_pd) for t_pd ∈ periods(n, t_inv)) < 1
         for t_inv ∈ 𝒯ᴵⁿᵛ)
-        if bool
+        if bool_max
             @warn(
                 "The sum of the maximum period demands is in at least one strategic period " *
                 "smaller than 1. As a consequence, a surplus for `demand_sink_surplus` is " *

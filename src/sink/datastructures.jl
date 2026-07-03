@@ -151,7 +151,7 @@ of the total demand that can be satisified within the demand period.
   most be satisifed in each demand period.
 - **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
   dictionary requires the fields `:surplus` and `:deficit`. The same penalty is utilized for
-  the strategic surplus/deficit and period surplus/deficit, al
+  the strategic surplus/deficit and period surplus/deficit.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The

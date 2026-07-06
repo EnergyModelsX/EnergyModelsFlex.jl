@@ -12,6 +12,7 @@ The following sink node types are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 PeriodDemandSink
+StratPeriodDemandSink
 MultipleInputSink
 BinaryMultipleInputSinkStrat
 ContinuousMultipleInputSinkStrat
@@ -20,7 +21,7 @@ LoadShiftingNode
 
 ## [Source `Node` types](@id lib-pub-source-node)
 
-The following source node type is implemented in the `EnergyModelsFlex`:
+The following source node type are implemented in the `EnergyModelsFlex`:
 
 ```@docs
 PayAsProducedPPA

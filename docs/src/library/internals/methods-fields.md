@@ -7,7 +7,7 @@
 Pages = ["methods-fields.md"]
 ```
 
-## [`PeriodDemandSink` types](@id lib-int-met_field-PeriodDemandSink)
+## [`PeriodDemandSink` node](@id lib-int-met_field-PeriodDemandSink)
 
 ```@docs
 EMF.period_demand
@@ -16,13 +16,21 @@ EMF.periods(n::EMF.AbstractPeriodDemandSink, ts::TS.TimeStructure)
 EMF.number_of_periods
 ```
 
-## [`ActivationCostNode` types](@id lib-int-met_field-ActivationCostNode)
+## [`StratPeriodDemandSink` node](@id lib-int-met_field-StratPeriodDemandSink)
+
+```@docs
+EMF.strategic_demand
+EMF.period_demand_min
+EMF.period_demand_max
+```
+
+## [`ActivationCostNode` node](@id lib-int-met_field-ActivationCostNode)
 
 ```@docs
 EMF.activation_consumption
 ```
 
-## [`CapacityCostLink` types](@id lib-int-met_field-CapacityCostLink)
+## [`CapacityCostLink` node](@id lib-int-met_field-CapacityCostLink)
 
 ```@docs
 EMF.cap_price
@@ -31,7 +39,7 @@ EMF.periods(l::CapacityCostLink, ts::TS.TimeStructure)
 EMF.cap_resource
 ```
 
-## [`Combustion` types](@id lib-int-met_field-Combustion)
+## [`Combustion` node](@id lib-int-met_field-Combustion)
 
 ```@docs
 EMF.limits

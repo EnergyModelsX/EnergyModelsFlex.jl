@@ -59,6 +59,7 @@ makedocs(
             ],
             "Sink nodes"=>Any[
                 "PeriodDemandSink"=>"nodes/sink/perioddemand.md",
+                "StratPeriodDemandSink"=>"nodes/sink/stratperioddemand.md",
                 "LoadShiftingNode"=>"nodes/sink/loadshiftingnode.md",
                 "MultipleInputSink"=>"nodes/sink/multipleinputsink.md",
                 "AbstractMultipleInputSinkStrat"=>"nodes/sink/multipleinputsinkstrat.md",

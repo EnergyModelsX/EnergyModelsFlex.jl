@@ -90,17 +90,6 @@ function PeriodDemandSink(
 end
 
 """
-    period_demand(n::AbstractPeriodDemandSink)
-    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition)
-
-Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
-demand period `t_pd`.
-"""
-period_demand(n::AbstractPeriodDemandSink) = n.period_demand
-period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
-    n.period_demand[t_pd]
-
-"""
     period_duration(n::AbstractPeriodDemandSink)
 
 Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or in demand
@@ -125,6 +114,143 @@ Returns the number of demand periods for a `PeriodDemandSink` `n` for the given 
 """
 number_of_periods(n::AbstractPeriodDemandSink, ts::TS.TimeStructure) =
     length(periods(n, ts))
+
+"""
+    period_demand(n::AbstractPeriodDemandSink)
+    period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition)
+
+Returns the period demands of `AbstractPeriodDemandSink` `n` as a `TimeProfile` or in
+demand period `t_pd`.
+"""
+period_demand(n::AbstractPeriodDemandSink) = n.period_demand
+period_demand(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition) =
+    n.period_demand[t_pd]
+
+"""
+    struct StratPeriodDemandSink <: AbstractPeriodDemandSink
+
+A `StratPeriodDemandSink` is a [`Sink`](@extref EnergyModelsBase.Sink) that has a total
+demand that can specified for each strategic period through the field `strat_demand`. In
+addition, you can specify multiple demand periods, each with a minimum and maximum fraction
+of the total demand that can be satisified within the demand period.
+
+# Fields
+- **`id::Any`** is the name/identifier of the node.
+- **`cap::TimeProfile`** is the installed capacity.
+- **`strat_demand::TimeProfile`** is the demand within each strategic period that must be
+  satisfied. It **must** be specified as either a `FixedProfile` or `StrategicProfile` as
+  it is indexed over strategic periods
+- **`period_duration::TimeProfile`** is the sum of the durations of the individual
+  operational periods within a given demand period. Due to a constructor, it can either be
+  specified as number (the same duration in all demand periods), as a vector (varying
+  duration of each demand period), or as a time profile (*e.g.*, varying period durations
+  due to varying operational time structures). It cannot be specified as `OperationalProfile`.
+- **`period_min::TimeProfile`** is the relative fraction of the strategic demand that must
+  be at least satisifed in each demand period.
+- **`period_max::TimeProfile`** is the relative fraction of the strategic demand that can at
+  most be satisifed in each demand period.
+- **`penalty::Dict{Symbol,<:TimeProfile}`** are penalties for surplus or deficits. The
+  dictionary requires the fields `:surplus` and `:deficit`. The same penalty is utilized for
+  the strategic surplus/deficit and period surplus/deficit.
+- **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
+  with conversion value `Real`.
+- **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
+  field `data` is conditional through usage of a constructor.
+"""
+struct StratPeriodDemandSink <: AbstractPeriodDemandSink
+    id::Any
+    cap::TimeProfile
+    strat_demand::TimeProfile
+    period_duration::TimeProfile
+    period_min::TimeProfile
+    period_max::TimeProfile
+    penalty::Dict{Symbol,<:TimeProfile}
+    input::Dict{<:Resource,<:Real}
+    data::Vector{<:ExtensionData}
+end
+function StratPeriodDemandSink(
+    id,
+    cap::TimeProfile,
+    strat_dem::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}},
+    per_min::TimeProfile,
+    per_max::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+    data::Vector{<:ExtensionData},
+)
+    if isa(period_duration, Number)
+        per_dur = FixedProfile(period_duration)
+    elseif isa(period_duration, Vector{<:Number})
+        per_dur = PartitionProfile(period_duration)
+    end
+    return StratPeriodDemandSink(
+        id,
+        cap,
+        strat_dem,
+        per_dur,
+        per_min,
+        per_max,
+        penalty,
+        input,
+        data,
+    )
+end
+function StratPeriodDemandSink(
+    id,
+    cap::TimeProfile,
+    strat_demand::TimeProfile,
+    period_duration::Union{Number, Vector{<:Number}, TimeProfile},
+    per_min::TimeProfile,
+    per_max::TimeProfile,
+    penalty::Dict{Symbol,<:TimeProfile},
+    input::Dict{<:Resource,<:Real},
+)
+    return StratPeriodDemandSink(
+        id,
+        cap,
+        strat_demand,
+        period_duration,
+        per_min,
+        per_max,
+        penalty,
+        input,
+        ExtensionData[],
+    )
+end
+
+"""
+    strategic_demand(n::StratPeriodDemandSink)
+    strategic_demand(n::StratPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod)
+
+Returns the strategic demands of `StratPeriodDemandSink` `n` as a `TimeProfile` or in
+strategic period `t_inv`.
+"""
+strategic_demand(n::StratPeriodDemandSink) = n.strat_demand
+strategic_demand(n::StratPeriodDemandSink, t_inv::TS.AbstractStrategicPeriod) =
+    n.strat_demand[t_inv]
+
+"""
+    period_demand_min(n::StratPeriodDemandSink)
+    period_demand_min(n::StratPeriodDemandSink, t_pd::TS.PeriodPartition)
+
+Returns the minimum period demands of `StratPeriodDemandSink` `n` as a `TimeProfile` or
+in demand period `t_pd`.
+"""
+period_demand_min(n::StratPeriodDemandSink) = n.period_min
+period_demand_min(n::StratPeriodDemandSink, t_pd::TS.PeriodPartition) =
+    n.period_min[t_pd]
+
+"""
+    period_demand_max(n::StratPeriodDemandSink)
+    period_demand_max(n::StratPeriodDemandSink, t_pd::TS.PeriodPartition)
+
+Returns the minimum period demands of `StratPeriodDemandSink` `n` as a `TimeProfile` or
+in demand period `t_pd`.
+"""
+period_demand_max(n::StratPeriodDemandSink) = n.period_max
+period_demand_max(n::StratPeriodDemandSink, t_pd::TS.PeriodPartition) =
+    n.period_max[t_pd]
 
 """
     struct MultipleInputSink <: AbstractMultipleInputSink

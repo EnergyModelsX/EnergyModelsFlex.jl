@@ -1,6 +1,6 @@
 # Release notes
 
-## Unversioned
+## Version 0.4.0 (2026-07-XX)
 
 ### Breaking changes
 
@@ -13,6 +13,11 @@
 
 * Rewrote `CapacityCostLink` with `PeriodPartition` (introduced in *[`TimeStruct` 0.9.12](https://github.com/sintefore/TimeStruct.jl/releases/tag/v0.9.12)*) to increase flexibility of the link with respect to the time structure.
 * Rewriting requires adjustment of the parameters due to changed meaning of some of the values.
+
+### New node `StratPeriodDemandSink`
+
+* Introduced new node type `StratPeriodDemandSink` as subtype of `AbstractPeriodDemandSink`.
+* Node to be used for strategic demands and lower and upper bounds for satisfying the demand within a demand period.
 
 ## Version 0.3.0 (2026-04-16)
 

@@ -95,11 +95,13 @@ This method checks that a [`StratPeriodDemandSink`](@ref) node is valid.
   A warning is printed if this is not the case.
 - The individual periods must all satisfy the specified duration(s).
 - The field `period_min` is required to be in the range [0, 1], indexable by a
-  `PeriodPartition`. Te sum within a strategic period should be smaller than or equal to 1
+  `PeriodPartition`. The sum within a strategic period should be smaller than or equal to 1
   (only a warning is thrown, as the model is still solvable).
 - The field `period_max` is required to be in the range [0, 1] and indexable by a
   `PeriodPartition`. The sum within a strategic period should be larger than or equal to 1
   (only a warning is thrown, as the model is still solvable).
+- A warning is thrown if the field `period_min` is larger than the field `period_max` in any
+  demand period.
 """
 function EMB.check_node(
     n::StratPeriodDemandSink,
@@ -190,7 +192,7 @@ function EMB.check_node(
     end
 
     message = "are not allowed for the field `:period_max`."
-    bool = EMB.check_partition_profile(period_demand_max(n), message)
+    bool *= EMB.check_partition_profile(period_demand_max(n), message)
     if bool
         bool_max = all(0 ≤ period_demand_max(n, t_pd) ≤ 1 for t_pd ∈ 𝒯ᵖᵈ)
         @assert_or_log(
@@ -205,6 +207,17 @@ function EMB.check_node(
                 "The sum of the maximum period demands is in at least one strategic period " *
                 "smaller than 1. As a consequence, a surplus for `demand_sink_surplus` is " *
                 "guaranteed.",
+                maxlog=1
+            )
+        end
+    end
+
+    if bool
+        if any(period_demand_min(n, t_pd) > period_demand_max(n, t_pd) for t_pd ∈ 𝒯ᵖᵈ)
+            @warn(
+                "The minimum demand through the field `period_min` is larger than the " *
+                "maximum demand through the field `period_max` in at least one demand " *
+                "period resulting in a guranteed penalty",
                 maxlog=1
             )
         end

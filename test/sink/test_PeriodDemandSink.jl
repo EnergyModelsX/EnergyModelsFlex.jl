@@ -254,11 +254,18 @@ end
         msg = "The sum of the minimum period demands is in at least one strategic period " *
             "larger than 1. As a consequence, a deficit for `demand_sink_deficit` is " *
             "guaranteed."
-        @test_logs (:warn, msg) check_per_dem_sink(; per_min=FixedProfile(0.5))
+        per_min = PartitionProfile([30, 30, 30, 30, 0, 0]./100)
+        per_max = PartitionProfile([40, 40, 40, 40, 0, 0]./100)
+        @test_logs (:warn, msg) check_per_dem_sink(; per_min, per_max)
         msg = "The sum of the maximum period demands is in at least one strategic period " *
             "smaller than 1. As a consequence, a surplus for `demand_sink_surplus` is " *
             "guaranteed."
         @test_logs (:warn, msg) check_per_dem_sink(; per_max=FixedProfile(0.1))
+        msg = "The minimum demand through the field `period_min` is larger than the " *
+            "maximum demand through the field `period_max` in at least one demand " *
+            "period resulting in a guranteed penalty"
+        per_min = PartitionProfile([10, 10, 10, 10, 10, 0]./100)
+        @test_logs (:warn, msg) check_per_dem_sink(; per_min)
     end
 
     # Set the global again to false

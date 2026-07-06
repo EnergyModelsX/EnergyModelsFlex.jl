@@ -110,7 +110,7 @@ The variables include:
 
 #### [Additional variables](@id nodes-stratperioddemandsink-math-add)
 
-[`StratPeriodDemandSink`](@ref) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_element()`](@ref) for including constraints for deficits and surplus for individual resources as well as what the fraction satisfied by each resource on both the level of demand periods (as introduced by the method for [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)) and strategic periods (introduced through a dedicated methods for [`StratPeriodDemandSink`](@ref)):
+[`StratPeriodDemandSink`](@ref) nodes declare in addition several variables through dispatching on the method [`EnergyModelsBase.variables_element()`](@ref) for including constraints for deficits and surplus for individual demand periods (as introduced by the method for [`AbstractPeriodDemandSink`](@ref EnergyModelsFlex.AbstractPeriodDemandSink)) and strategic periods (introduced through a dedicated method for [`StratPeriodDemandSink`](@ref)):
 
 - ``\texttt{demand\_sink\_surplus}[n, t_pd]``:\
   Surplus of energy delivered beyond the required `period_max` fraction in demand period `t_pd` .
@@ -180,7 +180,7 @@ The deficit and surplus in a demand period can then be calculated as
 \begin{aligned}
 \sum_{t \in t_{pd}} \texttt{​cap\_use}[n, t] \times duration(t) + {} & \texttt{demand\_sink\_deficit}[n, t_{pd}]  \geq \\
 & \frac{period\_demand\_min(n, t_{pd}) \times strategic\_demand(n, t_{inv})}{multiple(first(t_{pd})) / duration\_strat(t_{inv})} \\
-\sum_{t \in t_{pd}} \texttt{​cap\_use}[n, t] \times duration(t) \geq {} & \texttt{demand\_sink\_surplus}[n, t_{pd}] + {} \\
+\sum_{t \in t_{pd}} \texttt{​cap\_use}[n, t] \times duration(t) \leq {} & \texttt{demand\_sink\_surplus}[n, t_{pd}] + {} \\
 & \frac{period\_demand\_max(n, t_{pd}) \times strategic\_demand(n, t_{inv})}{multiple(first(t_{pd})) / duration\_strat(t_{inv})}
 \end{aligned}
 ```

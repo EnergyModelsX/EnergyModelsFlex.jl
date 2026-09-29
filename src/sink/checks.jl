@@ -63,7 +63,7 @@ function EMB.check_node(
         @assert_or_log(
             all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[t_pd] for t_pd ∈ 𝒯ᵖᵈ),
             "The duration of the last period on the `SimpleTimes` level is shorter than " *
-            "specified. This is caused by inconsistently specified `period_duration` and" *
+            "specified. This is caused by inconsistently specified `period_duration` and " *
             "time structure."
         )
     end
@@ -166,7 +166,7 @@ function EMB.check_node(
     @assert_or_log(
         all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[t_pd] for t_pd ∈ 𝒯ᵖᵈ),
         "The duration of the last period on the `SimpleTimes` level is shorther than " *
-        "specified. This is caused by inconsistently specified `period_duration` and" *
+        "specified. This is caused by inconsistently specified `period_duration` and " *
         "time structure."
     )
 

@@ -185,6 +185,7 @@ cap_price(l::CapacityCostLink, t::TS.TimePeriod) = l.cap_price[t]
 
 """
     period_duration(l::CapacityCostLink)
+    period_duration(l::CapacityCostLink, t_pd::TS.PeriodPartition)
 
 Returns the prices periods of `CapacityCostLink` `l` as `TimeProfile` or in price
 period `t_pd`.

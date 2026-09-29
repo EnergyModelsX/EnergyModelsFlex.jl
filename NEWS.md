@@ -1,6 +1,12 @@
 # Release notes
 
-## Version 0.4.0 (2026-07-XX)
+## Version 0.4.1 (2026-09-29)
+
+* Improved the documentation for `StorageEfficiency` to highlight that the dictionary `output` can only include the stored resource, as the other resources are not included.
+* Incorporated a check for this, as it is considered a model bug.
+* Improved the test set for `StorageEfficiency`.
+
+## Version 0.4.0 (2026-07-06)
 
 ### Breaking changes
 
@@ -74,7 +80,7 @@
 
 ### Public release on GitHub
 
-* Released the exisiting version so that case studies in the project [FLEX4FACT](https://flex4fact.eu/) are running without any problems.
+* Released the existing version so that case studies in the project [FLEX4FACT](https://flex4fact.eu/) are running without any problems.
 * Release depends on old versions of `EnergyModelsBase`.
 * It is planned to update the model to the latest version within a short period of time.
 
@@ -133,7 +139,7 @@
 
 ### Enhancement
 
-* `BatteryStorage` cant be included before it is updated to `EnergyModelsBase` v0.8.0.
+* `BatteryStorage` cannot be included before it is updated to `EnergyModelsBase` v0.8.0.
 
 ## Version 0.1.1 (2024-06-18)
 

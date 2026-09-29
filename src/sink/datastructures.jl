@@ -91,6 +91,7 @@ end
 
 """
     period_duration(n::AbstractPeriodDemandSink)
+    period_duration(n::AbstractPeriodDemandSink, t_pd::TS.PeriodPartition)
 
 Returns the demand periods of `AbstractPeriodDemandSink` `n` as `TimeProfile` or in demand
 period `t_pd`.

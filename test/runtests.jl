@@ -17,6 +17,8 @@ const OPTIMIZER = optimizer_with_attributes(
     HiGHS.Optimizer,
     MOI.Silent() => true,
 )
+⪆(x, y) = x > y || isapprox(x, y; atol = TEST_ATOL)
+⪅(x, y) = x < y || isapprox(x, y; atol = TEST_ATOL)
 
 """
     run_node_test(node_supertype::String, node_type::String)

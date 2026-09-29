@@ -27,7 +27,7 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
         output::Dict{<:Resource,<:Real},
         data::Vector{<:ExtensionData}) where {T<:EMB.StorageBehavior}
         @warn "Deprecation note: the development of ElectricBattery node is " *
-              "discontinued, and the node will be removed in the next release v0.3.0."
+              "discontinued, and the node will be removed in the next release v0.5.0."
         new{T}(id, charge, level, c_rate, coloumbic_eff, stor_res, input, output, data)
     end
 end

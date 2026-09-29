@@ -27,7 +27,7 @@ function EMB.check_link(l::CapacityCostLink, 𝒯, ::EnergyModel, ::Bool)
         @assert_or_log(
             all(sum(duration(t) for t ∈ t_pd) ≥ period_duration(l, t_pd) for t_pd ∈ 𝒯ᵖᵈ),
             "The duration of the last period on the `SimpleTimes` level is shorter than " *
-            "specified. This is caused by inconsistently specified `period_duration` and" *
+            "specified. This is caused by inconsistently specified `period_duration` and " *
             "time structure."
         )
         @assert_or_log(

@@ -25,7 +25,7 @@ In addition, they only allow the transport of a single, specified [`Resource`](@
        # old behavior, corresponding to 2 periods
        cap_period_duration = 2
 
-       # new behavior, corresponding to periods whocse duration sums to at least 4
+       # new behavior, corresponding to periods whose duration sums to at least 4
        cap_period_duration = 4
        ```
 
@@ -75,7 +75,7 @@ The following additional fields are included for [`CapacityCostLink`](@ref) link
   In addition, all values have to be non-negative.
 - **`cap_price::TimeProfile`** :\
   The price per unit of maximum capacity usage over the sub-periods.
-  This value is averaged over sub-periods as defined by `cap_price_periods`.
+  This value is averaged over sub-periods as defined by `cap_period_duration`.
   All values have to be non-negative.
   !!! danger "Price values"
 
@@ -90,14 +90,14 @@ The following additional fields are included for [`CapacityCostLink`](@ref) link
       ts = TwoLevel(1, 1, SimpleTimes(8760, 1); op_per_strat=8760.0)
 
        # 12 price periods corresponding to months
-      cap_price_periods = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] .* 24
+      cap_period_duration = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] .* 24
 
       cap_price = 100 # €/GW/year
       ```
 
       If the peak usage is 1 GW in each month, the model computes a total cost of 12 × 100 = 1200 €/year.
 
-      To achieve seasonal/monthly peak charges, define multiple `cap_price_periods` and provide `cap_price` values that represent the intended charge per sub-period (or scale the values accordingly).
+      To achieve seasonal/monthly peak charges, define multiple `cap_period_duration` and provide `cap_price` values that represent the intended charge per sub-period (or scale the values accordingly).
 
       It is planned to change this behavior in the future.
       The change corresponds to a breaking change as we change the behavior of the model.

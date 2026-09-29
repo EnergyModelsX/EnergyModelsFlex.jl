@@ -10,7 +10,7 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
     charge::EMB.AbstractStorageParameters
     level::EMB.UnionCapacity
     c_rate::Real #
-    coloumbic_eff::Real  # efficency, typically 0.98
+    coloumbic_eff::Real  # efficiency, typically 0.98
     stor_res::Resource
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
@@ -21,12 +21,12 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
         charge::EMB.AbstractStorageParameters,
         level::EMB.UnionCapacity,
         c_rate::Real, #
-        coloumbic_eff::Real, # efficency, typically 0.98
+        coloumbic_eff::Real, # efficiency, typically 0.98
         stor_res::Resource,
         input::Dict{<:Resource,<:Real},
         output::Dict{<:Resource,<:Real},
         data::Vector{<:ExtensionData}) where {T<:EMB.StorageBehavior}
-        @warn "Depcrecation note: the development of ElectricBattery node is " *
+        @warn "Deprecation note: the development of ElectricBattery node is " *
               "discontinued, and the node will be removed in the next release v0.3.0."
         new{T}(id, charge, level, c_rate, coloumbic_eff, stor_res, input, output, data)
     end
@@ -36,7 +36,7 @@ function ElectricBattery{T}(
     charge::EMB.AbstractStorageParameters,
     level::EMB.UnionCapacity,
     c_rate::Real, #
-    coloumbic_eff::Real, # efficency, typically 0.98
+    coloumbic_eff::Real, # efficiency, typically 0.98
     stor_res::Resource,
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},

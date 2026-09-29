@@ -18,18 +18,29 @@ The fields of a [`StorageEfficiency`](@ref) are:
   The charging parameters of the `Storage` node must include a capacity.
   Depending on the chosen type, the `charge` parameters can also include variable OPEX and/or fixed OPEX.
 - **`level::EMB.UnionCapacity`**:\
-  The level parameters of the `Storage` node must include a capacity..
+  The level parameters of the `Storage` node must include a capacity.
   Depending on the chosen type, the `charge` parameters can also include variable OPEX and/or fixed OPEX.
   !!! note "Permitted values for storage parameters in `charge` and `level`"
       If the node should contain investments through the application of [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/), it is important to note that you can only use `FixedProfile` or `StrategicProfile` for the capacity, but not `RepresentativeProfile` or `OperationalProfile`.
       Similarly, you can only use `FixedProfile` or `StrategicProfile` for the fixed OPEX, but not `RepresentativeProfile` or `OperationalProfile`.
       The variable operating expenses can be provided as `OperationalProfile` as well.
       In addition, all capacity and fixed OPEX values have to be non-negative.
-- **`stor_res::ResourceEmit`**:\
+- **`stor_res::Resource`**:\
   The `stor_res` is the stored [`Resource`](@extref EnergyModelsBase.Resource).
 - **`input::Dict{<:Resource,<:Real}`** and **`output::Dict{<:Resource,<:Real}`**:\
   Both fields describe the `input` and `output` [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.
   The stored [`Resource`](@extref EnergyModelsBase.Resource) (outlined above) must be included to create the linking variables.
+  !!! note "`output` resources"
+      Any output resource other than the resource `stor_res` is not considered in the output flows.
+      Hence, it is not feasible to have multiple output resources.
+      This is checked and an error is thrown.
+  !!! warning "Conversion factors"
+      The conversion factors behave differently.
+      For any resource other than the stored [`Resource`](@extref EnergyModelsBase.Resource), it corresponds to a value relative to the flow of the stored [`Resource`](@extref EnergyModelsBase.Resource).
+      For the stored [`Resource`](@extref EnergyModelsBase.Resource), it corresponds to the fraction of the flow into the node that is charged or the fraction of the loss in storage level that is flowing out of the node.
+      This implies that values smaller than 1 must be used although this is not checked.
+
+      The constraints are explained *[below](@ref nodes-stor_eff-math-con-stand)*.
 - **`data::Vector{<:ExtensionData}`**:\
   An entry for providing additional data to the model.
   In the current version, it is used for additional investment data when [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/) is used.
@@ -38,7 +49,7 @@ The fields of a [`StorageEfficiency`](@ref) are:
 
 ## [Mathematical description](@id nodes-stor_eff-math)
 
-In the following mathematical equations, we use the name for variables and functions used in the model.
+In the following mathematical equations, we use the names of the variables and functions used in the model.
 Variables are in general represented as
 
 ``\texttt{var\_example}[index_1, index_2]``
@@ -47,7 +58,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-stor_eff-math-var)
 
@@ -137,28 +148,29 @@ These standard constraints are:
   This function is only called for specified data of the storage node, see above.
 
 !!! info "Implementation of OPEX"
-    Even if a `Storage` node includes the corresponding capacity field (*i.e.*, `charge`, `level`, and `discharge`), we only include the fixed and variable OPEX constribution for the different capacities if the corresponding *[storage parameters](@extref EnergyModelsBase lib-pub-nodes-stor_par)* have a field `opex_fixed` and `opex_var`, respectively.
+    Even if a `Storage` node includes the corresponding capacity field (*i.e.*, `charge`, `level`, and `discharge`), we only include the fixed and variable OPEX contribution for the different capacities if the corresponding *[storage parameters](@extref EnergyModelsBase lib-pub-nodes-stor_par)* have a field `opex_fixed` and `opex_var`, respectively.
     Otherwise, they are omitted.
 
-The functions `constraints_flow_in` and `constraints_flow_out` are extended with new methods that, compared to a [`RefStorage`](@extref EnergyModelsBase.RefStorage) node, better controls the storage efficiency:
+The functions `constraints_flow_in` and `constraints_flow_out` are extended with new methods that, compared to a [`RefStorage`](@extref EnergyModelsBase.RefStorage) node, changed the behavior of the charge and discharge efficiencies.
 
-The function `constraints_flow_in` is exytended with a new method to incorporate the conversion factor also for the stored resource.
-The effective charging rate is defined by the conversion factor (typically <1) of the stored resource ``p_{\text{stor}}``:
+The function `constraints_flow_in` is extended with a new method to incorporate the conversion factor also for the stored resource.
+The effective charging rate is defined by the conversion factor (typically <1) of the stored resource ``p_{stor} = storage\_resource(n)``:
 
 ```math
-\texttt{stor\_charge\_use}[n, t] = \texttt{flow\_in}[n, t, p_{\text{stor}}] \times inputs(n, p_{\text{stor​}})
+\texttt{stor\_charge\_use}[n, t] = \texttt{flow\_in}[n, t, p_{stor}] \times inputs(n, p_{stor})
 ```
 
-For each additional input resource ``p ∈ inputs(n) \setminus p_{\text{stor}}``, the flow is proportional to the main storage flow by a conversion factor:
+For each additional input resource ``p ∈ inputs(n) \setminus p_{stor}``, the flow is proportional to the main storage flow with a conversion factor:
 
 ```math
-\texttt{flow\_in}[n, t, p] = \texttt{flow\_in}[n, t,p_{\text{stor​}}] \times inputs(n,p)
+\texttt{flow\_in}[n, t, p] = \texttt{flow\_in}[n, t, p_{stor}] \times inputs(n,p)
 ```
 
-The function `constraints_flow_out` is extended with a new method to incorporate the conversion factor for discharging_
+The function `constraints_flow_out` is extended with a new method to incorporate the conversion factor for discharging:
 
 ```math
-\texttt{flow\_out}[n, t,pstor​]=\texttt{stor\_discharge\_use}[n, t] 'times outputs(n, p_{\text{stor​}})
+\texttt{flow\_out}[n, t, p_{stor}] = \texttt{stor\_discharge\_use}[n, t] \times outputs(n, p_{stor})
 ```
 
 This models energy losses when discharging from storage (*e.g.*, thermal or round-trip losses in batteries).
+It is not feasible to provide other `outputs`.

@@ -4,19 +4,18 @@
 This method checks that a [`MinUpDownTimeNode`](@ref) node is valid.
 
 It reuses the standard checks of a `NetworkNode` node through calling the function
-[`EMB.check_node_default`](@extref EnergyModelsBase.check_node_default), but adds an
-additional check on the data.
+[`EMB.check_node_default`](@extref EnergyModelsBase.check_node_default), but adds
+additional checks on the fields `load_min` and `load_max`.
 
 ## Checks
 - The field `cap` is required to be non-negative.
-- The value of the field `fixed_opex` is required to be non-negative and
+- The value of the field `opex_fixed` is required to be non-negative and
   accessible through a `StrategicPeriod` as outlined in the function
   [`EMB.check_fixed_opex()`](@extref EnergyModelsBase.check_fixed_opex).
 - The values of the dictionary `input` are required to be non-negative.
 - The values of the dictionary `output` are required to be non-negative.
-
- - The field `load_min` is required to be greater than zero.
- - The field `load_min` is required to be not larger than the field `load_max`.
+- The field `load_min` is required to be greater than zero.
+- The field `load_min` is required to be not larger than the field `load_max`.
 """
 function EMB.check_node(
     n::MinUpDownTimeNode,
@@ -52,7 +51,7 @@ This method checks that a `LimitedFlexibleInput` node is valid.
  - The field `cap` is required to be non-negative.
  - The values of the dictionary `input` are required to be positive.
  - The values of the dictionary `output` are required to be non-negative.
- - The value of the field `fixed_opex` is required to be non-negative and
+ - The value of the field `opex_fixed` is required to be non-negative and
    accessible through a `StrategicPeriod` as outlined in the function
    `check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`.
  - The values of the dictionary `limit` are required to be non-negative.
@@ -78,7 +77,7 @@ This method checks that a `Combustion` node is valid.
  - The field `cap` is required to be non-negative.
  - The values of the dictionary `input` are required to be positive.
  - The values of the dictionary `output` are required to be non-negative.
- - The value of the field `fixed_opex` is required to be non-negative and
+ - The value of the field `opex_fixed` is required to be non-negative and
    accessible through a `StrategicPeriod` as outlined in the function
    `check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`.
  - The values of the dictionary `limit` are required to be non-negative.
@@ -105,7 +104,7 @@ This method checks that a `FlexibleOutput` node is valid.
  - The field `cap` is required to be non-negative.
  - The values of the dictionary `input` are required to be non-negative.
  - The values of the dictionary `output` are required to be positive.
- - The value of the field `fixed_opex` is required to be non-negative and
+ - The value of the field `opex_fixed` is required to be non-negative and
    accessible through a `StrategicPeriod` as outlined in the function
    `check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`.
 """

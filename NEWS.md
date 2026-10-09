@@ -1,5 +1,14 @@
 # Release notes
 
+## Unversioned
+
+### Documentation
+
+* Corrected typos and stale descriptions in all docstrings and comments.
+* Fixed typos and logical errors in the documentation pages and added the missing elements `InflexibleSource`, `FlexibleOutput`, and `CapacityCostLink` to the overview.
+* Restructured the examples with a common subsection structure and comments for all fields.
+* Adjusted the duration of the capacity price periods in the `CapacityCostLink` example to illustrate the link usage.
+
 ## Version 0.4.1 (2026-09-29)
 
 * Improved the documentation for `StorageEfficiency` to highlight that the dictionary `output` can only include the stored resource, as the other resources are not included.

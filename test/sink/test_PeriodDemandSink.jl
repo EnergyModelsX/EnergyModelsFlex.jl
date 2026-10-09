@@ -263,7 +263,7 @@ end
         @test_logs (:warn, msg) check_per_dem_sink(; per_max=FixedProfile(0.1))
         msg = "The minimum demand through the field `period_min` is larger than the " *
             "maximum demand through the field `period_max` in at least one demand " *
-            "period resulting in a guranteed penalty"
+            "period resulting in a guaranteed penalty"
         per_min = PartitionProfile([10, 10, 10, 10, 10, 0]./100)
         @test_logs (:warn, msg) check_per_dem_sink(; per_min)
     end

@@ -31,7 +31,7 @@ The [`InflexibleSource`](@ref) has the same standard fields as the [`RefSource`]
   In addition, all values have to be non-negative.
 - **`output::Dict{<:Resource, <:Real}`**:\
   The field `output` includes [`Resource`](@extref EnergyModelsBase.Resource)s with their corresponding conversion factors as dictionaries.
-  In the case of a non-dispatchable renewable energy source, `output` should always include your *electricity* resource. In practice, you should use a value of 1.\
+  In the case of an inflexible source, `output` includes the generated resource. In practice, you should use a value of 1.\
   All values have to be non-negative.
 - **`data::Vector{<:ExtensionData}`**:\
   An entry for providing additional data to the model.
@@ -59,7 +59,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-inflexiblesource-math-var)
 
@@ -78,7 +78,7 @@ The variables include:
 ### [Constraints](@id nodes-inflexiblesource-math-con)
 
 The following sections omit the direct inclusion of the vector of inflexible source nodes.
-Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N^{\text{inflexiblesource}\_source}`` for all [`InflexibleSource`](@ref) types if not stated differently.
+Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`InflexibleSource`](@ref) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all strategic periods).
 
 #### [Standard constraints](@id nodes-inflexiblesource-math-con-stand)
@@ -125,7 +125,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and strategic periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:
+- `constraints_ext_data`:
   This function is only called for specified additional data, see above.
 
 The function `constraints_capacity` is extended with a new method for inflexible source nodes to allow the fixing of the ``\texttt{cap\_use}[n, t]`` to the variable ``\texttt{cap\_inst}[n, t]``

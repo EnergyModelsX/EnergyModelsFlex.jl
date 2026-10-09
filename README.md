@@ -13,7 +13,7 @@
 > The different node types are partly experimental.
 > They have furthermore some limitations with respect to the chosen `TimeStructure` or whether they are able to handle investments.
 > As a consequence, it is advised to read the documentation for each node to identify their usefulness.
-> Is is planned to remove some nodes and rewrite the behaviour of other nodes to improve their flexibility.
+> It is planned to remove some nodes and rewrite the behaviour of other nodes to improve their flexibility.
 >
 > Among others, using `PeriodDemandSink`, `StratPeriodDemandSink`, and `CapacityCostLink` in combination with `EnergyModelsGUI` results in errors when trying to access fields that have as values `PartitionProfile`.
 > The same holds for variables that are defined over `PeriodPartition`s where you cannot see the results.

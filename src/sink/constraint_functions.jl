@@ -5,7 +5,8 @@ Function for creating the constraint on the maximum capacity utilization of an
 [`AbstractPeriodDemandSink`](@ref).
 
 The method is changed from the standard approach through calculating the demand period
-surplus or deficit in addition to the operational period surplus or deficit.
+surplus and deficit in addition to the operational period deficit. The operational period
+surplus is fixed to 0.
 """
 function EMB.constraints_capacity(
     m,
@@ -44,9 +45,8 @@ end
 
 Function for creating the constraint on the variable OPEX of an [`AbstractPeriodDemandSink`](@ref).
 
-The method is changed from the standard approach through calculating both the demand period
-surplus and deficit in addition to the operational period deficit. The operational period
-surplus is fixed to 0 to avoid problems in the calculations.
+The method is changed from the standard approach through penalizing the demand period
+surplus and deficit instead of the operational period surplus and deficit.
 """
 function EMB.constraints_opex_var(m, n::AbstractPeriodDemandSink, 𝒯ᴵⁿᵛ, ::EnergyModel)
     # Only penalise the total surplus and deficit in each period, not in the
@@ -67,7 +67,7 @@ end
 """
     EMB.constraints_capacity(m, n::StratPeriodDemandSink, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Function for creating the constraint on the maximum capacity utilization of an
+Function for creating the constraint on the maximum capacity utilization of a
 [`StratPeriodDemandSink`](@ref).
 
 The method is changed from the standard approach through calculating both the strategic and
@@ -152,12 +152,12 @@ function EMB.constraints_opex_var(m, n::StratPeriodDemandSink, 𝒯ᴵⁿᵛ, ::
 end
 
 """
-    EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure)
+    EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, ::EnergyModel)
 
 Function for creating the constraint on the inlet flow of a `MultipleInputSink`.
 
 The difference to the standard constraint is that the `MultipleInputSink` allows for
-several different resources can be used interchangably and the ratio is not enforced.
+several different resources to be used interchangeably and the ratio is not enforced.
 """
 function EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, ::EnergyModel)
     # Declaration of the required subsets
@@ -172,7 +172,7 @@ function EMB.constraints_flow_in(m, n::MultipleInputSink, 𝒯::TimeStructure, :
 end
 
 """
-    EMB.constraints_flow_in(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure)
+    EMB.constraints_flow_in(m, n::AbstractMultipleInputSinkStrat, 𝒯::TimeStructure, ::EnergyModel)
 
 Function for creating the constraint on the inlet flow to a [`AbstractMultipleInputSinkStrat`](@ref).
 
@@ -185,7 +185,7 @@ As a consequence, the method includes the constraints for:
 1. the capacity utilization (replacing `constraints_capacity`),
 2. the bounds on the individual flows into the node based on the variable `input_frac_strat`,
 3. the summation limit of `input_frac_strat`, and
-4. the calculation of the total deficit in the `Sink` node.
+4. the calculation of the total surplus and deficit in the `Sink` node.
 """
 function EMB.constraints_flow_in(
     m,

@@ -31,11 +31,6 @@ Creates the following additional variables for **ALL** [`StratPeriodDemandSink`]
   demand in each strategic period `t_inv`.
 - `demand_sink_strat_deficit[n, t_inv]` is a non-negative variable indicating a deficit in
   demand in each strategic period `t_inv`.
-
-!!! note "Definition of period"
-    The period in the description above does not correspond to an operational period as known
-    from `TimeStruct`. Instead, it is a period in which the demand must be satisfied. A period
-    can consist of multiple operational periods.
 """
 function EMB.variables_element(
     m,
@@ -98,7 +93,7 @@ Creates the following additional variables for **ALL** [`LoadShiftingNode`](@ref
   time period `t`.
 - `load_shift_to[n, t]` is an integer variable for how many batches are shifted to the time
   period `t`.
-- `:load_shifted[n ,t]` is a continous variable for the total capacity load shifted in
+- `load_shifted[n, t]` is a continuous variable for the total capacity load shifted in
   time period `t`. The variable can also be negative indicating a load shifted from this
   time period.
 

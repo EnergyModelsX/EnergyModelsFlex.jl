@@ -1,7 +1,6 @@
 """
     constraints_capacity(m, n::MinUpDownTimeNode, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-
 Add capacity constraints to the optimization model `m` for a node `n` with
 minimum up/down time requirements over the time structure `𝒯`. The constraints
 ensure that the node's capacity usage respects its operational limits and
@@ -28,9 +27,9 @@ function EMB.constraints_capacity(
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
 
     for t_inv ∈ 𝒯ᴵⁿᵛ
-        ops = collect(t_inv) #array of al operational periodes
+        ops = collect(t_inv) # array of all operational periods
 
-        N_h = n.min_time_down #min down time in the tinme unit used in the case
+        N_h = n.min_time_down # min down time in the time unit used in the case
         M_h = n.min_time_up
         durations = [duration(t) for t ∈ t_inv]
 
@@ -56,7 +55,7 @@ function EMB.constraints_capacity(
 
         min_cap = n.load_min
         max_cap = n.load_max
-        for (i, t) ∈ enumerate(t_inv) # i from 1 to number of operational periodes
+        for (i, t) ∈ enumerate(t_inv) # i from 1 to number of operational periods
             M = Int(M_arr[i])
             N = Int(N_arr[i])
 
@@ -211,8 +210,8 @@ end
 
 Function for creating the constraint on the inlet flow to a `Combustion` node. The input
 resources are limited by the `limit` field in the node `n` as for the `LimitedFlexibleInput` node,
-but additionally, it is balance requirement for the input and output flows controlled by the
-`heat_resource` field in the node `n`. If `outputs(n, p_heat)` == 1, then there is flow balance.
+but additionally, there is a balance requirement for the input and output flows controlled by
+the `heat_res` field in the node `n`. If `outputs(n, p_heat) == 1`, then there is flow balance.
 """
 function EMB.constraints_flow_in(
     m,

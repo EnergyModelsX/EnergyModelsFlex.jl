@@ -1,5 +1,5 @@
 """
-    check_node(n::PeriodDemandSink, 𝒯, ::EnergyModel)
+    EMB.check_node(n::PeriodDemandSink, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
 
 This method checks that a [`PeriodDemandSink`](@ref) node is valid.
 
@@ -11,7 +11,8 @@ This method checks that a [`PeriodDemandSink`](@ref) node is valid.
   indexable by a `PeriodPartition`.
 - The sum of the values `:deficit` and `:surplus` in the dictionary `penalty` has to be
   non-negative to avoid an infeasible model.
-- The individual periods must all satisfy the specified duration(s).
+- The field `period_duration` is required to be indexable by a `PeriodPartition` and the
+  individual periods must all satisfy the specified duration(s).
 - The field `period_demand` is required to be non-negative and indexable by a
   `PeriodPartition`.
 """
@@ -78,7 +79,7 @@ function EMB.check_node(
     end
 end
 """
-    check_node(n::StratPeriodDemandSink, 𝒯, ::EnergyModel)
+    EMB.check_node(n::StratPeriodDemandSink, 𝒯, modeltype::EnergyModel, check_timeprofiles::Bool)
 
 This method checks that a [`StratPeriodDemandSink`](@ref) node is valid.
 
@@ -90,9 +91,9 @@ This method checks that a [`StratPeriodDemandSink`](@ref) node is valid.
   indexable by a `StrategicPeriod`.
 - The sum of the values `:deficit` and `:surplus` in the dictionary `penalty` has to be
   non-negative to avoid an infeasible model.
-- The strategic demand must be positive and indexable by a strategic period.
-- The maximum capacity per operational period must be sufficient to satisfy the annual demand
-  A warning is printed if this is not the case.
+- The strategic demand must be non-negative and indexable by a strategic period.
+- The maximum capacity per operational period must be sufficient to satisfy the strategic
+  demand. A warning is printed if this is not the case.
 - The individual periods must all satisfy the specified duration(s).
 - The field `period_min` is required to be in the range [0, 1], indexable by a
   `PeriodPartition`. The sum within a strategic period should be smaller than or equal to 1
@@ -165,7 +166,7 @@ function EMB.check_node(
 
     @assert_or_log(
         all(sum(duration(t) for t ∈ t_pd) ≥ per_dur[t_pd] for t_pd ∈ 𝒯ᵖᵈ),
-        "The duration of the last period on the `SimpleTimes` level is shorther than " *
+        "The duration of the last period on the `SimpleTimes` level is shorter than " *
         "specified. This is caused by inconsistently specified `period_duration` and " *
         "time structure."
     )
@@ -217,7 +218,7 @@ function EMB.check_node(
             @warn(
                 "The minimum demand through the field `period_min` is larger than the " *
                 "maximum demand through the field `period_max` in at least one demand " *
-                "period resulting in a guranteed penalty",
+                "period resulting in a guaranteed penalty",
                 maxlog=1
             )
         end
@@ -232,14 +233,17 @@ This method checks that the `LoadShiftingNode` node is valid.
 ## Checks
  - The field `cap` is required to be non-negative.
  - The values of the dictionary `input` are required to be positive.
- - The values of load_shift_times are required to be larger than 0.
- - The values of load_shift_times are required to be less than the length of 𝒯.
+ - The values of load_shift_times are required to be not larger than the length of 𝒯.
  - The values of load_shift_magnitude are required to be non-negative.
  - The values of load_shift_duration are required to be positive.
  - The values of load_shifts_per_period are required to be non-negative.
 """
 function EMB.check_node(n::LoadShiftingNode, 𝒯, ::EnergyModel, check_timeprofiles::Bool)
     𝒯ᴵⁿᵛ = strategic_periods(𝒯)
+
+    # TODO: Add a check that all values of `load_shift_times` are positive and that
+    # `load_shift_times .+ load_shift_duration - 1` does not exceed `length(𝒯)`, as the
+    # constraints index `collect(𝒯)` directly.
 
     @assert_or_log(
         all(EMB.capacity(n, t) ≥ 0 for t ∈ 𝒯),

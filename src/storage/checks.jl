@@ -14,9 +14,7 @@ checks introduced in the function [`check_node_default`](@extref EnergyModelsBas
   to be non-negative if the chosen composite type has the field `capacity`.
 - The `TimeProfile` of the field `capacity` in the type in the field `level` is required
   to be non-negative.
-- The `TimeProfile` of the field `capacity` in the type in the field `discharge` is required
-  to be non-negative if the chosen composite type has the field `capacity`.
-- The `TimeProfile` of the field `fixed_opex` is required to be non-negative and
+- The `TimeProfile` of the field `opex_fixed` is required to be non-negative and
   accessible through a `StrategicPeriod` as outlined in the function
   [`check_fixed_opex(n, 𝒯ᴵⁿᵛ, check_timeprofiles)`](@extref EnergyModelsBase.check_fixed_opex)
   for the chosen composite type.

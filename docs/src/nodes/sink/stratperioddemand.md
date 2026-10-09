@@ -5,7 +5,7 @@ A *demand period* is a consecutive range of operational periods, that together w
 
 !!! warning "TimeStructure for node"
     This node requires considerations of the operational time structure and the chosen demand period duration.
-    Irregular durations may cause misalignment of shifted loads, especially if the field `period_duration` does not align with the chosen [`SimpleTimes`](@extref TimeStruct.SimpleTimes) structure representing the operational periods.
+    Irregular durations may cause misalignment of the demand periods, especially if the field `period_duration` does not align with the chosen [`SimpleTimes`](@extref TimeStruct.SimpleTimes) structure representing the operational periods.
 
 !!! warning "`StratPeriodDemandSink` and `EnergyModelsGUI`"
     Some of the fields of this node cannot be represented in `EnergyModelsGUI`.
@@ -67,7 +67,7 @@ The standard fields are given as:
   The fraction of annual demand that must be at least or can be at most satisfied within a demand period.
   The length of this time profile should match the number of demand periods (*e.g.*, days) in the time structure.\
   They cannot be specified as `OperationalProfile`.
-  A warning is printed if either the sum of `period_min` is larger than 1 (guaranteeing a surplus penalty introduction) or if the sum of `period_max` is smaller than 1 (guaranteeing a deficit penalty introduction)
+  A warning is printed if either the sum of `period_min` is larger than 1 (guaranteeing a deficit penalty introduction) or if the sum of `period_max` is smaller than 1 (guaranteeing a surplus penalty introduction).
 
 !!! tip "Profiles for `period_min` and `period_max`"
     It is best to utilize the [`PartitionProfile`](@extref TimeStruct.PartitionProfile) type if the fractions are varying in the individual demand periods.
@@ -77,7 +77,7 @@ The standard fields are given as:
     Ensure that the `period_min` and `period_max` time profiles length aligns with the periods specified by `period_duration`.
     Mismatches can lead to indexing errors or inconsistent demand enforcement.
 
-These fields are at the 3ʳᵈ and 4ᵗʰ position below the field `cap` as shown in [`StratPeriodDemandSink`](@ref).
+These fields are at the 3ʳᵈ to 6ᵗʰ position below the field `cap` as shown in [`StratPeriodDemandSink`](@ref).
 
 ## [Mathematical description](@id nodes-stratperioddemandsink-math)
 
@@ -90,7 +90,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-stratperioddemandsink-math-var)
 
@@ -129,7 +129,7 @@ In addition, all constraints are valid ``\forall t \in T`` (that is in all opera
 
 #### [Standard constraints](@id nodes-stratperioddemandsink-math-con-stand)
 
-[`StratPeriodDemandSink`](@ref) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase nodes-sink) node as described in the *[documentaiton of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
+[`StratPeriodDemandSink`](@ref) utilize in general the standard constraints that are implemented for a [`Sink`](@extref EnergyModelsBase nodes-sink) node as described in the *[documentation of `EnergyModelsBase`](@extref EnergyModelsBase nodes-sink-math-con)*.
 These standard constraints are:
 
 - `constraints_capacity_installed`:
@@ -151,8 +151,8 @@ These standard constraints are:
   ```
 
   !!! tip "Multiple inputs"
-      The constrained above allows for the utilization of multiple inputs with varying ratios.
-      it is however necessary to deliver the fixed ratio of all inputs.
+      The constraint above allows for the utilization of multiple inputs with varying ratios.
+      It is however necessary to deliver the fixed ratio of all inputs.
 
 - `constraints_opex_fixed`:\
   The current implementation fixes the fixed operating expenses of a sink to 0.
@@ -161,7 +161,7 @@ These standard constraints are:
   \texttt{opex\_fixed}[n, t_{inv}] = 0
   ```
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified additional data, see above.
 
 The function `constraints_capacity` is extended with a new method to account for the calculation of the period demand deficit and surplus.

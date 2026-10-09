@@ -1,10 +1,10 @@
 """
 EnergyModelsFlex is a Julia package that extends the
 [`EnergyModelsX`](https://github.com/EnergyModelsX) energy system modeling
-framework with additional node types that capture different aspects of
+framework with additional node and link types that capture different aspects of
 flexibility in energy systems.
 
-This package provides a series of technology node types for `EnergyModelsX`
+This package provides a series of technology node types and a link type for `EnergyModelsX`
 enabling energy and process flexibility modeling.
 """
 module EnergyModelsFlex

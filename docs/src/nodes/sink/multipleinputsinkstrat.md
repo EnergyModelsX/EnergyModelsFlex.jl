@@ -67,7 +67,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-mul_in_sink_strat-math-var)
 
@@ -139,7 +139,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified additional data, see above.
 
 The function `constraints_capacity` is extended with a new method as we moved the capacity constraint to the function `constraints_flow_in` as outlined below.
@@ -153,12 +153,12 @@ The inlet overall flow balance is given by
 \texttt{cap\_use}[n, t]
 ```
 
-The inlet flow is linked to the binary choice and the capacity through the following function:
+The inlet flow is linked to the input fraction and the capacity through the following constraint:
 
 ```math
 \begin{aligned}
 \frac{\texttt{flow\_in}[n, t, p]}{inputs(n, p)} + & \texttt{sink\_deficit\_p}[n, t, p] = \\
-& capacity(n, {t_{inv}}) \times \texttt{input\_frac\_strat}[n, t_{inv}, p] + \texttt{sink\_surplus\_p}[n, t, p]
+& capacity(n, t) \times \texttt{input\_frac\_strat}[n, t_{inv}, p] + \texttt{sink\_surplus\_p}[n, t, p]
 \end{aligned}
 ```
 

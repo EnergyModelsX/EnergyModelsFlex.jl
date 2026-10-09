@@ -56,9 +56,9 @@ The standard fields are given as:
 [`MinUpDownTimeNode`](@ref) nodes add four additional fields compared to a [`NetworkNode`](@extref EnergyModelsBase nodes-network_node):
 
 - **`min_time_up::Real`**:\
-  Minimum number of operational periods the unit must remain on after being started.
+  Minimum duration the unit must remain on after being started, given in the time unit of the operational periods.
 - **`min_time_down::Real`**:\
-  Minimum number of operational periods the unit must remain off after being stopped.
+  Minimum duration the unit must remain off after being stopped, given in the time unit of the operational periods.
 - **`load_min::Real`**:\
   Minimum power output when the unit is on. The value must be larger than zero.
 - **`load_max::Real`**:\
@@ -149,7 +149,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified data of the nodes, see above.
 
 The function `constraints_capacity` receives a new method to handle the minimum up and down time constraints:

@@ -22,7 +22,7 @@ In addition, they only allow the transport of a single, specified [`Resource`](@
        # time structure
        ts = SimpleTimes(10, 2)
 
-       # old behavior, corresponding to 2 periods
+       # old behavior, corresponding to price periods of 2 operational periods
        cap_period_duration = 2
 
        # new behavior, corresponding to periods whose duration sums to at least 4
@@ -34,12 +34,12 @@ In addition, they only allow the transport of a single, specified [`Resource`](@
 
        ```julia
        # time structure
-       ts = Twolevel(2, 1, SimpleTimes(10, 2); op_per_strat=8760.0)
+       ts = TwoLevel(2, 1, SimpleTimes(10, 2); op_per_strat=8760.0)
 
-       # old behavior, corresponding to 5 periods a 1752 duration based on `op_per_strat`
+       # old behavior, corresponding to 5 price periods of duration 1752 based on `op_per_strat`
        cap_period_duration = [1752, 1752, 1752, 1752, 1752]
 
-       # new behavior, corresponding to 5 periods a 4 duration based on `SimpleTimes`
+       # new behavior, corresponding to 5 price periods of duration 4 based on `SimpleTimes`
        cap_period_duration = [4, 4, 4, 4, 4]
        ```
 
@@ -63,7 +63,7 @@ Hence, it utilizes the same functions declared in `EnergyModelsBase`.
   If not specified, a `Linear` link is assumed.
   !!! note "Different formulations"
       The current implementation of links does not provide another formulation.
-      Our aim is in a later stage to allow the user to switch fast through different formulations to increase or decrese the complexity of the model.
+      Our aim is in a later stage to allow the user to switch fast through different formulations to increase or decrease the complexity of the model.
 
 ### [Additional fields](@id links-CapacityCostLink-fields-new)
 
@@ -134,7 +134,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id links-CapacityCostLink-math-var)
 
@@ -173,7 +173,7 @@ and the no-loss constraint
 
 All additional constraints are created within a new method for the function [`create_link`](@extref EnergyModelsBase.create_link).
 
-The capacity utilization constraint tracks the maximum usage within each sub-period ``t_{sub}``:
+The capacity utilization constraint tracks the maximum usage within each sub-period ``t_{pd}``:
 
 ```math
 \texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{ccl\_cap\_use\_max}[l, t_{pd}]
@@ -200,5 +200,5 @@ Finally, costs are aggregated to each strategic period:
 In addition, the energy flow of the constrained resource should not exceed the maximum capacity, which is included through the following constraint:
 
 ```math
-\texttt{flow\_in}[l, t, cap\_resource(l)] \leq \texttt{link\_cap\_inst}[l, t]
+\texttt{link\_in}[l, t, cap\_resource(l)] \leq \texttt{link\_cap\_inst}[l, t]
 ```

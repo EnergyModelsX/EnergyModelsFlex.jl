@@ -58,7 +58,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-loadshiftingnode-math-var)
 
@@ -93,7 +93,7 @@ In addition, all constraints are valid ``\forall t \in T`` (that is in all opera
 #### [Standard constraints](@id nodes-loadshiftingnode-math-con-stand)
 
 Load shifting nodes nodes utilize in general the standard constraints described on *[Constraint functions](@extref EnergyModelsBase man-con)*.
-In fact, they use the same `create_node` function as a [`RefSource`](@extref EnergyModelsBase.RefSource) node.
+In fact, they use the same `create_node` function as a [`RefSink`](@extref EnergyModelsBase.RefSink) node.
 These standard constraints are:
 
 - `constraints_flow_in`:
@@ -105,7 +105,7 @@ These standard constraints are:
   ```
 
   !!! tip "Multiple inputs"
-      The constrained above allows for the utilization of multiple inputs with varying ratios.
+      The constraint above allows for the utilization of multiple inputs with varying ratios.
       It is however necessary to deliver the fixed ratio of all inputs.
 
 - `constraints_opex_fixed`:\
@@ -130,7 +130,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified additional data, see above.
 
 The function `constraints_capacity` receives a new method to handle the load shifting constraints:

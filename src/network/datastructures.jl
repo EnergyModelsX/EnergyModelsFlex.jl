@@ -10,14 +10,14 @@ abstract type UnitCommitmentNode{} <: EMB.NetworkNode end
 
 `MinUpDownTimeNode` is a specialized [`NetworkNode`](@extref EnergyModelsBase
 nodes-network_node) type that introduces unit commitment logic including minimum
-up and down time constraints.  It is useful for modeling dispatchable power
+up and down time constraints. It is useful for modeling dispatchable power
 plants or technologies where operation must adhere to minimum runtime
 constraints.
 
 # Fields
 - **`id`**: Identifier or name for the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.
@@ -25,10 +25,10 @@ constraints.
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`min_time_up::Real`** is the minimum number of operational periods the unit must remain on
-  after being started.
-- **`min_time_down::Real`** is the minimum number of operational periods the unit must remain
-  off after being stopped.
+- **`min_time_up::Real`** is the minimum duration the unit must remain on after being
+  started, given in the time unit of the operational periods.
+- **`min_time_down::Real`** is the minimum duration the unit must remain off after being
+  stopped, given in the time unit of the operational periods.
 - **`load_min::Real`** is the minimum capacity output when the unit is on.
 - **`load_max::Real`** is the maximum capacity output when the unit is on
   (usually aligned with `cap`).
@@ -42,8 +42,8 @@ struct MinUpDownTimeNode <: UnitCommitmentNode
     opex_fixed::TimeProfile
     input::Dict{Resource,Real}
     output::Dict{Resource,Real}
-    min_time_up::Real #number of operational periodes
-    min_time_down::Real  #number of operational periodes
+    min_time_up::Real
+    min_time_down::Real
     load_min::Real
     load_max::Real
     data::Vector{<:ExtensionData}
@@ -86,7 +86,7 @@ extra input when switching on, such as combustion turbines or thermal boilers.
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.
@@ -94,8 +94,8 @@ extra input when switching on, such as combustion turbines or thermal boilers.
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`activation_time::Real`**: Duration of activation effect (currently used to inform
-  activation logic in customized formulations).
+- **`activation_time::Real`** is the duration of the activation effect. The field is
+  currently not utilized in the constraints.
 - **`activation_consumption::Dict{<:Resource,<:Real}`** are the additional input resources
   required when the unit switches on with their absolute demand.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
@@ -163,12 +163,12 @@ introduces a `limit` on the fraction a given resource can contribute to the tota
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.
 - **`limit::Dict{<:Resource, <:Real}`** are the limits for each
-  [`Resource`](@extref EnergyModelsBase.Resource)s of the total input.
+  [`Resource`](@extref EnergyModelsBase.Resource) relative to the total input.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
 - **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
@@ -210,12 +210,12 @@ in the sense that the output `heat_res` captures the lost energy.
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.
 - **`limit::Dict{<:Resource, <:Real}`** are the limits for each
-  [`Resource`](@extref EnergyModelsBase.Resource)s of the total input.
+  [`Resource`](@extref EnergyModelsBase.Resource) relative to the total input.
 - **`heat_res::Resource`** the residual heat resource.
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
@@ -281,7 +281,7 @@ by the sum of these.
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.

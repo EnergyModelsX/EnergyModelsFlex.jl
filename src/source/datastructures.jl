@@ -1,17 +1,17 @@
 """
     struct PayAsProducedPPA <: AbstractNonDisRES
 
-A pay-as-produced ppa energy source. It extends the existing `AbstractNonDisRES` node through
+A pay-as-produced PPA energy source. It extends the existing `AbstractNonDisRES` node through
 including a constraint on the opex_var such that curtailed energy is also included in the opex.
 
 # Fields
-- **`id`** is the name/identifyer of the node.
+- **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
 - **`profile::TimeProfile`** is the power production in each operational period as a ratio
   of the installed capacity at that time.
 - **`opex_var::TimeProfile`** is the variable operating expense per energy unit produced.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense.
-- **`output::Dict{Resource, Real}`** are the generated `Resource`s, normally Power.
+- **`output::Dict{<:Resource,<:Real}`** are the generated `Resource`s, normally Power.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The field `data`
   is conditional through usage of a constructor.
 """
@@ -41,13 +41,13 @@ end
 An inflexible [`Source`](@extref EnergyModelsBase.Source) node with fixed capacity.
 The inflexible [`Source`](@extref EnergyModelsBase.Source) node represents a source with a
 fixed capacity usage.
-Note, that if you include investments, you can only use `cap` as `TimeProfile` a
-`FixedProfile` or `StrategicProfile`.
+Note that if you include investments, you can only use a `FixedProfile` or
+`StrategicProfile` as `TimeProfile` for `cap`.
 
 # Fields
 - **`id`** is the name/identifier of the node.
 - **`cap::TimeProfile`** is the installed capacity.
-- **`opex_var::TimeProfile`** is the variable operating expense per per capacity usage
+- **`opex_var::TimeProfile`** is the variable operating expense per capacity usage
   through the variable `:cap_use`.
 - **`opex_fixed::TimeProfile`** is the fixed operating expense per installed capacity
   through the variable `:cap_inst`.

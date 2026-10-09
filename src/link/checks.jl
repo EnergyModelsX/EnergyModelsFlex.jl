@@ -1,13 +1,14 @@
 """
-    EMB.check_link(l::CapacityCostLink, 𝒯,  ::EnergyModel, ::Bool)
+    EMB.check_link(l::CapacityCostLink, 𝒯, ::EnergyModel, ::Bool)
 
 This method checks that the *[`CapacityCostLink`](@ref)* link is valid.
 
 ## Checks
 - The field `cap` is required to be non-negative.
 - The field `cap_price` is required to be non-negative.
-- The individual `period_duration`s must all satisfy the specified duration(s) and be
-  positive.
+- The field `cap_period_duration` is required to be indexable by a `PeriodPartition` and
+  positive in each price period.
+- The individual price periods must all satisfy the specified duration(s).
 """
 function EMB.check_link(l::CapacityCostLink, 𝒯, ::EnergyModel, ::Bool)
     𝒯ᵖᵈ = periods(l, 𝒯)

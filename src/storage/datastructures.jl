@@ -1,7 +1,7 @@
 """
-    ElectricBattery <: EMB.Storage
+    ElectricBattery{T} <: EMB.Storage{T}
 
-Electric battery node
+Electric battery node. The node is deprecated and will be removed in v0.5.0.
 - c_rate:
 - coloumbic_eff:
 """
@@ -9,8 +9,8 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
     id::Any
     charge::EMB.AbstractStorageParameters
     level::EMB.UnionCapacity
-    c_rate::Real #
-    coloumbic_eff::Real  # efficiency, typically 0.98
+    c_rate::Real
+    coloumbic_eff::Real
     stor_res::Resource
     input::Dict{<:Resource,<:Real}
     output::Dict{<:Resource,<:Real}
@@ -20,8 +20,8 @@ struct ElectricBattery{T<:EMB.StorageBehavior} <: EMB.Storage{T}
         id,
         charge::EMB.AbstractStorageParameters,
         level::EMB.UnionCapacity,
-        c_rate::Real, #
-        coloumbic_eff::Real, # efficiency, typically 0.98
+        c_rate::Real,
+        coloumbic_eff::Real,
         stor_res::Resource,
         input::Dict{<:Resource,<:Real},
         output::Dict{<:Resource,<:Real},
@@ -35,8 +35,8 @@ function ElectricBattery{T}(
     id,
     charge::EMB.AbstractStorageParameters,
     level::EMB.UnionCapacity,
-    c_rate::Real, #
-    coloumbic_eff::Real, # efficiency, typically 0.98
+    c_rate::Real,
+    coloumbic_eff::Real,
     stor_res::Resource,
     input::Dict{<:Resource,<:Real},
     output::Dict{<:Resource,<:Real},
@@ -61,10 +61,10 @@ A StorageEfficiency node which enables storage efficiency control compared to Re
 
 It is designed as a parametric type through the type parameter `T` to differentiate between
 different cyclic behaviours. Note that the parameter `T` is only used for dispatching, but
-does not carry any other information. Hence, it is simple to fast switch between different
+does not carry any other information. Hence, it is simple to quickly switch between different
 [`StorageBehavior`](@extref EnergyModelsBase.StorageBehavior)s.
 
-The current implemented cyclic behaviours are [`CyclicRepresentative`](@extref
+The currently implemented cyclic behaviours are [`CyclicRepresentative`](@extref
 EnergyModelsBase.CyclicRepresentative) and [`CyclicStrategic`](@extref
 EnergyModelsBase.CyclicStrategic).
 
@@ -79,8 +79,9 @@ EnergyModelsBase.CyclicStrategic).
 - **`stor_res::Resource`** is the stored [`Resource`](@extref EnergyModelsBase.Resource).
 - **`input::Dict{<:Resource,<:Real}`** are the input [`Resource`](@extref EnergyModelsBase.Resource)s
   with conversion value `Real`.
-- **`output::Dict{<:Resource,<:Real}`** are the generated [`Resource`](@extref EnergyModelsBase.Resource)s
-  with conversion value `Real`.
+- **`output::Dict{<:Resource,<:Real}`** is the generated [`Resource`](@extref EnergyModelsBase.Resource)
+  with conversion value `Real`. It can only include the stored [`Resource`](@extref EnergyModelsBase.Resource)
+  `stor_res`.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments).
   The field `data` is conditional through usage of a constructor.
 """

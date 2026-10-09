@@ -2,7 +2,7 @@
     constraints_level_aux(m, n::ElectricBattery, 𝒯, 𝒫, ::EnergyModel)
 
 Add auxiliary level constraints to the optimization model `m` for a node `n`
-representing an electric battery over the time structure `𝒯` and subset `𝒫`.
+representing an electric battery over the time structure `𝒯` and resources `𝒫`.
 The constraints ensure that the change in storage level is correctly accounted
 for in each operational period.
 
@@ -10,7 +10,7 @@ for in each operational period.
 - `m`: The optimization model.
 - `n`: The node representing an electric battery.
 - `𝒯`: The time structure.
-- `𝒫`: The subset of periods.
+- `𝒫`: The resources.
 - `modeltype`: The type of energy model.
 
 # Constraints

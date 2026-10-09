@@ -2,8 +2,7 @@
     struct CapacityCostLink <: Link
 
 A link between two nodes with costs on the maximum link usage for the resource `cap_resource`
-within specified price periods. All other resources have no costs associated with their usage
-(as they follow the [`Direct`](@extref EnergyModelsBase.Direct) approach).
+within specified price periods. The link only transports the resource `cap_resource`.
 
 # Fields
 - **`id`** is the name/identifier of the link.
@@ -16,7 +15,7 @@ within specified price periods. All other resources have no costs associated wit
   number (the same duration in all price periods), as a vector (varying duration of each
   price period), or as a time profile (*e.g.*, varying period durations due to varying
   operational time structures). It cannot be specified as `OperationalProfile`.
-- **`cap_resource::Resource`** is the resource used by `CapacityCostLink`
+- **`cap_resource::Resource`** is the resource transported by the `CapacityCostLink`.
 - **`formulation::Formulation`** is the used formulation of links. The field `formulation`
   is conditional through usage of a constructor.
 - **`data::Vector{<:ExtensionData}`** is the additional data (*e.g.*, for investments). The
@@ -25,7 +24,7 @@ within specified price periods. All other resources have no costs associated wit
 !!! note "Changed behavior"
     The field `cap_price_periods` was replaced with the field `cap_period_duration` with a
     change in meaning. This is explained in the
-    *[documentation](https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/03/CapacityCostLink)*.
+    *[documentation](https://energymodelsx.github.io/EnergyModelsFlex.jl/stable/how-to/update-models/#how_to-update-03-CapacityCostLink)*.
 """
 struct CapacityCostLink <: EMB.Link
     id::Any
@@ -177,7 +176,7 @@ EMB.outputs(l::CapacityCostLink) = [cap_resource(l)]
     cap_price(l::CapacityCostLink)
     cap_price(l::CapacityCostLink, t::TS.TimePeriod)
 
-Returns the price per unit of maximum capacity usage of of `CapacityCostLink` `l` as
+Returns the price per unit of maximum capacity usage of `CapacityCostLink` `l` as
 `TimeProfile` or in time period `t`.
 """
 cap_price(l::CapacityCostLink) = l.cap_price
@@ -187,7 +186,7 @@ cap_price(l::CapacityCostLink, t::TS.TimePeriod) = l.cap_price[t]
     period_duration(l::CapacityCostLink)
     period_duration(l::CapacityCostLink, t_pd::TS.PeriodPartition)
 
-Returns the prices periods of `CapacityCostLink` `l` as `TimeProfile` or in price
+Returns the price period duration of `CapacityCostLink` `l` as `TimeProfile` or in price
 period `t_pd`.
 """
 period_duration(l::CapacityCostLink) = l.cap_period_duration

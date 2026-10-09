@@ -1,7 +1,7 @@
 """
     EMB.variables_element(m, ℒˢᵘᵇ::Vector{<:CapacityCostLink}, 𝒯, modeltype::EnergyModel)
 
-Creates the following additional variable for **ALL** capacity cost links:
+Creates the following additional variables for **ALL** capacity cost links:
 - `ccl_cap_use_max[l, t_pd]` is a continuous variable describing the maximum capacity
   usage of [`CapacityCostLink`](@ref) `l` in cost period `t_pd`.
 - `ccl_cap_use_cost[l, t_pd]` is a continuous variable describing the cost

@@ -17,7 +17,7 @@ end
 """
     constraints_capacity(m, n::InflexibleSource, 𝒯::TimeStructure, modeltype::EnergyModel)
 
-Function for fixing the capacity of a `InflexibleSource` to the installed capacity.
+Function for fixing the capacity usage of an `InflexibleSource` to the installed capacity.
 """
 function EMB.constraints_capacity(
     m,

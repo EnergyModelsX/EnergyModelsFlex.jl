@@ -4,7 +4,7 @@ Contributing to `EnergyModelsFlex` can be achieved in several different ways.
 
 ## [File a bug report](@id how_to-con-bug_rep)
 
-An approach to contributing to `EnergyModelsFlex` is through filing a bug report as an *[issue](https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl/-/issues/new)* when unexpected behaviour is occuring.
+An approach to contributing to `EnergyModelsFlex` is through filing a bug report as an *[issue](https://github.com/EnergyModelsX/EnergyModelsFlex.jl/issues/new)* when unexpected behaviour is occurring.
 
 When filing a bug report, please follow the following guidelines:
 
@@ -27,7 +27,7 @@ Feature requests for `EnergyModelsFlex` should follow the guidelines developed f
 
 !!! tip "Development of new types and functionality"
     In general, new types or functionality are best tested by implementing them in a package in which they are required.
-    In this case, if you believe that these new types or functionality may be relevant for several other packages, we ask you to create an *[issue](https://gitlab.sintef.no/clean_export/EnergyModelsFlex.jl/-/issues/new)* with
+    In this case, if you believe that these new types or functionality may be relevant for several other packages, we ask you to create an *[issue](https://github.com/EnergyModelsX/EnergyModelsFlex.jl/issues/new)* with
 
     1. a link to the implementation,
     2. a description of its benefits, and

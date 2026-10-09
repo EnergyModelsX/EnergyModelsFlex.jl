@@ -66,7 +66,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-FlexibleOutput-math-var)
 
@@ -82,7 +82,7 @@ The [`FlexibleOutput`](@ref) node uses the standard `NetworkNode` optimization v
 ### [Constraints](@id nodes-FlexibleOutput-math-con)
 
 The following sections omit the direct inclusion of the vector of flexible output nodes.
-Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ ^{FlexibleOutput}`` for all [`FlexibleOutput`](@ref) types if not stated differently.
+Instead, it is implicitly assumed that the constraints are valid ``\forall n ∈ N`` for all [`FlexibleOutput`](@ref) types if not stated differently.
 In addition, all constraints are valid ``\forall t \in T`` (that is in all operational periods) or ``\forall t_{inv} \in T^{Inv}`` (that is in all strategic periods).
 
 #### [Standard constraints](@id nodes-FlexibleOutput-math-con-stand)
@@ -142,7 +142,7 @@ The following standard constraints apply:
 
 The function `constraints_flow_out` is extended with a new method for flexible output nodes such that the outputs are flexible within their sum being the capacity usage of the node.
 
-Let ``\mathcal{P}^{out}(n)`` denote the set of output resources of node ``n`` excluding CO₂, obtained through the function [`soutputs`](@extref EnergyModelsBase.outputs).
+Let ``\mathcal{P}^{out}(n)`` denote the set of output resources of node ``n`` excluding CO₂, obtained through the function [`outputs`](@extref EnergyModelsBase.outputs).
 The implemented constraint is then given by
 
 ```math

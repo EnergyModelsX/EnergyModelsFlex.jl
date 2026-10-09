@@ -55,7 +55,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-payasproducedppa-math-var)
 
@@ -73,7 +73,7 @@ The variables include:
 !!! note
     Non-dispatchable renewable energy source nodes are not compatible with `CaptureData`.
     Hence, you can only provide [`EmissionsProcess`](@extref EnergyModelsBase.EmissionsProcess) to the node.
-    It is our aim to include the potential for construction emissions in a latter stage
+    It is our aim to include the potential for construction emissions in a later stage
 
 ### [Constraints](@id nodes-payasproducedppa-math-con)
 
@@ -128,7 +128,7 @@ These standard constraints are:
       The variables ``\texttt{cap\_inst}`` are declared over all operational periods (see the section on *[Capacity variables](@extref EnergyModelsBase man-opt_var-cap)* for further explanations).
       Hence, we use the function ``first(t_{inv})`` to retrieve the installed capacities in the first operational period of a given strategic period ``t_{inv}`` in the function `constraints_opex_fixed`.
 
-- `constraints_data`:
+- `constraints_ext_data`:
   This function is only called for specified data of the pay-as-produced PPA energy source, see above.
 
 The function `constraints_opex_var` is extended with a new method to include the variable operating expenses also for the variable ``\texttt{curtailment}``:

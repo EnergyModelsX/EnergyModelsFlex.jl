@@ -42,7 +42,7 @@ with square brackets, while functions are represented as
 
 ``func\_example(index_1, index_2)``
 
-with parantheses.
+with parentheses.
 
 ### [Variables](@id nodes-mul_in_sink-math-var)
 
@@ -111,13 +111,13 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified additional data, see above.
 
 The function `constraints_flow_in` receives a new method to account for that the individual resources can be used interchangeably adjusted by their specific conversion factor:
 
 ```math
-\sum_{p \in P} \frac{\texttt{inflow}[n,t,p]}{inputs(n,p)}=\texttt{cap\_use}[n,t]
+\sum_{p \in P} \frac{\texttt{flow\_in}[n,t,p]}{inputs(n,p)}=\texttt{cap\_use}[n,t]
 ```
 
 The total effective input from all resources (accounting for their conversion factors) must equal the capacity used to meet demand.

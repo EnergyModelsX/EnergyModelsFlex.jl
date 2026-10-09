@@ -19,7 +19,7 @@ The fields of a [`StorageEfficiency`](@ref) are:
   Depending on the chosen type, the `charge` parameters can also include variable OPEX and/or fixed OPEX.
 - **`level::EMB.UnionCapacity`**:\
   The level parameters of the `Storage` node must include a capacity.
-  Depending on the chosen type, the `charge` parameters can also include variable OPEX and/or fixed OPEX.
+  Depending on the chosen type, the `level` parameters can also include variable OPEX and/or fixed OPEX.
   !!! note "Permitted values for storage parameters in `charge` and `level`"
       If the node should contain investments through the application of [`EnergyModelsInvestments`](https://energymodelsx.github.io/EnergyModelsInvestments.jl/), it is important to note that you can only use `FixedProfile` or `StrategicProfile` for the capacity, but not `RepresentativeProfile` or `OperationalProfile`.
       Similarly, you can only use `FixedProfile` or `StrategicProfile` for the fixed OPEX, but not `RepresentativeProfile` or `OperationalProfile`.
@@ -94,7 +94,7 @@ These standard constraints are:
 
   ```math
   \begin{aligned}
-  \texttt{stor\_level\_use}[n, t] & \leq \texttt{stor\_level\_inst}[n, t] \\
+  \texttt{stor\_level}[n, t] & \leq \texttt{stor\_level\_inst}[n, t] \\
   \texttt{stor\_charge\_use}[n, t] & \leq \texttt{stor\_charge\_inst}[n, t]
   \end{aligned}
   ```
@@ -144,7 +144,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified data of the storage node, see above.
 
 !!! info "Implementation of OPEX"

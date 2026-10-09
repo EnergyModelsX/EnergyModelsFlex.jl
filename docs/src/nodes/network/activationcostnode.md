@@ -131,7 +131,7 @@ These standard constraints are:
       The function [``scale\_op\_sp(t_{inv}, t)``](@extref EnergyModelsBase.scale_op_sp) calculates the scaling factor between operational and investment periods.
       It also takes into account potential operational scenarios and their probability as well as representative periods.
 
-- `constraints_data`:\
+- `constraints_ext_data`:\
   This function is only called for specified data of the nodes, see above.
 
 The functions `constraints_capacity` is extended with  a new method to calculate the on-off switching.
@@ -142,10 +142,10 @@ The consistency across time is provided by the following constraint
 \texttt{on\_off}[n, t_{prev}] - \texttt{offswitch}[n, t] + \texttt{onswitch}[n, t]
 ```
 
-  For the first time step in each investment period, the last value of the previous period is used instead of $t_{prev}$.
+  For the first operational period of each strategic period, the last operational period of the same strategic period is used as $t_{prev}$, resulting in a cyclic constraint.
 
 ```math
-\texttt{offswitch}[n, t] + \texttt{onswitch}[n, t] \leq 0
+\texttt{offswitch}[n, t] + \texttt{onswitch}[n, t] \leq 1
 ```
 
 The operational usage of the node is limited by the variable ``\texttt{on\_off}[n, t]``

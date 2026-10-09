@@ -1,7 +1,7 @@
 # [Update your model to the latest versions](@id how_to-update)
 
 `EnergyModelsFlex` is still in a pre-release version.
-Hence, there are frequently breaking changes occuring, although we plan to keep backwards compatibility.
+Hence, there are frequently breaking changes occurring, although we plan to keep backwards compatibility.
 This document is designed to provide users with information regarding how they have to adjust their nodes to keep compatibility to the latest changes.
 
 ## [Adjustments from 0.3.0](@id how_to-update-03)
@@ -52,7 +52,7 @@ PeriodDemandSink(
     # implying a total duration of 4 for the 2 periods
     ```
 
-    THis is reflected by the renaming from `period_length` to `period_duration`.
+    This is reflected by the renaming from `period_length` to `period_duration`.
 
 ### [Changed `CapacityCostLink`](@id how_to-update-03-CapacityCostLink)
 
@@ -60,7 +60,7 @@ The introduction of `PartitionProfile` in *[`TimeStruct` v0.9.12](https://github
 
 The field `cap_price_periods` was renamed to `cap_period_duration` and its meaning was changed when moving from 0.3 to 0.4.
 The reason for this change is to make the link behavior less dependent on the operational resolution.
-The following updated must hence be performed as it is not possible to create respective constructor methods:
+The following update must hence be performed as it is not possible to create respective constructor methods:
 
 1. When specifying a number, the previous meaning of the number of operational periods was changed to the sum of the durations of the operational periods.
    The following change is hence required if you have operational durations differing from `1`:
@@ -76,7 +76,7 @@ The following updated must hence be performed as it is not possible to create re
    cap_period_duration = 4
    ```
 
-   Both cases create five price periods with a duration of `4`, but instead of specifying the number of periods periods, we now define the duration of each price period.
+   Both cases create five price periods with a duration of `4`, but instead of specifying the number of periods, we now define the duration of each price period.
 
 2. When specifying a vector, the previous scaling based on the chosen value of `op_per_strat` was removed as it is in our opinion more straightforward to base it on the actual operational time structure.
    The following change is hence required:

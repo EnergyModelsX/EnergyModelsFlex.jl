@@ -22,11 +22,12 @@ Flexibility in energy systems refers to the ability to adapt generation, consump
 
 ## Implemented flexible node types
 
-This package provides several node types that extend the EnergyModelsX interface:
+This package provides several node and link types that extend the EnergyModelsX interface:
 
 ### Source Nodes
 
 - [`PayAsProducedPPA`](@ref nodes-payasproducedppa): A source with contractual constraints typical for renewable power purchase agreements (PPA).
+- [`InflexibleSource`](@ref nodes-inflexiblesource): A source that always operates at its installed capacity.
 
 ### Sink Nodes
 
@@ -43,10 +44,15 @@ This package provides several node types that extend the EnergyModelsX interface
 - [`ActivationCostNode`](@ref nodes-activationcostnode): Includes additional input costs on startup (e.g. ignition fuel).
 - [`LimitedFlexibleInput`](@ref nodes-limitedflexibleinput): Restricts the share of individual input fuels in a multi-input conversion process.
 - [`Combustion`](@ref nodes-combustion): Enforces full energy balances including residual heat losses.
+- [`FlexibleOutput`](@ref nodes-FlexibleOutput): Distributes a single capacity flexibly across multiple output resources.
 
 ### Storage
 
-- [`StorageEfficiency`](@ref nodes-stor_eff): Allows modeling of time- and state-dependent storage efficiency losses.
+- [`StorageEfficiency`](@ref nodes-stor_eff): Adds charge and discharge efficiencies to a storage node.
+
+### Links
+
+- [`CapacityCostLink`](@ref links-CapacityCostLink): A link with costs on the maximum capacity usage within capacity price periods.
 
 ---
 
@@ -56,6 +62,7 @@ This package provides several node types that extend the EnergyModelsX interface
 Pages = [
     "manual/quick-start.md",
     "examples/flexible_demand.md",
+    "examples/capacity_cost_link.md",
     "manual/NEWS.md",
 ]
 Depth = 1
